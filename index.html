@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IELTS Listening Practice Pro</title>
     <!-- Load YouTube Iframe API -->
     <script src="https://www.youtube.com/iframe_api"></script>
+    <!-- Load SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -21,10 +23,7 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
-        html, body {
-            height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column;
-        }
-
+        html, body { height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
 
         /* --- STICKY TOP ZONE --- */
@@ -32,31 +31,37 @@
             flex-shrink: 0; background-color: var(--bg-color); padding-top: 15px; padding-bottom: 10px;
             border-bottom: 2px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); z-index: 100;
         }
-
         header h1 { text-align: center; font-size: 1.5rem; margin-bottom: 15px; }
-
         .top-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
 
         /* --- SCROLLABLE WORKSPACE --- */
-        .main-scroll-area {
-            flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 20px; padding-bottom: 200px; 
-        }
+        .main-scroll-area { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 20px; padding-bottom: 200px; }
 
         /* --- Media Player --- */
         .media-setup { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
         @media (min-width: 600px) { .media-setup { flex-direction: row; } }
         .input-group { display: flex; flex: 1; gap: 8px; }
-        
         input[type="text"], input[type="file"] { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; }
 
-        button { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+        /* Buttons Update for SVG alignment */
+        button { 
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px; 
+            background: var(--primary); color: white; border: none; padding: 8px 14px; 
+            border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; 
+        }
+        button svg { width: 16px; height: 16px; flex-shrink: 0; }
         button:hover { background: var(--primary-hover); }
-        .btn-sm { padding: 4px 8px; font-size: 12px; border-radius: 4px; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
         .btn-danger { background: transparent; border: 1px solid #ef4444; color: #ef4444; }
+        .btn-danger:hover { background: #fef2f2; }
         .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
         .btn-print { background: #4f46e5; }
+        .btn-print:hover { background: #4338ca; }
         .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
 
         .video-wrapper { position: relative; background: #000; border-radius: 8px; display: none; overflow: hidden; margin-bottom: 10px; }
         .video-wrapper.is-video { padding-bottom: 56.25%; height: 0; }
@@ -75,13 +80,15 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
         .section-header { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+        .section-header div { display: flex; gap: 6px; }
         .section-title { font-size: 1.25rem; font-weight: bold; border: none; border-bottom: 2px dashed var(--border); padding: 4px; flex: 1; background: transparent; }
         
         /* Time Mark UI */
         .time-marks-area { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; background: #f8fafc; padding: 8px; border-radius: 8px; border: 1px dashed var(--border); }
         .time-badge { background: #e0e7ff; color: var(--primary); padding: 4px 8px; border-radius: 12px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; border: 1px solid #c7d2fe; transition: 0.2s; }
         .time-badge:hover { background: #c7d2fe; }
-        .time-badge button { background: none; border: none; color: #ef4444; font-size: 14px; cursor: pointer; padding: 0; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+        .time-badge button { background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px; width: auto; height: auto; display: inline-flex; align-items: center; justify-content: center; }
+        .time-badge button svg { width: 12px; height: 12px; }
 
         .answers-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
         .answer-row { display: flex; flex-direction: column; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
@@ -104,8 +111,8 @@
 
         .correction-ui { display: none; flex-direction: column; gap: 8px; padding-left: 35px; }
         .correction-tools { display: flex; gap: 10px; align-items: center; }
-        .btn-icon { padding: 6px; border-radius: 50%; background: transparent; border: 1px solid var(--border); display: flex; align-items: center; cursor: pointer; }
-        .btn-icon svg { width: 20px; height: 20px; }
+        .btn-icon { padding: 6px; border-radius: 50%; background: transparent; border: 1px solid var(--border); display: flex; align-items: center; cursor: pointer; color: var(--text-main); }
+        .btn-icon svg { width: 18px; height: 18px; }
         .btn-icon.check:hover { background: #dcfce7; border-color: #22c55e; color: #16a34a; }
         .btn-icon.cross:hover { background: #fee2e2; border-color: #ef4444; color: #dc2626; }
 
@@ -113,20 +120,20 @@
 
         /* --- CUSTOM VIRTUAL KEYBOARD --- */
         #custom-keyboard {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: #cbd5e1; padding: 10px 5px; box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #cbd5e1; padding: 10px 5px 15px 5px; box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
             z-index: 1000; display: flex; flex-direction: column; gap: 8px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none;
         }
         #custom-keyboard.show { transform: translateY(0); }
         .kb-row { display: flex; justify-content: center; gap: 6px; }
         .kb-key {
-            background: #ffffff; border-radius: 6px; padding: 12px 10px; font-size: 1.2rem; font-weight: 500; text-align: center;
+            background: #ffffff; border-radius: 6px; padding: 12px 6px; font-size: 1.2rem; font-weight: 500; text-align: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.2); flex: 1; max-width: 45px; cursor: pointer; touch-action: manipulation; display: flex; align-items: center; justify-content: center;
         }
         .kb-key:active { background: #e2e8f0; transform: scale(0.95); }
         .kb-key.wide { max-width: 65px; font-size: 1rem; background: #94a3b8; color: white; }
         .kb-key.space { max-width: 150px; font-size: 1rem; }
         .kb-key.done { max-width: 80px; font-size: 1rem; background: var(--primary); color: white; }
-        .kb-key.proper { font-size: 1rem; background: #10b981; color: white; }
+        .kb-key.proper { max-width: 65px; font-size: 1rem; background: #10b981; color: white; }
 
         @media print {
             html, body { height: auto !important; overflow: visible !important; display: block !important; }
@@ -144,14 +151,30 @@
     <div class="container">
         <header><h1>IELTS Listening Pro</h1></header>
         <div class="top-actions">
-            <button class="btn-success" onclick="saveData(true)">💾 Simpan</button>
-            <button class="btn-warning" onclick="toggleCorrectionMode()" id="btn-correction">✅ Koreksi</button>
-            <button class="btn-print" onclick="window.print()">🖨️ Print</button>
-            <button class="btn-outline" onclick="toggleKeyboardMode()" id="btn-kb-mode">⌨️ Custom Keyboard: ON</button>
+            <button class="btn-success" onclick="saveData(true)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save
+            </button>
+            <button class="btn-warning" onclick="toggleCorrectionMode()" id="btn-correction">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Correction
+            </button>
+            <button class="btn-print" onclick="window.print()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Print
+            </button>
+            <button class="btn-outline" onclick="toggleKeyboardMode()" id="btn-kb-mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line><line x1="6" y1="12" x2="6.01" y2="12"></line><line x1="10" y1="12" x2="10.01" y2="12"></line><line x1="14" y1="12" x2="14.01" y2="12"></line><line x1="18" y1="12" x2="18.01" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+                Keyboard: ON
+            </button>
+            <button class="btn-outline" onclick="toggleSoundMode()" id="btn-sound-mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                Sound: OFF
+            </button>
         </div>
         <div class="media-setup" id="media-setup-box">
             <div class="input-group">
-                <input type="text" id="yt-link" placeholder="Link YouTube...">
+                <input type="text" id="yt-link" placeholder="YouTube Link...">
                 <button onclick="loadYouTube()">Load YT</button>
             </div>
             <div class="input-group">
@@ -160,20 +183,29 @@
             </div>
         </div>
         <div class="video-wrapper" id="video-wrapper"></div>
-        <div class="score-banner" id="score-banner">Skor: 0 / 0</div>
+        <div class="score-banner" id="score-banner">Score: 0 / 0</div>
     </div>
 </div>
 
 <div class="main-scroll-area">
     <div class="container" id="workspace-container">
         <div class="section-nav-bar">
-            <button id="btn-prev-sec" onclick="navigateSection(-1)">⬅️ Prev</button>
-            <span class="sec-indicator" id="sec-indicator">Part 1 dari 1</span>
-            <button id="btn-next-sec" onclick="navigateSection(1)">Next ➡️</button>
+            <button id="btn-prev-sec" onclick="navigateSection(-1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Prev
+            </button>
+            <span class="sec-indicator" id="sec-indicator">Part 1 of 1</span>
+            <button id="btn-next-sec" onclick="navigateSection(1)">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
         </div>
         <div id="workspace"></div>
         <div class="global-actions">
-            <button onclick="addSection()">+ Tambah Part Baru</button>
+            <button onclick="addSection()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add New Part
+            </button>
         </div>
     </div>
 </div>
@@ -182,27 +214,41 @@
 <div id="custom-keyboard"></div>
 
 <script>
+    // --- ICON SVGs CONSTANTS ---
+    const ICON_PRACTICE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+    const ICON_CORRECTION = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    const ICON_KEYBOARD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line><line x1="6" y1="12" x2="6.01" y2="12"></line><line x1="10" y1="12" x2="10.01" y2="12"></line><line x1="14" y1="12" x2="14.01" y2="12"></line><line x1="18" y1="12" x2="18.01" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>`;
+    const ICON_SOUND_ON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    const ICON_SOUND_OFF = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+    const ICON_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    const ICON_RIGHT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+    const ICON_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+    const ICON_PLUS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+    const ICON_SWITCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>`;
+    const ICON_CROSS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
     let sectionCount = 0;
     let currentSectionIndex = 0;
     let isCorrectionMode = false;
     let useCustomKB = true;
+    let soundEnabled = false;
     let activeInputTarget = null;
-    let kbShift = false, kbSymbol = false;
-    const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v4';
+    let audioCtx = null;
+    const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
 
-    // --- MEDIA PLAYER CONTROL (WITH YT API) ---
+    // --- MEDIA PLAYER CONTROL ---
     let ytPlayer = null;
     let localPlayer = null;
 
     function loadYouTube() {
         const url = document.getElementById('yt-link').value;
         const videoId = extractYouTubeID(url);
-        if (!videoId) return alert("Link YouTube tidak valid!");
+        if (!videoId) return Swal.fire({icon: 'error', title: 'Oops...', text: 'Invalid YouTube link!'});
 
         const wrapper = document.getElementById('video-wrapper');
         wrapper.style.display = 'block'; wrapper.className = 'video-wrapper is-video';
         
-        // Hancurkan player lama jika ada
         if (ytPlayer && ytPlayer.destroy) ytPlayer.destroy();
         wrapper.innerHTML = '<div id="yt-iframe-container"></div>';
         
@@ -221,7 +267,7 @@
 
     function loadLocalFile() {
         const file = document.getElementById('local-file').files[0];
-        if (!file) return alert("Pilih file video/audio!");
+        if (!file) return Swal.fire({icon: 'error', title: 'Oops...', text: 'Please select a video/audio file!'});
         
         const wrapper = document.getElementById('video-wrapper');
         wrapper.style.display = 'block';
@@ -264,16 +310,16 @@
             <div class="section-header">
                 <input type="text" class="section-title target-input" value="${title !== null ? title : `Part ${sectionCount}`}" oninput="saveData()">
                 <div>
-                    <button class="btn-outline btn-sm" onclick="toggleCollapse(this)">🔽 Hide</button>
-                    <button class="btn-danger btn-sm" onclick="removeSection(this)">🗑️</button>
+                    <button class="btn-outline btn-sm" onclick="toggleCollapse(this)">${ICON_DOWN} Hide</button>
+                    <button class="btn-danger btn-sm" onclick="removeSection(this)">${ICON_TRASH}</button>
                 </div>
             </div>
             <div class="time-marks-area">
-                <button class="btn-outline btn-sm" onclick="addTimeMark(this)">⏱️ Mark Waktu</button>
+                <button class="btn-outline btn-sm" onclick="addTimeMark(this)">${ICON_CLOCK} Time Mark</button>
                 <div class="time-container"></div>
             </div>
             <div class="answers-container"></div>
-            <button class="btn-outline" onclick="addAnswer(this)">+ Tambah Jawaban</button>
+            <button class="btn-outline" onclick="addAnswer(this)">${ICON_PLUS} Add Answer</button>
         `;
         workspace.appendChild(sectionDiv);
         applyInputProtection(); 
@@ -288,16 +334,14 @@
 
     function addTimeMark(btn, forcedTime = null) {
         const time = forcedTime !== null ? forcedTime : getCurrentMediaTime();
-        if (time === null) return alert("Mainkan video/audio terlebih dahulu untuk mencatat waktu!");
+        if (time === null) return Swal.fire({icon: 'warning', title: 'Wait!', text: 'Play video/audio first to record time!'});
         
         const container = btn.nextElementSibling;
         const badge = document.createElement('span');
         badge.className = 'time-badge';
         badge.dataset.time = time;
-        badge.innerHTML = `[ ${formatTime(time)} ] <button onclick="removeTimeMark(this, event)">x</button>`;
-        badge.onclick = (e) => {
-            if(e.target.tagName !== 'BUTTON') seekMediaTime(parseFloat(time));
-        };
+        badge.innerHTML = `[ ${formatTime(time)} ] <button onclick="removeTimeMark(this, event)">${ICON_CROSS}</button>`;
+        badge.onclick = (e) => { if(!e.target.closest('button')) seekMediaTime(parseFloat(time)); };
         container.appendChild(badge);
         if (forcedTime === null) saveData();
     }
@@ -310,16 +354,21 @@
 
     function toggleCollapse(btn) {
         const container = btn.closest('.section-card').querySelector('.answers-container');
-        if (container.style.display === 'none') { container.style.display = 'flex'; btn.innerHTML = '🔽 Hide'; } 
-        else { container.style.display = 'none'; btn.innerHTML = '▶️ Expand'; }
+        if (container.style.display === 'none') { container.style.display = 'flex'; btn.innerHTML = `${ICON_DOWN} Hide`; } 
+        else { container.style.display = 'none'; btn.innerHTML = `${ICON_RIGHT} Expand`; }
     }
 
     function removeSection(btn) {
-        if(confirm("Hapus section ini?")) {
-            btn.closest('.section-card').remove();
-            if(currentSectionIndex > 0) currentSectionIndex--;
-            updateGlobalNumbering(); updateSectionNav(); saveData();
-        }
+        Swal.fire({
+            title: 'Are you sure?', text: "Delete this section?", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                btn.closest('.section-card').remove();
+                if(currentSectionIndex > 0) currentSectionIndex--;
+                updateGlobalNumbering(); updateSectionNav(); saveData();
+            }
+        });
     }
 
     // --- ANSWERS (ESSAY & MCQ) ---
@@ -328,41 +377,32 @@
         const row = document.createElement('div');
         row.className = 'answer-row'; 
         row.dataset.correct = data.correct;
-        row.dataset.type = data.type; // 'essay' or 'mcq'
+        row.dataset.type = data.type;
 
-        const svgCheck = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
-        const svgCross = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`;
-
-        const optionsHtml = `<option value="">Opsi</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.mcqOpt===l?'selected':''}>${l}</option>`).join('');
-        const correctOptionsHtml = `<option value="">Kunci</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.correctOpt===l?'selected':''}>${l}</option>`).join('');
+        const optionsHtml = `<option value="">Opt</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.mcqOpt===l?'selected':''}>${l}</option>`).join('');
+        const correctOptionsHtml = `<option value="">Key</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.correctOpt===l?'selected':''}>${l}</option>`).join('');
 
         row.innerHTML = `
             <div class="answer-main">
                 <span class="answer-num"></span>
-                <!-- Mode Essay -->
-                <input type="text" class="answer-input essay-ui target-input" value="${data.text}" placeholder="Tulis jawaban..." oninput="saveData()">
-                
-                <!-- Mode MCQ -->
+                <input type="text" class="answer-input essay-ui target-input" value="${data.text}" placeholder="Write answer..." oninput="saveData()">
                 <div class="mcq-ui">
                     <select class="mcq-select" onchange="saveData()">${optionsHtml}</select>
-                    <input type="text" class="mcq-desc target-input" value="${data.mcqDesc}" placeholder="Keterangan opsi..." oninput="saveData()">
+                    <input type="text" class="mcq-desc target-input" value="${data.mcqDesc}" placeholder="Option desc..." oninput="saveData()">
                 </div>
-                
-                <button class="btn-outline btn-sm" onclick="toggleAnswerType(this)" title="Ganti Mode">🔄 Tipe</button>
-                <button class="btn-danger btn-sm" onclick="removeAnswer(this)">X</button>
+                <button class="btn-outline btn-sm" onclick="toggleAnswerType(this)" title="Switch Type">${ICON_SWITCH}</button>
+                <button class="btn-danger btn-sm" onclick="removeAnswer(this)">${ICON_CROSS}</button>
             </div>
-
             <div class="correction-ui" style="display: ${isCorrectionMode ? 'flex' : 'none'};">
                 <div class="correction-tools">
-                    <button class="btn-icon check" onclick="markCorrect(this, 'true')">${svgCheck}</button>
-                    <button class="btn-icon cross" onclick="markCorrect(this, 'false')">${svgCross}</button>
+                    <button class="btn-icon check" onclick="markCorrect(this, 'true')">${ICON_CORRECTION}</button>
+                    <button class="btn-icon cross" onclick="markCorrect(this, 'false')">${ICON_CROSS}</button>
                 </div>
-                <!-- MCQ Correct UI -->
                 <div class="mcq-ui" style="margin-top: 5px;">
                     <select class="mcq-correct-select" onchange="saveData()">${correctOptionsHtml}</select>
-                    <input type="text" class="mcq-correct-desc target-input" value="${data.correctDesc}" placeholder="Keterangan opsi benar..." oninput="saveData()">
+                    <input type="text" class="mcq-correct-desc target-input" value="${data.correctDesc}" placeholder="Correct option desc..." oninput="saveData()">
                 </div>
-                <input type="text" class="reason-input target-input" value="${data.reason}" placeholder="Alasan / Jawaban Benar (Opsional)..." oninput="saveData()">
+                <input type="text" class="reason-input target-input" value="${data.reason}" placeholder="Reason / Correct Answer (Optional)..." oninput="saveData()">
             </div>
         `;
         container.appendChild(row);
@@ -384,7 +424,7 @@
         sections.forEach((sec, i) => { sec.classList.remove('active'); if (i === currentSectionIndex) sec.classList.add('active'); });
         document.getElementById('btn-prev-sec').disabled = (currentSectionIndex === 0);
         document.getElementById('btn-next-sec').disabled = (currentSectionIndex === sections.length - 1);
-        document.getElementById('sec-indicator').textContent = `Part ${currentSectionIndex + 1} dari ${sections.length}`;
+        document.getElementById('sec-indicator').textContent = `Part ${currentSectionIndex + 1} of ${sections.length}`;
     }
     
     function navigateSection(dir) {
@@ -396,8 +436,8 @@
     function toggleCorrectionMode() {
         isCorrectionMode = !isCorrectionMode;
         const btn = document.getElementById('btn-correction');
-        if (isCorrectionMode) { btn.innerHTML = "✍️ Latihan"; btn.className = "btn-outline"; document.getElementById('score-banner').style.display = "block"; } 
-        else { btn.innerHTML = "✅ Koreksi"; btn.className = "btn-warning"; document.getElementById('score-banner').style.display = "none"; }
+        if (isCorrectionMode) { btn.innerHTML = `${ICON_PRACTICE} Practice`; btn.className = "btn-outline"; document.getElementById('score-banner').style.display = "block"; } 
+        else { btn.innerHTML = `${ICON_CORRECTION} Correction`; btn.className = "btn-warning"; document.getElementById('score-banner').style.display = "none"; }
         document.querySelectorAll('.correction-ui').forEach(ui => ui.style.display = isCorrectionMode ? 'flex' : 'none');
         calculateScore();
     }
@@ -407,31 +447,64 @@
     function calculateScore() {
         const rows = document.querySelectorAll('.answer-row');
         let correctCount = 0; rows.forEach(row => { if (row.dataset.correct === 'true') correctCount++; });
-        document.getElementById('score-banner').textContent = `Skor Terkini: ${correctCount} / ${rows.length}`;
+        document.getElementById('score-banner').textContent = `Current Score: ${correctCount} / ${rows.length}`;
+    }
+
+    // --- AUDIO / TYPING EFFECT ---
+    function toggleSoundMode() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('btn-sound-mode');
+        btn.innerHTML = soundEnabled ? `${ICON_SOUND_ON} Sound: ON` : `${ICON_SOUND_OFF} Sound: OFF`;
+    }
+
+    function playClickSound() {
+        if (!soundEnabled) return;
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+            
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.05);
+        } catch(e) { }
     }
 
     // --- CUSTOM KEYBOARD SYSTEM ---
+    let kbShift = false, kbSymbol = false, kbMoreSymbol = false;
     const kbLayouts = {
-        lowercase: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⇧','z','x','c','v','b','n','m','⌫'],['123','Aa','Space','Done']],
-        uppercase: [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['⬆','Z','X','C','V','B','N','M','⌫'],['123','Aa','Space','Done']],
-        symbols: [['1','2','3','4','5','6','7','8','9','0'],['-','/',':',';','(',')','$','&','@','"'],['abc','.','\,','?','!','\'','⌫'],['abc','Aa','Space','Done']]
+        lowercase: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⇧','z','x','c','v','b','n','m','⌫'],['123','Case','Space','Done']],
+        uppercase: [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['⬆','Z','X','C','V','B','N','M','⌫'],['123','Case','Space','Done']],
+        symbols: [['1','2','3','4','5','6','7','8','9','0'],['-','/',':',';','(',')','$','&','@','"'],['#+=','.','\,','?','!','\'','⌫'],['abc','Case','Space','Done']],
+        more_symbols: [['[',']','{','}','#','%','^','*','+','='],['_','\\','|','~','<','>','€','£','¥','¢'],['123','.','\,','?','!','\'','⌫'],['abc','Case','Space','Done']]
     };
 
     function renderKeyboard() {
         const kb = document.getElementById('custom-keyboard');
-        let layoutName = kbSymbol ? 'symbols' : (kbShift ? 'uppercase' : 'lowercase');
+        let layoutName = kbMoreSymbol ? 'more_symbols' : (kbSymbol ? 'symbols' : (kbShift ? 'uppercase' : 'lowercase'));
         kb.innerHTML = '';
         
         kbLayouts[layoutName].forEach(row => {
             const rowDiv = document.createElement('div'); rowDiv.className = 'kb-row';
             row.forEach(key => {
                 const btn = document.createElement('div'); btn.className = 'kb-key';
-                let label = key; if(key === 'Space') label = 'Spasi'; if(key === 'Aa') label = 'Proper';
+                let label = key; if(key === 'Space') label = 'Space'; if(key === 'Case') label = 'Aa';
                 btn.textContent = label;
-                if(['⇧','⬆','⌫','123','abc'].includes(key)) btn.classList.add('wide');
+                
+                if(['⇧','⬆','⌫','123','abc','#+='].includes(key)) btn.classList.add('wide');
                 if(key === 'Space') btn.classList.add('space');
                 if(key === 'Done') btn.classList.add('done');
-                if(key === 'Aa') btn.classList.add('proper');
+                if(key === 'Case') btn.classList.add('proper');
 
                 const triggerKey = (e) => { e.preventDefault(); e.stopPropagation(); handleKey(key); };
                 btn.onmousedown = triggerKey; btn.ontouchstart = triggerKey;
@@ -443,21 +516,68 @@
 
     function handleKey(key) {
         if(!activeInputTarget) return;
+        playClickSound();
+
         let val = activeInputTarget.value;
-        if(key === '⇧' || key === '⬆') { kbShift = !kbShift; renderKeyboard(); return; }
-        if(key === '123') { kbSymbol = true; renderKeyboard(); return; }
-        if(key === 'abc') { kbSymbol = false; renderKeyboard(); return; }
-        if(key === 'Done') { hideKeyboard(); return; }
-        if(key === 'Space') { activeInputTarget.value = val + ' '; saveData(); return; }
-        if(key === '⌫') { activeInputTarget.value = val.slice(0, -1); saveData(); return; }
-        if(key === 'Aa') { 
-            activeInputTarget.value = val.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            saveData(); return; 
+        let start = activeInputTarget.selectionStart;
+        let end = activeInputTarget.selectionEnd;
+        let hasSelection = start !== end;
+
+        if(!['⇧','⬆','123','abc','#+=','Done','Space','⌫','Case'].includes(key)) {
+            activeInputTarget.value = val.substring(0, start) + key + val.substring(end);
+            activeInputTarget.setSelectionRange(start + key.length, start + key.length);
+            if(kbShift) { kbShift = false; renderKeyboard(); }
+            saveData(); return;
         }
 
-        activeInputTarget.value = val + key;
-        if(kbShift) { kbShift = false; renderKeyboard(); }
-        saveData();
+        if(key === '⇧' || key === '⬆') { kbShift = !kbShift; renderKeyboard(); return; }
+        if(key === '123') { kbSymbol = true; kbMoreSymbol = false; renderKeyboard(); return; }
+        if(key === '#+=') { kbSymbol = false; kbMoreSymbol = true; renderKeyboard(); return; }
+        if(key === 'abc') { kbSymbol = false; kbMoreSymbol = false; renderKeyboard(); return; }
+        if(key === 'Done') { hideKeyboard(); return; }
+        
+        if(key === 'Space') { 
+            activeInputTarget.value = val.substring(0, start) + ' ' + val.substring(end);
+            activeInputTarget.setSelectionRange(start + 1, start + 1);
+            saveData(); return; 
+        }
+        
+        if(key === '⌫') { 
+            if (hasSelection) {
+                activeInputTarget.value = val.substring(0, start) + val.substring(end);
+                activeInputTarget.setSelectionRange(start, start);
+            } else if (start > 0) {
+                activeInputTarget.value = val.substring(0, start - 1) + val.substring(end);
+                activeInputTarget.setSelectionRange(start - 1, start - 1);
+            }
+            saveData(); return; 
+        }
+        
+        if(key === 'Case') { 
+            let targetText = hasSelection ? val.substring(start, end) : val;
+            let currentCaseState = activeInputTarget.dataset.caseState || "0"; 
+            let newText = "";
+            
+            if (currentCaseState === "0" || currentCaseState === "3") {
+                newText = targetText.split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+                activeInputTarget.dataset.caseState = "1";
+            } else if (currentCaseState === "1") {
+                newText = targetText.toLowerCase();
+                activeInputTarget.dataset.caseState = "2";
+            } else if (currentCaseState === "2") {
+                newText = targetText.toUpperCase();
+                activeInputTarget.dataset.caseState = "3";
+            }
+            
+            if (hasSelection) {
+                activeInputTarget.value = val.substring(0, start) + newText + val.substring(end);
+                activeInputTarget.setSelectionRange(start, start + newText.length);
+            } else {
+                activeInputTarget.value = newText;
+                activeInputTarget.setSelectionRange(newText.length, newText.length);
+            }
+            saveData(); return; 
+        }
     }
 
     function showKeyboard(inputElem) {
@@ -476,7 +596,7 @@
 
     function toggleKeyboardMode() {
         useCustomKB = !useCustomKB;
-        document.getElementById('btn-kb-mode').innerText = useCustomKB ? "⌨️ Custom Keyboard: ON" : "⌨️ Custom Keyboard: OFF";
+        document.getElementById('btn-kb-mode').innerHTML = useCustomKB ? `${ICON_KEYBOARD} Keyboard: ON` : `${ICON_KEYBOARD} Keyboard: OFF`;
         hideKeyboard(); applyInputProtection();
     }
 
@@ -512,7 +632,10 @@
             data.push({ title: sec.querySelector('.section-title').value, timeMarks, answers });
         });
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-        if (showAlert) alert("Progress disimpan!");
+        
+        if (showAlert) {
+            Swal.fire({ position: 'top-end', icon: 'success', title: 'Progress saved!', showConfirmButton: false, timer: 1500 });
+        }
     }
 
     function loadData() {
@@ -523,14 +646,10 @@
                 document.getElementById('workspace').innerHTML = ''; sectionCount = 0;
                 data.forEach(secData => {
                     const secDiv = addSection(secData.title, true);
-                    
-                    // Render Time Marks
                     if(secData.timeMarks) {
                         const btnMark = secDiv.querySelector('.time-marks-area button');
                         secData.timeMarks.forEach(t => addTimeMark(btnMark, t));
                     }
-
-                    // Render Answers
                     const btnAddAns = secDiv.querySelector('.answers-container').nextElementSibling;
                     secData.answers.forEach(ans => addAnswer(btnAddAns, ans));
                 });
