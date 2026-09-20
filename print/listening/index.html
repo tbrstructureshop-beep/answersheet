@@ -127,7 +127,7 @@
             margin-bottom: 15px;
             padding: 0 5px;
         }
-        .logos-left { display: flex; gap: 20px; align-items: center; }
+        .logo-box { flex: 1; }
         .header-logos img { height: 42px; object-fit: contain; }
 
         /* --- IDENTIFICATION SECTION --- */
@@ -208,19 +208,20 @@
         /* Visual Element Kanan: Ikon & Grid Kandidat */
         .pointer-hand {
             font-size: 26px; color: var(--ielts-orange); 
-            margin-left: 5px; transform: rotate(20deg); 
+            margin-left: 5px; transform: rotate(45deg); /* Berubah menjadi 45 Derajat */
             display: inline-block; line-height: 1;
         }
         .pencil-icon {
-            position: absolute; right: 155px; top: -15px; 
+            position: absolute; right: 150px; top: -10px; 
             width: 35px; height: 35px;
+            transform: rotate(45deg); /* Berubah menjadi 45 Derajat */
         }
 
         .cand-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
-        .cand-grid { display: flex; flex-direction: column; width: 100%; }
+        .cand-grid { display: flex; flex-direction: column; width: 100%; align-items: flex-start; }
         
         /* WARNA SELANG SELING GRID KANDIDAT */
-        .cand-row { display: flex; gap: 4px; align-items: center; padding: 1.5px 5px; }
+        .cand-row { display: flex; gap: 4px; align-items: center; padding: 1.5px 5px; border-radius: 2px;}
         .cand-row:nth-child(even) { background-color: var(--ielts-light); }
         .cand-row:nth-child(odd) { background-color: transparent; }
         .cand-row span { color: var(--ielts-orange); font-size: 10px; }
@@ -322,13 +323,15 @@
                 FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
             </div>
 
-            <!-- HEADER LOGOS -->
+            <!-- HEADER LOGOS: Kiri, Tengah, Kanan -->
             <div class="header-logos">
-                <div class="logos-left">
+                <div class="logo-box" style="text-align: left;">
                     <img src="../../Assets/BritCounsil.jpeg" alt="British Council">
+                </div>
+                <div class="logo-box" style="text-align: center;">
                     <img src="../../Assets/IdpEdu.jpeg" alt="IDP Education">
                 </div>
-                <div>
+                <div class="logo-box" style="text-align: right;">
                     <img src="../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
                 </div>
             </div>
@@ -376,13 +379,13 @@
 
                     <!-- Kanan: Grid OMR Candidate Number -->
                     <div class="id-right">
-                        <!-- Custom Orange Pencil Icon SVG -->
+                        <!-- Custom Orange Pencil Icon SVG (Rotasi 45 Derajat) -->
                         <svg class="pencil-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--ielts-orange)">
                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                         </svg>
 
                         <div class="cand-wrapper">
-                            <div class="write-boxes" id="cand-boxes" style="margin-left: 17px; margin-bottom: 4px;"></div>
+                            <div class="write-boxes" id="cand-boxes" style="margin-left: 0; margin-bottom: 4px;"></div>
                             <div class="cand-grid" id="cand-rows"></div>
                         </div>
                     </div>
@@ -499,10 +502,12 @@
             for(let i=0; i<38; i++) { topGridHtml += '<div class="t-cell"></div>'; }
             document.getElementById('top-grid-boxes').innerHTML = topGridHtml;
 
-            // Generate Grid Angka Candidate Number (Selang-seling via CSS)
+            // Generate Grid Angka Candidate Number Berundak (Indented) 
             let candRowsHtml = '';
             for(let r=0; r<6; r++) {
-                candRowsHtml += '<div class="cand-row"><span>►</span>';
+                // Memberikan margin bertahap pada setiap baris untuk efek berundak/tangga
+                let indentAmount = r * 10;
+                candRowsHtml += `<div class="cand-row" style="margin-left: ${indentAmount}px;"><span>►</span>`;
                 for(let n=0; n<=9; n++) { candRowsHtml += `<div class="omr-num">${n}</div>`; }
                 candRowsHtml += '</div>';
             }
