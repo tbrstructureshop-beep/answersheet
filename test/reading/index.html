@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IELTS Listening Practice Pro</title>
+    <!-- Load YouTube Iframe API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <!-- Load SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --correct-bg: #dcfce7;
+            --incorrect-bg: #fee2e2;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+
+        html, body { height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+        /* --- STICKY TOP ZONE --- */
+        .sticky-zone {
+            flex-shrink: 0; background-color: var(--bg-color); padding-top: 15px; padding-bottom: 10px;
+            border-bottom: 2px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); z-index: 100;
+        }
+        header h1 { text-align: center; font-size: 1.5rem; margin-bottom: 15px; }
+        .top-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
+
+        /* --- SCROLLABLE WORKSPACE --- */
+        .main-scroll-area { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 20px; padding-bottom: 200px; }
+
+        /* --- Media Player --- */
+        .media-setup { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        @media (min-width: 600px) { .media-setup { flex-direction: row; } }
+        .input-group { display: flex; flex: 1; gap: 8px; }
+        input[type="text"], input[type="file"] { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; }
+
+        /* Buttons */
+        button { 
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px; 
+            background: var(--primary); color: white; border: none; padding: 8px 14px; 
+            border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; 
+        }
+        button svg { width: 16px; height: 16px; flex-shrink: 0; }
+        button:hover { background: var(--primary-hover); }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 4px; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
+        .btn-danger { background: transparent; border: 1px solid #ef4444; color: #ef4444; }
+        .btn-danger:hover { background: #fef2f2; }
+        .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
+        .btn-print { background: #4f46e5; }
+        .btn-print:hover { background: #4338ca; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+
+        .video-wrapper { position: relative; background: #000; border-radius: 8px; display: none; overflow: hidden; margin-bottom: 10px; }
+        .video-wrapper.is-video { padding-bottom: 56.25%; height: 0; }
+        .video-wrapper.is-video iframe, .video-wrapper.is-video video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .video-wrapper.is-audio { background: var(--card-bg); padding: 15px; }
+        .video-wrapper.is-audio audio { width: 100%; outline: none; }
+
+        .score-banner { display: none; background: #10b981; color: white; text-align: center; padding: 10px; font-weight: bold; border-radius: 8px; }
+
+        /* --- Workspace --- */
+        .section-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--card-bg); padding: 10px 15px; border-radius: 8px; }
+        .sec-indicator { font-weight: bold; color: var(--primary); }
+        
+        .section-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid var(--primary); display: none; }
+        .section-card.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+        .section-header { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+        .section-header div { display: flex; gap: 6px; }
+        .section-title { font-size: 1.25rem; font-weight: bold; border: none; border-bottom: 2px dashed var(--border); padding: 4px; flex: 1; background: transparent; }
+        
+        /* Time Mark UI */
+        .time-marks-area { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; background: #f8fafc; padding: 8px; border-radius: 8px; border: 1px dashed var(--border); }
+        .time-badge { background: #e0e7ff; color: var(--primary); padding: 4px 8px; border-radius: 12px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; border: 1px solid #c7d2fe; transition: 0.2s; }
+        .time-badge:hover { background: #c7d2fe; }
+        .time-badge button { background: none; border: none; color: #ef4444; cursor: pointer; padding: 2px; width: auto; height: auto; display: inline-flex; align-items: center; justify-content: center; }
+        .time-badge button svg { width: 12px; height: 12px; }
+
+        .answers-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+        .answer-row { display: flex; flex-direction: column; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
+        .answer-row[data-correct="true"] { background-color: var(--correct-bg); border-color: #86efac; }
+        .answer-row[data-correct="false"] { background-color: var(--incorrect-bg); border-color: #fca5a5; }
+
+        .answer-main { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .answer-num { font-weight: bold; color: var(--primary); min-width: 25px; text-align: right; }
+        .answer-input, .reason-input, .section-title, .mcq-desc, .mcq-correct-desc { cursor: text; flex: 1; border: none; background: transparent; border-bottom: 1px solid var(--border); padding: 6px; font-size: 16px; min-width: 120px; }
+        
+        .reason-input { width: 100%; border: 1px dashed var(--text-muted); padding: 8px; border-radius: 6px; background: white; }
+        
+        /* Multiple Choice UI Toggles */
+        .answer-row[data-type="essay"] .mcq-ui { display: none !important; }
+        .answer-row[data-type="mcq"] .essay-ui { display: none !important; }
+        .mcq-ui { display: flex; gap: 6px; flex: 1; align-items: center; width: 100%; }
+        .mcq-select { padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: white; font-size: 14px; outline: none; cursor: pointer; }
+
+        .input-active { border-bottom: 2px solid var(--primary) !important; background-color: #eff6ff !important; border-radius: 4px; outline: none; }
+
+        .correction-ui { display: none; flex-direction: column; gap: 8px; padding-left: 35px; }
+        .correction-tools { display: flex; gap: 10px; align-items: center; }
+        .btn-icon { padding: 6px; border-radius: 50%; background: transparent; border: 1px solid var(--border); display: flex; align-items: center; cursor: pointer; color: var(--text-main); }
+        .btn-icon svg { width: 18px; height: 18px; }
+        .btn-icon.check:hover { background: #dcfce7; border-color: #22c55e; color: #16a34a; }
+        .btn-icon.cross:hover { background: #fee2e2; border-color: #ef4444; color: #dc2626; }
+
+        .global-actions { text-align: center; margin-bottom: 50px; }
+
+        /* --- CUSTOM VIRTUAL KEYBOARD --- */
+        #custom-keyboard {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #cbd5e1; padding: 10px 5px 15px 5px; box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+            z-index: 1000; display: flex; flex-direction: column; gap: 8px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none;
+        }
+        #custom-keyboard.show { transform: translateY(0); }
+        .kb-row { display: flex; justify-content: center; gap: 6px; }
+        .kb-key {
+            background: #ffffff; border-radius: 6px; padding: 12px 6px; font-size: 1.2rem; font-weight: 500; text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); flex: 1; max-width: 45px; cursor: pointer; touch-action: manipulation; display: flex; align-items: center; justify-content: center;
+        }
+        .kb-key:active { background: #e2e8f0; transform: scale(0.95); }
+        .kb-key.wide { max-width: 65px; font-size: 1rem; background: #94a3b8; color: white; }
+        .kb-key.space { max-width: 150px; font-size: 1rem; }
+        .kb-key.done { max-width: 80px; font-size: 1rem; background: var(--primary); color: white; }
+        .kb-key.proper { max-width: 65px; font-size: 1rem; background: #10b981; color: white; }
+
+        @media print {
+            html, body { height: auto !important; overflow: visible !important; display: block !important; }
+            .main-scroll-area { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; }
+            .sticky-zone, .section-nav-bar, .global-actions, button, #custom-keyboard, .time-marks-area { display: none !important; }
+            .section-card { display: block !important; box-shadow: none; border: none; border-bottom: 2px solid #000; margin-bottom: 10px; }
+            .answer-row { background: transparent !important; border: none !important; padding: 5px 0; }
+            .answer-input, .reason-input, .mcq-desc, .mcq-correct-desc { border-bottom: 1px solid #000; color: black; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sticky-zone">
+    <div class="container">
+        <header><h1>IELTS Listening Pro</h1></header>
+        <div class="top-actions">
+            <button class="btn-success" onclick="saveData(true)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save
+            </button>
+            <button class="btn-warning" onclick="toggleCorrectionMode()" id="btn-correction">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Correction
+            </button>
+            <button class="btn-print" onclick="window.open('print/listening/index.html', '_blank')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Print
+            </button>
+            <!-- DICTIONARY BUTTON -->
+            <button class="btn-outline" onclick="openDictionary()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                Dictionary
+            </button>
+            <!-- RESET & BACKUP BUTTON -->
+            <button class="btn-danger" onclick="clearLocalStorage()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                Reset & Backup
+            </button>
+            <button class="btn-outline" onclick="toggleKeyboardMode()" id="btn-kb-mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line><line x1="6" y1="12" x2="6.01" y2="12"></line><line x1="10" y1="12" x2="10.01" y2="12"></line><line x1="14" y1="12" x2="14.01" y2="12"></line><line x1="18" y1="12" x2="18.01" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+                Keyboard: ON
+            </button>
+            <button class="btn-outline" onclick="toggleSoundMode()" id="btn-sound-mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                Sound: OFF
+            </button>
+        </div>
+        <div class="media-setup" id="media-setup-box">
+            <div class="input-group">
+                <input type="text" id="yt-link" placeholder="YouTube Link...">
+                <button onclick="loadYouTube()">Load YT</button>
+            </div>
+            <div class="input-group">
+                <input type="file" id="local-file" accept="video/mp4,audio/*,video/*">
+                <button onclick="loadLocalFile()">Load File</button>
+            </div>
+        </div>
+        <div class="video-wrapper" id="video-wrapper"></div>
+        <div class="score-banner" id="score-banner">Score: 0 / 0</div>
+    </div>
+</div>
+
+<div class="main-scroll-area">
+    <div class="container" id="workspace-container">
+        <div class="section-nav-bar">
+            <button id="btn-prev-sec" onclick="navigateSection(-1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Prev
+            </button>
+            <span class="sec-indicator" id="sec-indicator">Part 1 of 1</span>
+            <button id="btn-next-sec" onclick="navigateSection(1)">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+        <div id="workspace"></div>
+        <div class="global-actions">
+            <button onclick="addSection()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add New Part
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- CUSTOM KEYBOARD -->
+<div id="custom-keyboard"></div>
+
+<script>
+    // --- ICON SVGs CONSTANTS ---
+    const ICON_PRACTICE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+    const ICON_CORRECTION = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    const ICON_KEYBOARD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line><line x1="6" y1="12" x2="6.01" y2="12"></line><line x1="10" y1="12" x2="10.01" y2="12"></line><line x1="14" y1="12" x2="14.01" y2="12"></line><line x1="18" y1="12" x2="18.01" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>`;
+    const ICON_SOUND_ON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    const ICON_SOUND_OFF = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+    const ICON_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    const ICON_RIGHT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+    const ICON_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+    const ICON_PLUS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+    const ICON_SWITCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>`;
+    const ICON_CROSS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+    let sectionCount = 0;
+    let currentSectionIndex = 0;
+    let isCorrectionMode = false;
+    let useCustomKB = true;
+    let soundEnabled = false;
+    let activeInputTarget = null;
+    let audioCtx = null;
+    let isAppLoaded = false;
+    const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
+
+    // --- MEDIA PLAYER CONTROL ---
+    let ytPlayer = null;
+    let localPlayer = null;
+
+    function loadYouTube() {
+        const url = document.getElementById('yt-link').value;
+        const videoId = extractYouTubeID(url);
+        if (!videoId) return Swal.fire({icon: 'error', title: 'Oops...', text: 'Invalid YouTube link!'});
+
+        const wrapper = document.getElementById('video-wrapper');
+        wrapper.style.display = 'block'; wrapper.className = 'video-wrapper is-video';
+        
+        if (ytPlayer && ytPlayer.destroy) ytPlayer.destroy();
+        wrapper.innerHTML = '<div id="yt-iframe-container"></div>';
+        
+        ytPlayer = new YT.Player('yt-iframe-container', {
+            videoId: videoId,
+            playerVars: { 'playsinline': 1, 'rel': 0 },
+            events: { 'onReady': () => { localPlayer = null; } }
+        });
+        document.getElementById('media-setup-box').style.display = 'none'; 
+    }
+
+    function extractYouTubeID(url) {
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        return url.match(regex)?.[1] || null;
+    }
+
+    function loadLocalFile() {
+        const file = document.getElementById('local-file').files[0];
+        if (!file) return Swal.fire({icon: 'error', title: 'Oops...', text: 'Please select a video/audio file!'});
+        
+        const wrapper = document.getElementById('video-wrapper');
+        wrapper.style.display = 'block';
+        if (ytPlayer && ytPlayer.destroy) { ytPlayer.destroy(); ytPlayer = null; }
+
+        if(file.type.startsWith('audio/')) {
+            wrapper.className = 'video-wrapper is-audio'; wrapper.innerHTML = `<audio id="local-media" controls src="${URL.createObjectURL(file)}"></audio>`;
+        } else {
+            wrapper.className = 'video-wrapper is-video'; wrapper.innerHTML = `<video id="local-media" controls src="${URL.createObjectURL(file)}"></video>`;
+        }
+        localPlayer = document.getElementById('local-media');
+        document.getElementById('media-setup-box').style.display = 'none';
+    }
+
+    function getCurrentMediaTime() {
+        if (localPlayer) return localPlayer.currentTime;
+        if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') return ytPlayer.getCurrentTime();
+        return null;
+    }
+
+    function seekMediaTime(seconds) {
+        if (localPlayer) { localPlayer.currentTime = seconds; localPlayer.play(); }
+        else if (ytPlayer && typeof ytPlayer.seekTo === 'function') { ytPlayer.seekTo(seconds, true); ytPlayer.playVideo(); }
+    }
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    // --- WORKSPACE & TIME MARKS ---
+    function addSection(title = null, skipSave = false) {
+        sectionCount++;
+        const workspace = document.getElementById('workspace');
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'section-card';
+        
+        sectionDiv.innerHTML = `
+            <div class="section-header">
+                <input type="text" class="section-title target-input" value="${title !== null ? title : `Part ${sectionCount}`}" oninput="saveData()">
+                <div>
+                    <button class="btn-outline btn-sm" onclick="toggleCollapse(this)">${ICON_DOWN} Hide</button>
+                    <button class="btn-danger btn-sm" onclick="removeSection(this)">${ICON_TRASH}</button>
+                </div>
+            </div>
+            <div class="time-marks-area">
+                <button class="btn-outline btn-sm" onclick="addTimeMark(this)">${ICON_CLOCK} Time Mark</button>
+                <div class="time-container"></div>
+            </div>
+            <div class="answers-container"></div>
+            <button class="btn-outline" onclick="addAnswer(this)">${ICON_PLUS} Add Answer</button>
+        `;
+        workspace.appendChild(sectionDiv);
+        applyInputProtection(); 
+        
+        if(!skipSave) {
+            addAnswer(sectionDiv.querySelector('.answers-container').nextElementSibling);
+            currentSectionIndex = document.querySelectorAll('.section-card').length - 1;
+            updateSectionNav();
+        }
+        return sectionDiv;
+    }
+
+    function addTimeMark(btn, forcedTime = null) {
+        const time = forcedTime !== null ? forcedTime : getCurrentMediaTime();
+        if (time === null) return Swal.fire({icon: 'warning', title: 'Wait!', text: 'Play video/audio first to record time!'});
+        
+        const container = btn.nextElementSibling;
+        const badge = document.createElement('span');
+        badge.className = 'time-badge';
+        badge.dataset.time = time;
+        badge.innerHTML = `[ ${formatTime(time)} ] <button onclick="removeTimeMark(this, event)">${ICON_CROSS}</button>`;
+        badge.onclick = (e) => { if(!e.target.closest('button')) seekMediaTime(parseFloat(time)); };
+        container.appendChild(badge);
+        if (forcedTime === null) saveData();
+    }
+
+    function removeTimeMark(btn, event) {
+        event.stopPropagation();
+        btn.closest('.time-badge').remove();
+        saveData();
+    }
+
+    function toggleCollapse(btn) {
+        const container = btn.closest('.section-card').querySelector('.answers-container');
+        if (container.style.display === 'none') { container.style.display = 'flex'; btn.innerHTML = `${ICON_DOWN} Hide`; } 
+        else { container.style.display = 'none'; btn.innerHTML = `${ICON_RIGHT} Expand`; }
+    }
+
+    function removeSection(btn) {
+        Swal.fire({
+            title: 'Are you sure?', text: "Delete this section?", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                btn.closest('.section-card').remove();
+                if(currentSectionIndex > 0) currentSectionIndex--;
+                updateGlobalNumbering(); updateSectionNav(); saveData();
+            }
+        });
+    }
+
+    // --- ANSWERS (ESSAY & MCQ) ---
+    function addAnswer(btn, data = {type: "essay", text: "", mcqOpt: "", mcqDesc: "", correct: "null", correctOpt: "", correctDesc: "", reason: ""}) {
+        const container = btn.closest('.section-card').querySelector('.answers-container');
+        const row = document.createElement('div');
+        row.className = 'answer-row'; 
+        row.dataset.correct = data.correct;
+        row.dataset.type = data.type;
+
+        const optionsHtml = `<option value="">Opt</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.mcqOpt===l?'selected':''}>${l}</option>`).join('');
+        const correctOptionsHtml = `<option value="">Key</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.correctOpt===l?'selected':''}>${l}</option>`).join('');
+
+        row.innerHTML = `
+            <div class="answer-main">
+                <span class="answer-num"></span>
+                <input type="text" class="answer-input essay-ui target-input" value="${data.text}" placeholder="Write answer..." oninput="saveData()">
+                <div class="mcq-ui">
+                    <select class="mcq-select" onchange="saveData()">${optionsHtml}</select>
+                    <input type="text" class="mcq-desc target-input" value="${data.mcqDesc}" placeholder="Option desc..." oninput="saveData()">
+                </div>
+                <button class="btn-outline btn-sm" onclick="toggleAnswerType(this)" title="Switch Type">${ICON_SWITCH}</button>
+                <button class="btn-danger btn-sm" onclick="removeAnswer(this)">${ICON_CROSS}</button>
+            </div>
+            <div class="correction-ui" style="display: ${isCorrectionMode ? 'flex' : 'none'};">
+                <div class="correction-tools">
+                    <button class="btn-icon check" onclick="markCorrect(this, 'true')">${ICON_CORRECTION}</button>
+                    <button class="btn-icon cross" onclick="markCorrect(this, 'false')">${ICON_CROSS}</button>
+                </div>
+                <div class="mcq-ui" style="margin-top: 5px;">
+                    <select class="mcq-correct-select" onchange="saveData()">${correctOptionsHtml}</select>
+                    <input type="text" class="mcq-correct-desc target-input" value="${data.correctDesc}" placeholder="Correct option desc..." oninput="saveData()">
+                </div>
+                <input type="text" class="reason-input target-input" value="${data.reason}" placeholder="Reason / Correct Answer (Optional)..." oninput="saveData()">
+            </div>
+        `;
+        container.appendChild(row);
+        applyInputProtection(); updateGlobalNumbering(); calculateScore(); saveData();
+    }
+
+    function toggleAnswerType(btn) {
+        const row = btn.closest('.answer-row');
+        row.dataset.type = row.dataset.type === 'essay' ? 'mcq' : 'essay';
+        saveData();
+    }
+
+    function removeAnswer(btn) { btn.closest('.answer-row').remove(); updateGlobalNumbering(); calculateScore(); saveData(); }
+    function updateGlobalNumbering() { document.querySelectorAll('.answer-row').forEach((row, i) => { row.querySelector('.answer-num').textContent = (i + 1) + "."; }); }
+
+    function updateSectionNav() {
+        const sections = document.querySelectorAll('.section-card');
+        if (!sections.length) return;
+        sections.forEach((sec, i) => { sec.classList.remove('active'); if (i === currentSectionIndex) sec.classList.add('active'); });
+        document.getElementById('btn-prev-sec').disabled = (currentSectionIndex === 0);
+        document.getElementById('btn-next-sec').disabled = (currentSectionIndex === sections.length - 1);
+        document.getElementById('sec-indicator').textContent = `Part ${currentSectionIndex + 1} of ${sections.length}`;
+    }
+    
+    function navigateSection(dir) {
+        const len = document.querySelectorAll('.section-card').length;
+        currentSectionIndex = Math.max(0, Math.min(len - 1, currentSectionIndex + dir));
+        updateSectionNav();
+    }
+
+    function toggleCorrectionMode() {
+        isCorrectionMode = !isCorrectionMode;
+        const btn = document.getElementById('btn-correction');
+        if (isCorrectionMode) { btn.innerHTML = `${ICON_PRACTICE} Practice`; btn.className = "btn-outline"; document.getElementById('score-banner').style.display = "block"; } 
+        else { btn.innerHTML = `${ICON_CORRECTION} Correction`; btn.className = "btn-warning"; document.getElementById('score-banner').style.display = "none"; }
+        document.querySelectorAll('.correction-ui').forEach(ui => ui.style.display = isCorrectionMode ? 'flex' : 'none');
+        calculateScore();
+    }
+    
+    function markCorrect(btn, status) { btn.closest('.answer-row').dataset.correct = status; calculateScore(); saveData(); }
+    
+    function calculateScore() {
+        const rows = document.querySelectorAll('.answer-row');
+        let correctCount = 0; rows.forEach(row => { if (row.dataset.correct === 'true') correctCount++; });
+        document.getElementById('score-banner').textContent = `Current Score: ${correctCount} / ${rows.length}`;
+    }
+
+    // --- AUDIO / TYPING EFFECT ---
+    function toggleSoundMode() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('btn-sound-mode');
+        btn.innerHTML = soundEnabled ? `${ICON_SOUND_ON} Sound: ON` : `${ICON_SOUND_OFF} Sound: OFF`;
+    }
+
+    function playClickSound() {
+        if (!soundEnabled) return;
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+            
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.05);
+        } catch(e) { }
+    }
+
+    // --- CUSTOM KEYBOARD SYSTEM ---
+    let kbShift = false, kbSymbol = false, kbMoreSymbol = false;
+    const kbLayouts = {
+        lowercase: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⇧','z','x','c','v','b','n','m','⌫'],['123','Case','Space','Done']],
+        uppercase: [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['⬆','Z','X','C','V','B','N','M','⌫'],['123','Case','Space','Done']],
+        symbols: [['1','2','3','4','5','6','7','8','9','0'],['-','/',':',';','(',')','$','&','@','"'],['#+=','.','\,','?','!','\'','⌫'],['abc','Case','Space','Done']],
+        more_symbols: [['[',']','{','}','#','%','^','*','+','='],['_','\\','|','~','<','>','€','£','¥','¢'],['123','.','\,','?','!','\'','⌫'],['abc','Case','Space','Done']]
+    };
+
+    function renderKeyboard() {
+        const kb = document.getElementById('custom-keyboard');
+        let layoutName = kbMoreSymbol ? 'more_symbols' : (kbSymbol ? 'symbols' : (kbShift ? 'uppercase' : 'lowercase'));
+        kb.innerHTML = '';
+        
+        kbLayouts[layoutName].forEach(row => {
+            const rowDiv = document.createElement('div'); rowDiv.className = 'kb-row';
+            row.forEach(key => {
+                const btn = document.createElement('div'); btn.className = 'kb-key';
+                let label = key; if(key === 'Space') label = 'Space'; if(key === 'Case') label = 'Aa';
+                btn.textContent = label;
+                
+                if(['⇧','⬆','⌫','123','abc','#+='].includes(key)) btn.classList.add('wide');
+                if(key === 'Space') btn.classList.add('space');
+                if(key === 'Done') btn.classList.add('done');
+                if(key === 'Case') btn.classList.add('proper');
+
+                const triggerKey = (e) => { e.preventDefault(); e.stopPropagation(); handleKey(key); };
+                btn.onmousedown = triggerKey; btn.ontouchstart = triggerKey;
+                rowDiv.appendChild(btn);
+            });
+            kb.appendChild(rowDiv);
+        });
+    }
+
+    function handleKey(key) {
+        if(!activeInputTarget) return;
+        playClickSound();
+
+        let val = activeInputTarget.value;
+        let start = activeInputTarget.selectionStart;
+        let end = activeInputTarget.selectionEnd;
+        let hasSelection = start !== end;
+
+        if(!['⇧','⬆','123','abc','#+=','Done','Space','⌫','Case'].includes(key)) {
+            activeInputTarget.value = val.substring(0, start) + key + val.substring(end);
+            activeInputTarget.setSelectionRange(start + key.length, start + key.length);
+            if(kbShift) { kbShift = false; renderKeyboard(); }
+            saveData(); return;
+        }
+
+        if(key === '⇧' || key === '⬆') { kbShift = !kbShift; renderKeyboard(); return; }
+        if(key === '123') { kbSymbol = true; kbMoreSymbol = false; renderKeyboard(); return; }
+        if(key === '#+=') { kbSymbol = false; kbMoreSymbol = true; renderKeyboard(); return; }
+        if(key === 'abc') { kbSymbol = false; kbMoreSymbol = false; renderKeyboard(); return; }
+        if(key === 'Done') { hideKeyboard(); return; }
+        
+        if(key === 'Space') { 
+            activeInputTarget.value = val.substring(0, start) + ' ' + val.substring(end);
+            activeInputTarget.setSelectionRange(start + 1, start + 1);
+            saveData(); return; 
+        }
+        
+        if(key === '⌫') { 
+            if (hasSelection) {
+                activeInputTarget.value = val.substring(0, start) + val.substring(end);
+                activeInputTarget.setSelectionRange(start, start);
+            } else if (start > 0) {
+                activeInputTarget.value = val.substring(0, start - 1) + val.substring(end);
+                activeInputTarget.setSelectionRange(start - 1, start - 1);
+            }
+            saveData(); return; 
+        }
+        
+        if(key === 'Case') { 
+            let targetText = hasSelection ? val.substring(start, end) : val;
+            let currentCaseState = activeInputTarget.dataset.caseState || "0"; 
+            let newText = "";
+            
+            if (currentCaseState === "0" || currentCaseState === "3") {
+                newText = targetText.split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+                activeInputTarget.dataset.caseState = "1";
+            } else if (currentCaseState === "1") {
+                newText = targetText.toLowerCase();
+                activeInputTarget.dataset.caseState = "2";
+            } else if (currentCaseState === "2") {
+                newText = targetText.toUpperCase();
+                activeInputTarget.dataset.caseState = "3";
+            }
+            
+            if (hasSelection) {
+                activeInputTarget.value = val.substring(0, start) + newText + val.substring(end);
+                activeInputTarget.setSelectionRange(start, start + newText.length);
+            } else {
+                activeInputTarget.value = newText;
+                activeInputTarget.setSelectionRange(newText.length, newText.length);
+            }
+            saveData(); return; 
+        }
+    }
+
+    function showKeyboard(inputElem) {
+        if(!useCustomKB) return;
+        activeInputTarget = inputElem;
+        document.querySelectorAll('.target-input').forEach(el => el.classList.remove('input-active'));
+        inputElem.classList.add('input-active');
+        document.getElementById('custom-keyboard').classList.add('show');
+    }
+
+    function hideKeyboard() {
+        document.getElementById('custom-keyboard').classList.remove('show');
+        if(activeInputTarget) activeInputTarget.classList.remove('input-active');
+        activeInputTarget = null;
+    }
+
+    function toggleKeyboardMode() {
+        useCustomKB = !useCustomKB;
+        document.getElementById('btn-kb-mode').innerHTML = useCustomKB ? `${ICON_KEYBOARD} Keyboard: ON` : `${ICON_KEYBOARD} Keyboard: OFF`;
+        hideKeyboard(); applyInputProtection();
+    }
+
+    function applyInputProtection() {
+        document.querySelectorAll('.target-input').forEach(input => { input.readOnly = useCustomKB; });
+    }
+
+    document.addEventListener('click', (e) => {
+        if(e.target.classList.contains('target-input')) { showKeyboard(e.target); } 
+        else if(!e.target.closest('#custom-keyboard')) { hideKeyboard(); }
+    });
+
+    // --- DATA MANAGEMENT ---
+    function saveData(showAlert = false) {
+        const data = [];
+        document.querySelectorAll('.section-card').forEach(sec => {
+            const timeMarks = [];
+            sec.querySelectorAll('.time-badge').forEach(b => timeMarks.push(b.dataset.time));
+
+            const answers = [];
+            sec.querySelectorAll('.answer-row').forEach(row => {
+                answers.push({
+                    type: row.dataset.type,
+                    text: row.querySelector('.answer-input').value,
+                    mcqOpt: row.querySelector('.mcq-select').value,
+                    mcqDesc: row.querySelector('.mcq-desc').value,
+                    correct: row.dataset.correct,
+                    correctOpt: row.querySelector('.mcq-correct-select').value,
+                    correctDesc: row.querySelector('.mcq-correct-desc').value,
+                    reason: row.querySelector('.reason-input').value
+                });
+            });
+            data.push({ title: sec.querySelector('.section-title').value, timeMarks, answers });
+        });
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+        
+        if (showAlert) {
+            Swal.fire({ position: 'top-end', icon: 'success', title: 'Progress saved!', showConfirmButton: false, timer: 1500 });
+        }
+    }
+
+    function loadData() {
+        // Prevent double execution on weird browser live-reloads
+        if(isAppLoaded) return;
+        isAppLoaded = true;
+
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        // Clears the DOM perfectly and resets before loading data (fixes the jump to part 2)
+        document.getElementById('workspace').innerHTML = ''; 
+        sectionCount = 0;
+        
+        if (saved) {
+            const data = JSON.parse(saved);
+            if(data && data.length > 0) {
+                data.forEach(secData => {
+                    const secDiv = addSection(secData.title, true); // skip saving & answer creation
+                    if(secData.timeMarks) {
+                        const btnMark = secDiv.querySelector('.time-marks-area button');
+                        secData.timeMarks.forEach(t => addTimeMark(btnMark, t));
+                    }
+                    const btnAddAns = secDiv.querySelector('.answers-container').nextElementSibling;
+                    if (secData.answers && secData.answers.length > 0) {
+                        secData.answers.forEach(ans => addAnswer(btnAddAns, ans));
+                    } else {
+                        // Fallback just in case previous save corrupted
+                        addAnswer(btnAddAns); 
+                    }
+                });
+                currentSectionIndex = 0; updateSectionNav(); calculateScore(); renderKeyboard();
+                return;
+            }
+        }
+        
+        // Setup initial default screen if NO data
+        addSection(null, false); 
+        renderKeyboard();
+    }
+
+    // --- NEW FEATURES (BACKUP/RESET + API DICTIONARY) ---
+
+    function downloadBackup() {
+        const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!data) {
+            Swal.fire('Empty', 'There is no data to backup.', 'info');
+            return;
+        }
+        
+        const blob = new Blob([data], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        
+        const dateStr = new Date().toISOString().slice(0,10);
+        a.download = `IELTS_Listening_Backup_${dateStr}.json`;
+        
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function performClean() {
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+        // Clean DOM explicitly and re-initialize purely
+        document.getElementById('workspace').innerHTML = '';
+        sectionCount = 0;
+        currentSectionIndex = 0;
+        addSection(null, false); // Initializes clean Part 1 + 1 answer & updates everything
+        saveData(false);         // Overwrite empty state safely
+        Swal.fire('Cleaned!', 'Your workspace is fresh and backup is safe.', 'success');
+    }
+
+    function clearLocalStorage() {
+        Swal.fire({
+            title: 'Clean & Reset',
+            text: "This will delete all progress. Do you want to download a backup of your data first?",
+            icon: 'warning',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Backup & Clean',
+            denyButtonText: 'Clean Only',
+            confirmButtonColor: '#10b981',
+            denyButtonColor: '#ef4444'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                downloadBackup();
+                setTimeout(performClean, 500); // Tiny delay to let download trigger safely
+            } else if (result.isDenied) {
+                performClean();
+            }
+        });
+    }
+
+    window.searchDictionary = async function() {
+        const word = document.getElementById('dict-word').value.trim();
+        const lang = document.getElementById('dict-lang').value;
+        const resultDiv = document.getElementById('dict-result');
+        if(!word) return;
+        
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = '<div style="text-align:center; padding:10px;">Searching API...</div>';
+        
+        try {
+            // Fetch Translation (MyMemory Free API)
+            const transRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|${lang}`);
+            const transData = await transRes.json();
+            let translatedText = '';
+            if(transData && transData.responseData) {
+                translatedText = transData.responseData.translatedText;
+            }
+
+            // Fetch Definition & Audio (Free Dictionary API)
+            const defRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+            let defHtml = '';
+            let phoneticText = '';
+            let audioBtn = '';
+            
+            if (defRes.ok) {
+                const defData = await defRes.json();
+                const entry = defData[0];
+                
+                if (entry) {
+                    // Extract Phonetic
+                    if (entry.phonetic) {
+                        phoneticText = entry.phonetic;
+                    } else if (entry.phonetics && entry.phonetics.length > 0) {
+                        const p = entry.phonetics.find(x => x.text);
+                        if(p) phoneticText = p.text;
+                    }
+                    
+                    // Extract Audio Playback
+                    if (entry.phonetics && entry.phonetics.length > 0) {
+                        const audioObj = entry.phonetics.find(x => x.audio && x.audio.length > 0);
+                        if(audioObj) {
+                            audioBtn = `<span onclick="new Audio('${audioObj.audio}').play()" style="cursor:pointer; font-size:20px; user-select:none; margin-left:6px;" title="Play Audio">🔊</span>`;
+                        }
+                    }
+                    
+                    // Extract Meanings / Definitions properly
+                    if(entry.meanings && entry.meanings.length > 0) {
+                        defHtml += `<ul style="padding-left:20px; margin-top:10px; color:var(--text-muted); list-style-type:disc;">`;
+                        entry.meanings.slice(0, 3).forEach(m => {
+                            if(m.definitions && m.definitions.length > 0) {
+                                defHtml += `<li style="margin-bottom:6px;"><b>${m.partOfSpeech}</b>: ${m.definitions[0].definition}</li>`;
+                            }
+                        });
+                        defHtml += `</ul>`;
+                    }
+                }
+            } else {
+                defHtml = `<div style="color:var(--text-muted); margin-top:5px;">English definition not found.</div>`;
+            }
+            
+            // Build the final popup content securely
+            resultDiv.innerHTML = `
+                <div style="font-size:16px; margin-bottom:10px; display:flex; align-items:center; flex-wrap:wrap; gap:5px;">
+                    <strong style="font-size:18px; color:var(--text-main);">${word}</strong> 
+                    <span style="color:#888;">${phoneticText}</span>
+                    ${audioBtn}
+                    <span style="margin:0 5px;">&rarr;</span> 
+                    <strong style="color:var(--primary); font-size:18px;">${translatedText}</strong>
+                </div>
+                <div style="border-top:1px solid var(--border); padding-top:10px;">
+                    <b style="font-size:15px; color:var(--text-main);">English Dictionary:</b> 
+                    ${defHtml}
+                </div>
+            `;
+        } catch(e) {
+            resultDiv.innerHTML = '<span style="color:#ef4444; padding:10px; display:block;">Error fetching results. Please try again or check internet connection.</span>';
+        }
+    }
+
+    function openDictionary() {
+        Swal.fire({
+            title: 'Dictionary & Translate',
+            html: `
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="dict-word" class="swal2-input" style="margin:0; flex:1; font-size: 16px;" placeholder="English Word...">
+                        <select id="dict-lang" class="swal2-select" style="margin:0; width:auto; font-size: 14px; padding:5px;">
+                            <option value="id">Indonesian</option>
+                            <option value="ms">Malay</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="zh-CN">Chinese</option>
+                            <option value="ja">Japanese</option>
+                            <option value="ar">Arabic</option>
+                        </select>
+                    </div>
+                    <button onclick="searchDictionary()" class="swal2-confirm swal2-styled" style="margin:0; width:100%;">Search Database</button>
+                    <div id="dict-result" style="margin-top:5px; text-align:left; font-size:14px; background:var(--bg-color); padding:12px; border-radius:8px; display:none; max-height:280px; overflow-y:auto; border:1px solid var(--border);"></div>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true,
+            didOpen: () => {
+                document.getElementById('dict-word').addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') searchDictionary();
+                });
+            }
+        });
+    }
+
+    window.onload = loadData;
+</script>
+</body>
+</html>
