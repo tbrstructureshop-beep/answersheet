@@ -6,8 +6,8 @@
     <title>IELTS Listening - Print Answer Sheet</title>
     <style>
         :root {
-            --ielts-orange: #f0894d;
-            --ielts-light: #fbeae1;
+            --ielts-orange: #ed874c;
+            --ielts-light: #fdf3ed;
             --ielts-dark-orange: #d9753c;
             --text-dark: #222222;
         }
@@ -65,233 +65,205 @@
             width: 210mm;
             height: 297mm;
             background: white;
-            padding: 10mm 15mm;
+            padding: 10mm 0; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             position: relative;
             overflow: hidden; 
             display: flex;
+            justify-content: space-between;
         }
 
-        /* --- Alignment Marks (Kotak hitam di pinggir kertas) --- */
-        .alignment-marks {
-            width: 15px;
-            height: 100%;
+        /* --- OMR Marks (Garis Tepi Komputer LJK) --- */
+        .omr-col {
+            width: 15mm;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20mm 0;
+            align-items: center;
+            padding: 10mm 0;
         }
-        .mark-box {
-            width: 12px;
+        .omr-bar {
+            width: 14px;
             height: 6px;
             background-color: #000;
         }
-        
-        .main-content {
-            flex: 1;
-            padding: 0 5px;
-            position: relative;
+        .omr-bar-hidden {
+            width: 14px;
+            height: 6px;
+            background-color: transparent;
         }
 
-        /* --- WATERMARK FIX --- */
+        /* --- WATERMARK --- */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 50px;
+            font-size: 55px;
             font-weight: bold;
             color: #000000;
-            opacity: 0.15; /* Transparan 15% */
-            z-index: 9999; /* Berada DI ATAS lembar dan tulisan */
+            opacity: 0.15;
+            z-index: 9999; 
             text-align: center;
             line-height: 1.2;
             white-space: nowrap;
-            pointer-events: none; /* Agar tidak mengganggu klik */
+            pointer-events: none; 
             letter-spacing: 2px;
         }
 
-        /* --- Header & Logos --- */
-        .logos-header {
+        /* --- Konten Utama Kertas --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 5mm;
+        }
+
+        /* --- Header Logos --- */
+        .header-logos {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 0 10px;
+            margin-bottom: 15px;
         }
-        .logos-header img { height: 35px; object-fit: contain; }
+        .logos-left { display: flex; gap: 15px; align-items: center; }
+        .header-logos img { height: 35px; object-fit: contain; }
 
-        .sheet-title {
+        /* --- IDENTIFICATION SECTION (DIperbaiki sangat mirip Asli) --- */
+        .id-section {
+            border: 2px solid var(--ielts-orange);
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .id-title {
             text-align: center;
             color: var(--ielts-orange);
             font-size: 16px;
             font-weight: bold;
-            padding: 4px 0;
+            padding: 5px 0;
+            border-bottom: 2px solid var(--ielts-orange);
+            letter-spacing: 0.5px;
+        }
+        .id-body {
+            display: flex;
+            padding: 8px 12px;
+        }
+        
+        .id-left { flex: 6.5; display: flex; flex-direction: column; gap: 6px; }
+        .id-right { flex: 3.5; display: flex; flex-direction: column; align-items: flex-end; position: relative; padding-top: 15px;}
+
+        /* Teks & Label Oranye */
+        .o-text { color: var(--ielts-orange); font-size: 12px; }
+        .o-label { color: var(--ielts-orange); font-size: 13px; font-weight: bold; }
+        .o-sub { color: var(--ielts-orange); font-size: 10px; }
+
+        /* Row Layouts */
+        .flex-row { display: flex; align-items: center; gap: 10px; }
+        
+        /* Kotak Isian Angka */
+        .write-boxes { display: flex; gap: 2px; }
+        .w-box {
+            width: 22px; height: 26px;
+            border: 1px solid var(--ielts-orange);
+            outline: none; text-align: center; font-size: 16px;
+            font-weight: bold; font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Kotak Isian Nama */
+        .name-box {
+            width: 95%;
+            height: 28px;
+            border: 1px solid #f2ab83;
+            background-color: #fff;
+            outline: none;
+            padding: 4px 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Test Date Styling */
+        .date-section { margin-top: 5px; }
+        .date-row { display: flex; align-items: flex-start; gap: 8px; margin-top: 4px; }
+        .date-nums { display: flex; gap: 3px; flex-wrap: wrap; max-width: 450px;}
+        .omr-num {
+            font-size: 10px; color: var(--ielts-orange);
             border-top: 1px solid var(--ielts-orange);
             border-bottom: 1px solid var(--ielts-orange);
-            margin-bottom: 15px;
+            padding: 0 1px; font-weight: bold;
         }
 
-        /* --- Biodata Section --- */
-        .candidate-info {
-            font-size: 11px;
-            color: var(--ielts-orange);
-            margin-bottom: 10px;
-        }
-        .info-row {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-        .info-label { font-weight: bold; margin-right: 10px; width: 120px; }
-        
-        .input-line {
-            flex: 1;
-            border-bottom: 1px dashed var(--ielts-orange);
-            outline: none;
-            padding: 2px 5px;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            font-size: 14px;
-            text-transform: uppercase;
-            color: #000;
-            margin-left: 5px;
-        }
+        /* Right Side: Candidate Grid */
+        .pointer-hand { font-size: 18px; color: var(--ielts-orange); margin-left: 5px; transform: rotate(90deg); display: inline-block;}
+        .pencil-icon { position: absolute; right: 140px; top: -10px; font-size: 28px; transform: rotate(135deg); }
+        .cand-grid { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; width: 100%; align-items: flex-end;}
+        .cand-row { display: flex; gap: 4px; align-items: center; }
+        .cand-row span { color: var(--ielts-orange); font-size: 10px; }
 
-        /* Visual Box untuk Centre Number */
-        .centre-box-area {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .boxes-top { display: flex; gap: 2px; margin-bottom: 4px;}
-        .box-top { width: 20px; height: 25px; border: 1px solid var(--ielts-orange); }
-        .grid-shading {
-            display: flex; gap: 2px;
-        }
-        .grid-col { display: flex; flex-direction: column; gap: 2px; }
-        .grid-cell { width: 20px; height: 10px; border: 1px solid #f9c7aa; font-size: 7px; display: flex; justify-content: center; align-items: center; color: #f9c7aa; }
-
-        /* --- Grid Soal 1-40 --- */
+        /* --- GRID SOAL 1-40 --- */
         .listening-grid {
             display: flex;
             justify-content: space-between;
             gap: 15px;
         }
 
-        .grid-column {
-            flex: 1;
-            border: 2px solid var(--ielts-orange);
-        }
-
+        .grid-column { flex: 1; border: 2px solid var(--ielts-orange); }
+        
         .grid-header {
-            background-color: var(--ielts-orange);
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            padding: 3px;
-            font-size: 12px;
-            word-spacing: 15px;
+            background-color: var(--ielts-orange); color: white;
+            text-align: center; font-weight: bold; padding: 4px; font-size: 12px;
+            letter-spacing: 1px; word-spacing: 10px;
         }
 
         .marker-title {
-            text-align: right;
-            font-size: 8px;
-            color: var(--ielts-dark-orange);
-            padding: 2px 10px;
-            border-bottom: 1px solid var(--ielts-orange);
-            background-color: white;
+            text-align: right; font-size: 8px; color: var(--ielts-dark-orange);
+            padding: 2px 10px; border-bottom: 1px solid var(--ielts-orange); background-color: white;
         }
 
-        /* Rows */
         .q-row {
-            display: flex;
-            border-bottom: 1px solid var(--ielts-orange);
-            height: 24px;
-            background-color: #ffffff;
+            display: flex; border-bottom: 1px solid var(--ielts-orange);
+            height: 25px; background-color: #ffffff;
         }
         .q-row:last-child { border-bottom: none; }
-
-        /* Alternate colors like real IELTS */
-        .q-row:nth-child(even) { background-color: var(--ielts-light); }
+        .q-row:nth-child(even) { background-color: var(--ielts-light); } /* Alternate color */
 
         .q-num {
-            width: 30px;
-            font-weight: bold;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-right: 1px solid var(--ielts-orange);
-            font-size: 12px;
+            width: 32px; font-weight: bold; color: var(--text-dark);
+            display: flex; align-items: center; justify-content: center;
+            border-right: 1px solid var(--ielts-orange); font-size: 13px;
         }
 
         .q-ans {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #000;
+            flex: 1; display: flex; align-items: center; padding: 0 10px;
+            font-family: 'Courier New', Courier, monospace; font-size: 14px;
+            font-weight: bold; text-transform: uppercase; color: #000;
         }
 
-        /* Kotak Examiner (Marker) */
         .q-marker {
-            width: 60px;
-            border-left: 1px solid var(--ielts-orange);
-            display: flex;
-            align-items: center;
-            justify-content: space-evenly;
-            padding: 0 2px;
+            width: 65px; border-left: 1px solid var(--ielts-orange);
+            display: flex; align-items: center; justify-content: space-evenly; padding: 0 2px;
         }
-        
         .mark-box-small {
-            border: 1px solid #f2a983;
-            width: 14px;
-            height: 14px;
-            font-size: 9px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #d9753c;
-            background: white;
+            border: 1px solid var(--ielts-orange); width: 15px; height: 13px;
+            font-size: 9px; display: flex; justify-content: center; align-items: center;
+            color: var(--ielts-dark-orange); background: white;
         }
 
-        /* --- Footer --- */
+        /* --- FOOTER SKOR --- */
         .footer-scores {
-            margin-top: 10px;
-            display: flex;
-            gap: 15px;
-            border-top: 2px solid #000;
-            padding-top: 5px;
+            margin-top: 10px; display: flex; gap: 15px;
+            border-top: 2px solid #000; padding-top: 6px;
         }
-        .score-box-wrapper {
-            flex: 1;
-            border: 1px solid var(--ielts-orange);
-            display: flex;
-            flex-direction: column;
-        }
+        .score-box-wrapper { flex: 1; border: 1px solid var(--ielts-orange); display: flex; flex-direction: column; }
         .score-header {
-            background-color: var(--ielts-light);
-            text-align: center;
-            font-size: 10px;
-            padding: 3px;
-            border-bottom: 1px solid var(--ielts-orange);
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dark);
+            background-color: var(--ielts-light); text-align: center; font-size: 10px;
+            padding: 3px; border-bottom: 1px solid var(--ielts-orange);
+            height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-dark);
         }
-        .score-value {
-            height: 25px;
-            background: white;
-        }
+        .score-value { height: 22px; background: white; }
 
-        /* --- Print Rules --- */
+        /* Print Override */
         @media print {
             body { padding: 0; background: white; }
             .no-print-toolbar { display: none; }
@@ -307,7 +279,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             Close & Back
         </button>
-        <span class="toolbar-info">💡 Isi nama/biodata di garis yang disediakan sebelum print.</span>
+        <span class="toolbar-info">💡 Isi indentitas di kotak yang disediakan sebelum print.</span>
         <button class="btn btn-print" onclick="window.print()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Print A4 Document
@@ -317,62 +289,74 @@
     <!-- Lembar A4 -->
     <div class="a4-page">
         
-        <!-- Alignment Kiri -->
-        <div class="alignment-marks">
-            <div class="mark-box"></div><div class="mark-box"></div><div class="mark-box"></div>
-            <div class="mark-box"></div><div class="mark-box"></div><div class="mark-box"></div>
-        </div>
+        <!-- OMR Left Edge -->
+        <div class="omr-col" id="omr-left"></div>
 
-        <!-- Main Kertas -->
+        <!-- MAIN KONTEN KERTAS -->
         <div class="main-content">
-            <!-- WATERMARK: Diperbaiki opacity 15% & Z-Index 9999 -->
+            
+            <!-- WATERMARK (DIJAMIN DI ATAS & TRANSPARAN) -->
             <div class="watermark">
                 FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
             </div>
 
-            <!-- Logos -->
-            <div class="logos-header">
-                <img src="../../Assets/BritCounsil.jpeg" alt="British Council">
-                <img src="../../Assets/IdpEdu.jpeg" alt="IDP Education">
-                <img src="../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
+            <!-- HEADER LOGOS (RAPIH) -->
+            <div class="header-logos">
+                <div class="logos-left">
+                    <img src="../../Assets/BritCounsil.jpeg" alt="British Council">
+                    <img src="../../Assets/IdpEdu.jpeg" alt="IDP Education">
+                </div>
+                <div>
+                    <img src="../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
+                </div>
             </div>
 
-            <div class="sheet-title">IELTS Listening and Reading Answer Sheet</div>
-
-            <!-- Biodata -->
-            <div class="candidate-info">
-                <div class="info-row">
-                    <span class="info-label">Centre number:</span>
-                    <div class="centre-box-area">
-                        <div class="boxes-top">
-                            <div class="box-top"></div><div class="box-top"></div><div class="box-top"></div>
-                            <div class="box-top"></div><div class="box-top"></div><div class="box-top"></div>
+            <!-- IDENTIFICATION SECTION (SANGAT MIRIP ASLI) -->
+            <div class="id-section">
+                <div class="id-title">IELTS Listening and Reading Answer Sheet</div>
+                <div class="id-body">
+                    
+                    <!-- Kiri: Biodata Text -->
+                    <div class="id-left">
+                        <div class="flex-row">
+                            <span class="o-label" style="width: 100px;">Centre number:</span>
+                            <div class="write-boxes" id="centre-boxes"></div>
                         </div>
-                        <div class="grid-shading" id="shading-centre"></div>
+                        <div class="o-sub" style="margin-top:-2px;">Pencil must be used to complete this sheet.</div>
+                        
+                        <div class="o-text" style="margin-top: 8px;">Please write your full name in CAPITAL letters on the line below:</div>
+                        <div class="name-box" contenteditable="true"></div>
+                        
+                        <div class="o-text" style="margin-top: 6px; display: flex; align-items: center;">
+                            Then write your six digit Candidate number in the boxes and<br>shade the number in the grid on the right. 
+                            <span class="pointer-hand">☛</span>
+                        </div>
+
+                        <div class="date-section">
+                            <div class="o-text">Test date (shade ONE box for the day, ONE box for the month and ONE box for the year):</div>
+                            <div class="date-row">
+                                <span class="o-label" style="width: 45px;">Day:</span>
+                                <div class="date-nums" id="day-nums"></div>
+                            </div>
+                            <div class="date-row">
+                                <span class="o-label" style="width: 45px;">Month:</span>
+                                <div class="date-nums" id="month-nums" style="width:170px;"></div>
+                                <span class="o-label" style="margin-left: 10px;">Year <span style="font-size:10px; font-weight:normal;">(last 2 digits):</span></span>
+                                <div class="date-nums" id="year-nums"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kanan: Grid OMR Candidate Number -->
+                    <div class="id-right">
+                        <div class="pencil-icon">✏️</div>
+                        <div class="write-boxes" id="cand-boxes"></div>
+                        <div class="cand-grid" id="cand-rows"></div>
                     </div>
                 </div>
-
-                <div class="info-row" style="margin-top: 10px;">
-                    <span class="info-label">Please write your full name in CAPITAL letters on the line below:</span>
-                </div>
-                <div class="info-row" style="margin-top: -5px;">
-                    <span class="input-line" contenteditable="true" style="border-bottom-style: solid;"></span>
-                </div>
-
-                <div class="info-row">
-                    <span class="info-label">Please write your Candidate number on the line below:</span>
-                </div>
-                <div class="info-row" style="margin-top: -5px;">
-                    <span class="input-line" contenteditable="true" style="max-width: 350px; border-bottom-style: solid;"></span>
-                </div>
-                
-                <div class="info-row">
-                    <span class="info-label" style="width: auto;">Test date (Day, Month, Year):</span>
-                    <span class="input-line" contenteditable="true" style="max-width: 150px; border-bottom: none; font-size: 12px; margin-top: -2px;">__ / __ / ____</span>
-                </div>
             </div>
 
-            <!-- Area Kotak Soal 1-40 -->
+            <!-- AREA SOAL 1-40 -->
             <div class="listening-grid">
                 
                 <!-- Kolom 1 (1 - 20) -->
@@ -391,36 +375,33 @@
 
             </div>
 
-            <!-- Footer Skor -->
+            <!-- FOOTER SKOR -->
             <div class="footer-scores">
-                <div class="score-box-wrapper" style="max-width: 100px;">
-                    <div class="score-header">Marker 2<br>Initials</div>
-                    <div class="score-value"></div>
+                <div class="score-box-wrapper" style="max-width: 90px;">
+                    <div class="score-header">Marker 2<br>Initials</div><div class="score-value"></div>
                 </div>
-                <div class="score-box-wrapper" style="max-width: 100px;">
-                    <div class="score-header">Marker 1<br>Initials</div>
-                    <div class="score-value"></div>
+                <div class="score-box-wrapper" style="max-width: 90px;">
+                    <div class="score-header">Marker 1<br>Initials</div><div class="score-value"></div>
                 </div>
                 <div style="flex:1;"></div>
-                <div class="score-box-wrapper" style="max-width: 80px;">
-                    <div class="score-header">Band<br>Score</div>
-                    <div class="score-value"></div>
+                <div class="score-box-wrapper" style="max-width: 70px;">
+                    <div class="score-header">Band<br>Score</div><div class="score-value"></div>
                 </div>
-                <div class="score-box-wrapper" style="max-width: 100px;">
-                    <div class="score-header">Listening<br>Total</div>
-                    <div class="score-value"></div>
+                <div class="score-box-wrapper" style="max-width: 90px;">
+                    <div class="score-header">Listening<br>Total</div><div class="score-value"></div>
                 </div>
             </div>
-            <div style="text-align: center; font-size: 8px; font-weight: bold; margin-top: 5px;">IELTS L-R v4.0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DP650/394</div>
+            <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: bold; margin-top: 5px; color: #000;">
+                <span>IELTS L-R v4.0</span>
+                <span>DP650/394</span>
+            </div>
         </div>
 
-        <!-- Alignment Kanan -->
-        <div class="alignment-marks">
-            <div class="mark-box"></div><div class="mark-box"></div><div class="mark-box"></div>
-            <div class="mark-box"></div><div class="mark-box"></div><div class="mark-box"></div>
-        </div>
+        <!-- OMR Right Edge -->
+        <div class="omr-col" id="omr-right"></div>
     </div>
 
+    <!-- SCRIPTS -->
     <script>
         const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
         
@@ -439,6 +420,54 @@
             return flat;
         }
 
+        // Generate Kotak Isian (Centre Number & Candidate Number)
+        function generateWriteBoxes(id) {
+            let html = '';
+            for(let i=0; i<6; i++) { html += '<input type="text" class="w-box" maxlength="1">'; }
+            document.getElementById(id).innerHTML = html;
+        }
+
+        // Generate Tanggal OMR (Day, Month, Year)
+        function generateDates(id, start, end) {
+            let html = '';
+            for(let i=start; i<=end; i++) {
+                let num = i < 10 ? '0'+i : i;
+                html += `<div class="omr-num">${num}</div>`;
+            }
+            document.getElementById(id).innerHTML = html;
+        }
+
+        function initFormElements() {
+            // Generate garis tepi hitam LJK
+            let omrLeft = '', omrRight = '';
+            for(let i=0; i<30; i++) { 
+                omrRight += '<div class="omr-bar"></div>'; 
+                // Left OMR hanya di beberapa bagian untuk keakuratan
+                if(i < 3 || i > 26) { omrLeft += '<div class="omr-bar"></div>'; } 
+                else { omrLeft += '<div class="omr-bar-hidden"></div>'; }
+            }
+            document.getElementById('omr-right').innerHTML = omrRight;
+            document.getElementById('omr-left').innerHTML = omrLeft;
+
+            // Generate Kotak Isian
+            generateWriteBoxes('centre-boxes');
+            generateWriteBoxes('cand-boxes');
+
+            // Generate Tanggal
+            generateDates('day-nums', 1, 31);
+            generateDates('month-nums', 1, 12);
+            generateDates('year-nums', 9, 18);
+
+            // Generate Grid Angka Candidate Number
+            let candRowsHtml = '';
+            for(let r=0; r<6; r++) {
+                candRowsHtml += '<div class="cand-row"><span>►</span>';
+                for(let n=0; n<=9; n++) { candRowsHtml += `<div class="omr-num">${n}</div>`; }
+                candRowsHtml += '</div>';
+            }
+            document.getElementById('cand-rows').innerHTML = candRowsHtml;
+        }
+
         function renderGrid() {
             const answers = getFlatAnswers();
             const col1 = document.getElementById('col-1-20');
@@ -447,7 +476,7 @@
             for (let i = 1; i <= 40; i++) {
                 let ansText = answers[i - 1] || "";
 
-                // Desain kotak Marker Use Only yang spesifik menyerupai asli
+                // Kotak Marker Presisi [ ✓ ] [ Angka Soal ] [ ✗ ]
                 let rowHTML = `
                     <div class="q-row">
                         <div class="q-num">${i}</div>
@@ -466,18 +495,12 @@
                     col2.innerHTML += rowHTML;
                 }
             }
-
-            // Generate Shading Grid palsu untuk Centre Number (hanya untuk estetika agar mirip)
-            const shadingContainer = document.getElementById('shading-centre');
-            for(let c=0; c<6; c++) {
-                let colHTML = '<div class="grid-col">';
-                for(let r=0; r<=9; r++) { colHTML += `<div class="grid-cell">${r}</div>`; }
-                colHTML += '</div>';
-                shadingContainer.innerHTML += colHTML;
-            }
         }
 
-        window.onload = renderGrid;
+        window.onload = () => {
+            initFormElements();
+            renderGrid();
+        };
     </script>
 </body>
-</html>
+                        </html>
