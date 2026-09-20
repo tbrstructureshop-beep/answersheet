@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta viewport ini diatur ke fixed width agar di mobile tampil full fit-screen & bisa di-zoom -->
+    <meta name="viewport" content="width=850, user-scalable=yes">
     <title>IELTS Listening - Print Answer Sheet</title>
     <style>
         :root {
-            --ielts-orange: #f28b50;
-            --ielts-light-orange: #fae4d8;
-            --border-color: #d17540;
+            --ielts-orange: #eb8c54;
+            --ielts-light: #fbe6d5;
+            --text-dark: #333333;
         }
 
         * {
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             margin: 0;
             padding: 0;
             -webkit-print-color-adjust: exact !important;
@@ -21,14 +22,14 @@
         }
 
         body {
-            background-color: #e2e8f0;
+            background-color: #cbd5e1;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
         }
 
-        /* Toolbar (Hidden on Print) */
+        /* --- Toolbar (Sembunyi saat Print) --- */
         .no-print-toolbar {
             width: 210mm;
             background: #ffffff;
@@ -51,72 +52,123 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            transition: 0.2s;
         }
         .btn-print { background-color: #4f46e5; color: white; }
         .btn-print:hover { background-color: #4338ca; }
         .btn-back { background-color: #64748b; color: white; }
-        
-        .toolbar-info {
-            font-size: 13px;
-            color: #64748b;
-        }
+        .btn-back:hover { background-color: #475569; }
+        .toolbar-info { font-size: 13px; color: #64748b; }
 
-        /* A4 Page Setup */
+        /* --- Kertas A4 --- */
         .a4-page {
             width: 210mm;
             min-height: 297mm;
             background: white;
-            padding: 15mm;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            padding: 12mm 15mm;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             position: relative;
+            overflow: hidden; /* Mencegah watermark keluar dari kertas */
         }
 
-        /* Header Layout */
-        .header-title {
+        /* --- Watermark --- */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 42px;
+            font-weight: bold;
+            color: #000000;
+            opacity: 0.35; /* 35% Opacity */
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* --- Logos Header --- */
+        .logos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+        .logos-header img {
+            height: 45px;
+            object-fit: contain;
+        }
+
+        /* --- Sub Header --- */
+        .sheet-title {
             text-align: center;
             color: var(--ielts-orange);
-            font-size: 22px;
+            font-size: 17px;
             font-weight: bold;
-            margin: 20px 0;
+            padding: 6px 0;
+            border-top: 2px solid var(--ielts-orange);
             border-bottom: 2px solid var(--ielts-orange);
-            padding-bottom: 5px;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
         }
 
+        /* --- Biodata Section --- */
         .candidate-info {
-            margin-bottom: 20px;
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 20; /* Berada di atas watermark */
         }
-        
+
         .info-row {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             margin-bottom: 15px;
         }
         
         .info-label {
             color: var(--ielts-orange);
             font-weight: bold;
-            width: 150px;
+            margin-right: 10px;
+            white-space: nowrap;
         }
 
         .input-line {
             flex: 1;
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid #999;
             outline: none;
             padding: 2px 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 16px;
             text-transform: uppercase;
         }
 
-        /* 40 Questions Grid */
+        .box-grid-container {
+            display: flex;
+            gap: 2px;
+        }
+        .box-grid {
+            width: 20px;
+            height: 25px;
+            border: 1px solid var(--ielts-orange);
+        }
+
+        /* --- Grid Soal 1-40 --- */
         .listening-grid {
             display: flex;
             justify-content: space-between;
-            gap: 20px;
+            gap: 15px;
+            position: relative;
+            z-index: 20;
         }
 
         .grid-column {
             flex: 1;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--ielts-orange);
         }
 
         .grid-header {
@@ -124,40 +176,37 @@
             color: white;
             text-align: center;
             font-weight: bold;
-            padding: 5px;
-            font-size: 16px;
+            padding: 4px;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .marker-title {
             text-align: right;
-            font-size: 8px;
+            font-size: 9px;
             color: #999;
-            padding: 2px 5px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--ielts-light-orange);
+            padding: 2px 10px;
+            border-bottom: 2px solid var(--ielts-orange);
         }
 
         /* Rows */
         .q-row {
             display: flex;
-            border-bottom: 1px solid var(--border-color);
-            min-height: 30px;
+            border-bottom: 1px solid var(--ielts-orange);
+            min-height: 28px;
+            background-color: #ffffff;
         }
-        
-        .q-row:nth-child(even) {
-            background-color: #fff;
-        }
-        .q-row:nth-child(odd) {
-            background-color: var(--ielts-light-orange);
-        }
+        .q-row:last-child { border-bottom: none; }
 
         .q-num {
             width: 35px;
             font-weight: bold;
+            color: var(--text-dark);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-right: 1px solid var(--border-color);
+            border-right: 1px solid var(--ielts-orange);
             font-size: 14px;
         }
 
@@ -167,119 +216,179 @@
             align-items: center;
             padding: 0 10px;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             text-transform: uppercase;
             color: #000;
         }
 
+        /* Marker kolom warna alternate selang-seling */
         .q-marker {
-            width: 45px;
-            border-left: 1px solid var(--border-color);
+            width: 65px;
+            border-left: 1px solid var(--ielts-orange);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px;
+            color: #b5b5b5; 
+            font-size: 11px;
+            font-family: Arial, sans-serif;
+            font-weight: normal;
+        }
+        .q-row:nth-child(even) .q-marker { background-color: var(--ielts-light); }
+        .q-row:nth-child(odd) .q-marker { background-color: #ffffff; }
+
+        /* --- Footer --- */
+        .footer-scores {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            position: relative;
+            z-index: 20;
+        }
+        .score-box-wrapper {
+            flex: 1;
+            border: 1px solid #000;
+            display: flex;
+            flex-direction: column;
+        }
+        .score-header {
+            background-color: var(--ielts-light);
+            text-align: center;
+            font-size: 11px;
+            padding: 4px;
+            border-bottom: 1px solid #000;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #e2e8f0; /* Faded tick/cross placeholders */
-            font-size: 10px;
+        }
+        .score-value {
+            height: 30px;
+            background: white;
         }
 
-        /* Footer */
-        .footer-scores {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            border: 1px solid #000;
-        }
-        .score-box {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            border-right: 1px solid #000;
-            font-size: 12px;
-            background: var(--ielts-light-orange);
-        }
-        .score-box:last-child { border-right: none; }
-        .score-box div { background: white; border: 1px solid #000; height: 30px; margin-top: 5px; }
-
+        /* --- Print Rules --- */
         @media print {
             body { padding: 0; background: white; }
             .no-print-toolbar { display: none; }
-            .a4-page { box-shadow: none; margin: 0; padding: 10mm; }
+            .a4-page { box-shadow: none; margin: 0; padding: 10mm 15mm; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Toolbar for Screen Only -->
+    <!-- Toolbar (Sembunyi saat diprint) -->
     <div class="no-print-toolbar">
         <button class="btn btn-back" onclick="window.close()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             Close & Back
         </button>
-        <span class="toolbar-info">💡 You can type your Name & Details on the lines before printing.</span>
+        <span class="toolbar-info">💡 Ketik identitas & biodata Anda di garis yang disediakan sebelum klik Print.</span>
         <button class="btn btn-print" onclick="window.print()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Print A4 Document
         </button>
     </div>
 
-    <!-- Printable A4 Sheet -->
+    <!-- Halaman Utama Lembar A4 -->
     <div class="a4-page">
         
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>⚫⚫ BRITISH<br>⚫⚫ COUNCIL</h2>
-            <h2><i>idp</i></h2>
-            <h4 style="text-align: right; font-weight: normal;">UNIVERSITY of CAMBRIDGE<br>ESOL Examinations</h4>
+        <!-- Watermark -->
+        <div class="watermark">
+            FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
         </div>
 
-        <div class="header-title">IELTS Listening and Reading Answer Sheet</div>
+        <!-- 3 Logos Atas -->
+        <div class="logos-header">
+            <img src="../../Assets/BritCounsil.jpeg" alt="British Council">
+            <img src="../../Assets/IdpEdu.jpeg" alt="IDP Education">
+            <img src="../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
+        </div>
 
+        <!-- Garis Judul -->
+        <div class="sheet-title">IELTS Listening and Reading Answer Sheet</div>
+
+        <!-- Formulir Biodata -->
         <div class="candidate-info">
             <div class="info-row">
                 <span class="info-label">Centre number:</span>
-                <span class="input-line" contenteditable="true"></span>
-                <span class="info-label" style="text-align: right; margin-right: 10px;">Test date:</span>
-                <span class="input-line" contenteditable="true" style="max-width: 150px;" placeholder="DD/MM/YYYY"></span>
+                <div class="box-grid-container" style="margin-right: 30px;">
+                    <div class="box-grid"></div><div class="box-grid"></div><div class="box-grid"></div>
+                    <div class="box-grid"></div><div class="box-grid"></div><div class="box-grid"></div>
+                </div>
+                
+                <span class="info-label">Test date (Day, Month, Year):</span>
+                <span class="input-line" contenteditable="true" style="max-width: 150px; border-bottom: none;">
+                    __ / __ / ____
+                </span>
             </div>
+
             <div class="info-row">
-                <span class="info-label" style="width: auto; margin-right: 10px;">Please write your full name in CAPITAL letters:</span>
+                <span class="info-label" style="font-weight: normal; font-size: 12px; color: #666;">
+                    Please write your <b>full name</b> in CAPITAL letters on the line below:
+                </span>
+            </div>
+            <div class="info-row" style="margin-top: -10px;">
                 <span class="input-line" contenteditable="true"></span>
             </div>
+
             <div class="info-row">
-                <span class="info-label" style="width: auto; margin-right: 10px;">Candidate number:</span>
-                <span class="input-line" contenteditable="true" style="max-width: 200px;"></span>
+                <span class="info-label" style="font-weight: normal; font-size: 12px; color: #666;">
+                    Please write your Candidate number on the line below:
+                </span>
+            </div>
+            <div class="info-row" style="margin-top: -10px;">
+                <span class="input-line" contenteditable="true" style="max-width: 300px;"></span>
             </div>
         </div>
 
+        <!-- Area Kotak Soal 1-40 -->
         <div class="listening-grid">
-            <!-- Column 1 (Questions 1 - 20) -->
+            
+            <!-- Kolom 1 (Soal 1 - 20) -->
             <div class="grid-column">
-                <div class="grid-header">Listening</div>
+                <div class="grid-header">Listening &nbsp; Listening &nbsp; Listening</div>
                 <div class="marker-title">Marker use only</div>
                 <div id="col-1-20"></div>
             </div>
             
-            <!-- Column 2 (Questions 21 - 40) -->
+            <!-- Kolom 2 (Soal 21 - 40) -->
             <div class="grid-column">
-                <div class="grid-header">Listening</div>
+                <div class="grid-header">Listening &nbsp; Listening &nbsp; Listening</div>
                 <div class="marker-title">Marker use only</div>
                 <div id="col-21-40"></div>
             </div>
+
         </div>
 
+        <!-- Kotak Footer Skor -->
         <div class="footer-scores">
-            <div class="score-box">Marker 2 Initials<div></div></div>
-            <div class="score-box">Marker 1 Initials<div></div></div>
-            <div class="score-box">Band Score<div></div></div>
-            <div class="score-box">Listening Total<div></div></div>
+            <div class="score-box-wrapper" style="max-width: 120px;">
+                <div class="score-header">Marker 2<br>Initials</div>
+                <div class="score-value"></div>
+            </div>
+            <div class="score-box-wrapper" style="max-width: 120px;">
+                <div class="score-header">Marker 1<br>Initials</div>
+                <div class="score-value"></div>
+            </div>
+            <div style="flex:1;"></div>
+            <div class="score-box-wrapper" style="max-width: 100px;">
+                <div class="score-header">Band<br>Score</div>
+                <div class="score-value"></div>
+            </div>
+            <div class="score-box-wrapper" style="max-width: 120px;">
+                <div class="score-header">Listening<br>Total</div>
+                <div class="score-value"></div>
+            </div>
         </div>
 
     </div>
 
+    <!-- Script Pemetaan Jawaban ke Grid -->
     <script>
         const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
         
-        // Fungsi untuk mengambil semua jawaban dan meratakannya menjadi array
         function getFlatAnswers() {
             const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
             let flat = [];
@@ -287,7 +396,6 @@
                 const data = JSON.parse(saved);
                 data.forEach(section => {
                     section.answers.forEach(ans => {
-                        // Jika Tipe MCQ, ambil mcqOpt, Jika Essay ambil text
                         let finalAnswer = ans.type === 'mcq' ? ans.mcqOpt : ans.text;
                         flat.push(finalAnswer || "");
                     });
@@ -296,22 +404,19 @@
             return flat;
         }
 
-        // Render baris soal
         function renderGrid() {
             const answers = getFlatAnswers();
             const col1 = document.getElementById('col-1-20');
             const col2 = document.getElementById('col-21-40');
 
-            // Generate 40 rows
             for (let i = 1; i <= 40; i++) {
-                // Ambil jawaban (jika belum dikerjakan, biarkan kosong)
                 let ansText = answers[i - 1] || "";
 
                 let rowHTML = `
                     <div class="q-row">
                         <div class="q-num">${i}</div>
                         <div class="q-ans">${ansText}</div>
-                        <div class="q-marker">✓ &nbsp; ✗</div>
+                        <div class="q-marker"><span>✓</span> <span>${i}</span> <span>✗</span></div>
                     </div>
                 `;
 
@@ -323,7 +428,6 @@
             }
         }
 
-        // Jalankan saat halaman dimuat
         window.onload = renderGrid;
     </script>
 </body>
