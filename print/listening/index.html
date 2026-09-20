@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Listening - Print Answer Sheet</title>
+    <style>
+        :root {
+            --ielts-orange: #f28b50;
+            --ielts-light-orange: #fae4d8;
+            --border-color: #d17540;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background-color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Toolbar (Hidden on Print) */
+        .no-print-toolbar {
+            width: 210mm;
+            background: #ffffff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-print { background-color: #4f46e5; color: white; }
+        .btn-print:hover { background-color: #4338ca; }
+        .btn-back { background-color: #64748b; color: white; }
+        
+        .toolbar-info {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* A4 Page Setup */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 15mm;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Header Layout */
+        .header-title {
+            text-align: center;
+            color: var(--ielts-orange);
+            font-size: 22px;
+            font-weight: bold;
+            margin: 20px 0;
+            border-bottom: 2px solid var(--ielts-orange);
+            padding-bottom: 5px;
+        }
+
+        .candidate-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            color: var(--ielts-orange);
+            font-weight: bold;
+            width: 150px;
+        }
+
+        .input-line {
+            flex: 1;
+            border-bottom: 1px solid #000;
+            outline: none;
+            padding: 2px 5px;
+            text-transform: uppercase;
+        }
+
+        /* 40 Questions Grid */
+        .listening-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .grid-column {
+            flex: 1;
+            border: 1px solid var(--border-color);
+        }
+
+        .grid-header {
+            background-color: var(--ielts-orange);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        .marker-title {
+            text-align: right;
+            font-size: 8px;
+            color: #999;
+            padding: 2px 5px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--ielts-light-orange);
+        }
+
+        /* Rows */
+        .q-row {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 30px;
+        }
+        
+        .q-row:nth-child(even) {
+            background-color: #fff;
+        }
+        .q-row:nth-child(odd) {
+            background-color: var(--ielts-light-orange);
+        }
+
+        .q-num {
+            width: 35px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .q-ans {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #000;
+        }
+
+        .q-marker {
+            width: 45px;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e2e8f0; /* Faded tick/cross placeholders */
+            font-size: 10px;
+        }
+
+        /* Footer */
+        .footer-scores {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #000;
+        }
+        .score-box {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-right: 1px solid #000;
+            font-size: 12px;
+            background: var(--ielts-light-orange);
+        }
+        .score-box:last-child { border-right: none; }
+        .score-box div { background: white; border: 1px solid #000; height: 30px; margin-top: 5px; }
+
+        @media print {
+            body { padding: 0; background: white; }
+            .no-print-toolbar { display: none; }
+            .a4-page { box-shadow: none; margin: 0; padding: 10mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toolbar for Screen Only -->
+    <div class="no-print-toolbar">
+        <button class="btn btn-back" onclick="window.close()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Close & Back
+        </button>
+        <span class="toolbar-info">💡 You can type your Name & Details on the lines before printing.</span>
+        <button class="btn btn-print" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print A4 Document
+        </button>
+    </div>
+
+    <!-- Printable A4 Sheet -->
+    <div class="a4-page">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>⚫⚫ BRITISH<br>⚫⚫ COUNCIL</h2>
+            <h2><i>idp</i></h2>
+            <h4 style="text-align: right; font-weight: normal;">UNIVERSITY of CAMBRIDGE<br>ESOL Examinations</h4>
+        </div>
+
+        <div class="header-title">IELTS Listening and Reading Answer Sheet</div>
+
+        <div class="candidate-info">
+            <div class="info-row">
+                <span class="info-label">Centre number:</span>
+                <span class="input-line" contenteditable="true"></span>
+                <span class="info-label" style="text-align: right; margin-right: 10px;">Test date:</span>
+                <span class="input-line" contenteditable="true" style="max-width: 150px;" placeholder="DD/MM/YYYY"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label" style="width: auto; margin-right: 10px;">Please write your full name in CAPITAL letters:</span>
+                <span class="input-line" contenteditable="true"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label" style="width: auto; margin-right: 10px;">Candidate number:</span>
+                <span class="input-line" contenteditable="true" style="max-width: 200px;"></span>
+            </div>
+        </div>
+
+        <div class="listening-grid">
+            <!-- Column 1 (Questions 1 - 20) -->
+            <div class="grid-column">
+                <div class="grid-header">Listening</div>
+                <div class="marker-title">Marker use only</div>
+                <div id="col-1-20"></div>
+            </div>
+            
+            <!-- Column 2 (Questions 21 - 40) -->
+            <div class="grid-column">
+                <div class="grid-header">Listening</div>
+                <div class="marker-title">Marker use only</div>
+                <div id="col-21-40"></div>
+            </div>
+        </div>
+
+        <div class="footer-scores">
+            <div class="score-box">Marker 2 Initials<div></div></div>
+            <div class="score-box">Marker 1 Initials<div></div></div>
+            <div class="score-box">Band Score<div></div></div>
+            <div class="score-box">Listening Total<div></div></div>
+        </div>
+
+    </div>
+
+    <script>
+        const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
+        
+        // Fungsi untuk mengambil semua jawaban dan meratakannya menjadi array
+        function getFlatAnswers() {
+            const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+            let flat = [];
+            if (saved) {
+                const data = JSON.parse(saved);
+                data.forEach(section => {
+                    section.answers.forEach(ans => {
+                        // Jika Tipe MCQ, ambil mcqOpt, Jika Essay ambil text
+                        let finalAnswer = ans.type === 'mcq' ? ans.mcqOpt : ans.text;
+                        flat.push(finalAnswer || "");
+                    });
+                });
+            }
+            return flat;
+        }
+
+        // Render baris soal
+        function renderGrid() {
+            const answers = getFlatAnswers();
+            const col1 = document.getElementById('col-1-20');
+            const col2 = document.getElementById('col-21-40');
+
+            // Generate 40 rows
+            for (let i = 1; i <= 40; i++) {
+                // Ambil jawaban (jika belum dikerjakan, biarkan kosong)
+                let ansText = answers[i - 1] || "";
+
+                let rowHTML = `
+                    <div class="q-row">
+                        <div class="q-num">${i}</div>
+                        <div class="q-ans">${ansText}</div>
+                        <div class="q-marker">✓ &nbsp; ✗</div>
+                    </div>
+                `;
+
+                if (i <= 20) {
+                    col1.innerHTML += rowHTML;
+                } else {
+                    col2.innerHTML += rowHTML;
+                }
+            }
+        }
+
+        // Jalankan saat halaman dimuat
+        window.onload = renderGrid;
+    </script>
+</body>
+</html>
