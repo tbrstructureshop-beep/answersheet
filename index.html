@@ -17,212 +17,148 @@
             --incorrect-bg: #fee2e2;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
-        /* KUNCI BODY AGAR TIDAK BISA DI-SCROLL NATIVE */
-        html {
-            height: -webkit-fill-available;
-        }
-        
-        body {
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Matikan scroll utama layar */
             background-color: var(--bg-color);
             color: var(--text-main);
-            line-height: 1.5;
             display: flex;
             flex-direction: column;
-            height: 100vh; /* Fallback */
-            height: 100dvh; /* Dynamic viewport untuk HP */
-            min-height: -webkit-fill-available;
-            overflow: hidden; /* Matikan scroll utama */
-            margin: 0;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
 
         /* --- STICKY TOP ZONE (TETAP DI TEMPAT) --- */
         .sticky-zone {
-            flex-shrink: 0; /* Jangan biarkan area ini mengecil */
+            flex-shrink: 0; 
             background-color: var(--bg-color);
-            padding-top: 15px;
-            padding-bottom: 10px;
+            padding-top: 15px; padding-bottom: 10px;
             border-bottom: 2px solid var(--border);
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             z-index: 100;
-            max-height: 55dvh; /* Maksimal 55% layar HP jika keyboard memakan layar */
-            overflow-y: auto; /* Scroll dalam jika konten atas terlalu padat */
         }
 
-        header h1 {
-            text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
+        header h1 { text-align: center; font-size: 1.5rem; margin-bottom: 15px; }
 
-        .top-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
+        .top-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
 
-        /* --- SCROLLABLE WORKSPACE (AREA JAWABAN) --- */
+        /* --- SCROLLABLE WORKSPACE --- */
         .main-scroll-area {
-            flex-grow: 1; /* Ambil sisa layar yang ada */
-            overflow-y: auto; /* Area ini yang bisa di-scroll */
-            -webkit-overflow-scrolling: touch; /* Scroll mulus di iOS */
+            flex-grow: 1;
+            overflow-y: auto; /* Area bawah yang bisa di-scroll */
+            -webkit-overflow-scrolling: touch;
             padding-top: 20px;
-            padding-bottom: 40px;
+            padding-bottom: 200px; /* Ruang lebih untuk scroll saat keyboard muncul */
         }
 
-        /* --- Media Setup & Player --- */
-        .media-setup {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        @media (min-width: 600px) {
-            .media-setup {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-            }
-        }
-
+        /* --- Media Player --- */
+        .media-setup { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        @media (min-width: 600px) { .media-setup { flex-direction: row; } }
         .input-group { display: flex; flex: 1; gap: 8px; }
         
-        input[type="text"], input[type="file"] {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 16px; /* 16px wajib agar iOS tidak otomatis nge-zoom */
-        }
+        input[type="text"], input[type="file"] { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; }
 
-        button {
-            background: var(--primary); color: white; border: none; padding: 8px 14px;
-            border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500;
-            transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-        }
-
+        button { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; }
         button:hover { background: var(--primary-hover); }
-        button:disabled { background: #94a3b8; cursor: not-allowed; }
-        
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: #eff6ff; }
         .btn-danger { background: transparent; border: 1px solid #ef4444; color: #ef4444; }
-        .btn-danger:hover { background: #fef2f2; }
         .btn-success { background: #10b981; }
-        .btn-success:hover { background: #059669; }
         .btn-print { background: #4f46e5; }
-        .btn-print:hover { background: #4338ca; }
         .btn-warning { background: #f59e0b; color: white; }
-        .btn-warning:hover { background: #d97706; }
 
-        .video-wrapper {
-            position: relative; background: #000; border-radius: 8px; display: none; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        .video-wrapper { position: relative; background: #000; border-radius: 8px; display: none; overflow: hidden; margin-bottom: 10px; }
         .video-wrapper.is-video { padding-bottom: 56.25%; height: 0; }
         .video-wrapper.is-video iframe, .video-wrapper.is-video video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         .video-wrapper.is-audio { background: var(--card-bg); padding: 15px; }
         .video-wrapper.is-audio audio { width: 100%; outline: none; }
 
-        /* --- Score Banner --- */
-        .score-banner {
-            display: none; background: #10b981; color: white; text-align: center; padding: 10px;
-            font-size: 1.25rem; font-weight: bold; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        .score-banner { display: none; background: #10b981; color: white; text-align: center; padding: 10px; font-weight: bold; border-radius: 8px; }
 
-        /* --- Workspace & Horizontal Nav --- */
-        .section-nav-bar {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-            background: var(--card-bg); padding: 10px 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
+        /* --- Workspace --- */
+        .section-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--card-bg); padding: 10px 15px; border-radius: 8px; }
         .sec-indicator { font-weight: bold; color: var(--primary); }
+        
+        .section-card { background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid var(--primary); display: none; }
+        .section-card.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        .section-card {
-            background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px; border-left: 5px solid var(--primary); display: none;
-        }
-
-        .section-card.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
-        .section-title { font-size: 1.25rem; font-weight: bold; border: none; border-bottom: 2px dashed var(--border); padding: 4px; flex: 1; color: var(--text-main); background: transparent; min-width: 150px; }
-        .section-title:focus { outline: none; border-bottom-color: var(--primary); }
-
+        .section-header { display: flex; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+        .section-title { font-size: 1.25rem; font-weight: bold; border: none; border-bottom: 2px dashed var(--border); padding: 4px; flex: 1; background: transparent; }
+        
         .answers-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
-        .answer-row { display: flex; flex-direction: column; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); transition: background 0.3s; }
+        .answer-row { display: flex; flex-direction: column; gap: 10px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
         .answer-row[data-correct="true"] { background-color: var(--correct-bg); border-color: #86efac; }
         .answer-row[data-correct="false"] { background-color: var(--incorrect-bg); border-color: #fca5a5; }
 
         .answer-main { display: flex; align-items: center; gap: 12px; }
-        .answer-num { font-weight: bold; color: var(--primary); min-width: 30px; text-align: right; font-size: 1.1rem; }
-        .answer-input { flex: 1; border: none; background: transparent; border-bottom: 1px solid var(--border); padding: 6px; font-size: 16px; color: var(--text-main); }
-        .answer-input:focus { outline: none; border-bottom-color: var(--primary); }
+        .answer-num { font-weight: bold; color: var(--primary); min-width: 30px; text-align: right; }
+        .answer-input, .reason-input, .section-title { cursor: text; }
+        
+        .answer-input { flex: 1; border: none; background: transparent; border-bottom: 1px solid var(--border); padding: 6px; font-size: 16px; }
+        .reason-input { width: 100%; border: 1px dashed var(--text-muted); padding: 8px; border-radius: 6px; background: white; }
+        
+        /* Highlight input yang sedang diketik */
+        .input-active { border-bottom: 2px solid var(--primary) !important; background-color: #eff6ff !important; border-radius: 4px; outline: none; }
 
-        .correction-ui { display: none; flex-direction: column; gap: 8px; padding-left: 42px; width: 100%; }
+        .correction-ui { display: none; flex-direction: column; gap: 8px; padding-left: 42px; }
         .correction-tools { display: flex; gap: 10px; align-items: center; }
-        .reason-input { width: 100%; border: 1px dashed var(--text-muted); background: #fff; padding: 8px; border-radius: 6px; font-size: 16px; color: #475569; }
-
-        .btn-icon { padding: 6px; border-radius: 50%; background: transparent; border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-icon { padding: 6px; border-radius: 50%; background: transparent; border: 1px solid var(--border); display: flex; align-items: center; cursor: pointer; }
         .btn-icon svg { width: 20px; height: 20px; }
         .btn-icon.check:hover { background: #dcfce7; border-color: #22c55e; color: #16a34a; }
         .btn-icon.cross:hover { background: #fee2e2; border-color: #ef4444; color: #dc2626; }
 
-        .global-actions { text-align: center; margin-top: 20px; padding-bottom: 50px; }
+        .global-actions { text-align: center; margin-bottom: 50px; }
+
+        /* --- CUSTOM VIRTUAL KEYBOARD --- */
+        #custom-keyboard {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #cbd5e1; padding: 10px 5px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: flex; flex-direction: column; gap: 8px;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none; /* Mencegah seleksi saat ngetik */
+        }
+        #custom-keyboard.show { transform: translateY(0); }
+
+        .kb-row { display: flex; justify-content: center; gap: 6px; }
+        .kb-key {
+            background: #ffffff; border-radius: 6px; padding: 12px 10px;
+            font-size: 1.2rem; font-weight: 500; text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); flex: 1; max-width: 45px;
+            cursor: pointer; touch-action: manipulation;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .kb-key:active { background: #e2e8f0; transform: scale(0.95); }
+        .kb-key.wide { max-width: 65px; font-size: 1rem; background: #94a3b8; color: white; }
+        .kb-key.space { max-width: 150px; font-size: 1rem; }
+        .kb-key.done { max-width: 80px; font-size: 1rem; background: var(--primary); color: white; }
+        .kb-key.proper { font-size: 1rem; background: #10b981; color: white; }
 
         /* --- PRINT STYLES --- */
         @media print {
-            html, body { height: auto !important; overflow: visible !important; display: block !important; background: white; color: black; padding: 0; }
+            html, body { height: auto !important; overflow: visible !important; display: block !important; }
             .main-scroll-area { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; }
-            .sticky-zone, .section-nav-bar, .global-actions, button { display: none !important; }
-            .section-card { display: block !important; box-shadow: none; border: none; border-bottom: 2px solid #000; margin-bottom: 10px; padding: 10px 0; page-break-inside: avoid; }
-            .answers-container { display: flex !important; } 
+            .sticky-zone, .section-nav-bar, .global-actions, button, #custom-keyboard { display: none !important; }
+            .section-card { display: block !important; box-shadow: none; border: none; border-bottom: 2px solid #000; margin-bottom: 10px; }
             .answer-row { background: transparent !important; border: none !important; padding: 5px 0; }
             .answer-input, .reason-input { border-bottom: 1px solid #000; color: black; }
-            .correction-ui { display: flex !important; }
-            .correction-tools { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-<!-- STICKY ZONE (Kotak Atas Statis) -->
 <div class="sticky-zone">
     <div class="container">
-        <header>
-            <h1>IELTS Listening Pro</h1>
-        </header>
-        
+        <header><h1>IELTS Listening Pro</h1></header>
         <div class="top-actions">
             <button class="btn-success" onclick="saveData(true)">💾 Simpan</button>
-            <button class="btn-warning" onclick="toggleCorrectionMode()" id="btn-correction">✅ Mode Koreksi</button>
+            <button class="btn-warning" onclick="toggleCorrectionMode()" id="btn-correction">✅ Koreksi</button>
             <button class="btn-print" onclick="window.print()">🖨️ Print</button>
-            <button class="btn-danger" onclick="resetData()">🗑️ Reset</button>
+            <button class="btn-outline" onclick="toggleKeyboardMode()" id="btn-kb-mode">⌨️ Custom Keyboard: ON</button>
         </div>
-
         <div class="media-setup" id="media-setup-box">
             <div class="input-group">
                 <input type="text" id="yt-link" placeholder="Link YouTube...">
@@ -233,86 +169,78 @@
                 <button onclick="loadLocalFile()">Load File</button>
             </div>
         </div>
-
         <div class="video-wrapper" id="video-wrapper"></div>
         <div class="score-banner" id="score-banner">Skor: 0 / 0</div>
     </div>
 </div>
 
-<!-- SCROLLABLE WORKSPACE (Kotak Bawah Bisa Di-Scroll) -->
 <div class="main-scroll-area">
     <div class="container" id="workspace-container">
-        
-        <!-- Navigasi Horizontal -->
         <div class="section-nav-bar">
-            <button id="btn-prev-sec" onclick="navigateSection(-1)">⬅️ Prev Part</button>
+            <button id="btn-prev-sec" onclick="navigateSection(-1)">⬅️ Prev</button>
             <span class="sec-indicator" id="sec-indicator">Part 1 dari 1</span>
-            <button id="btn-next-sec" onclick="navigateSection(1)">Next Part ➡️</button>
+            <button id="btn-next-sec" onclick="navigateSection(1)">Next ➡️</button>
         </div>
-
-        <!-- Container untuk Sections -->
         <div id="workspace"></div>
-
         <div class="global-actions">
             <button onclick="addSection()">+ Tambah Part Baru</button>
         </div>
-
     </div>
+</div>
+
+<!-- CUSTOM KEYBOARD -->
+<div id="custom-keyboard">
+    <!-- Diisi oleh JS -->
 </div>
 
 <script>
     let sectionCount = 0;
     let currentSectionIndex = 0;
     let isCorrectionMode = false;
-    const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v2';
+    let useCustomKB = true; // Default nyala untuk memblokir keyboard bawaan HP
+    
+    // Status Keyboard
+    let kbShift = false;
+    let kbSymbol = false;
+    let activeInputTarget = null;
+    const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v3';
 
+    // FUNGSI MEDIA PLAYER
     function loadYouTube() {
         const url = document.getElementById('yt-link').value;
         const videoId = extractYouTubeID(url);
         if (!videoId) return alert("Link YouTube tidak valid!");
-
         const wrapper = document.getElementById('video-wrapper');
-        wrapper.style.display = 'block';
-        wrapper.className = 'video-wrapper is-video';
+        wrapper.style.display = 'block'; wrapper.className = 'video-wrapper is-video';
         wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
         document.getElementById('media-setup-box').style.display = 'none'; 
     }
-
     function extractYouTubeID(url) {
         const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-        const match = url.match(regex);
-        return match ? match[1] : null;
+        return url.match(regex)?.[1] || null;
     }
-
     function loadLocalFile() {
-        const fileInput = document.getElementById('local-file');
-        const file = fileInput.files[0];
+        const file = document.getElementById('local-file').files[0];
         if (!file) return alert("Pilih file video/audio!");
-
-        const fileURL = URL.createObjectURL(file);
         const wrapper = document.getElementById('video-wrapper');
         wrapper.style.display = 'block';
-        
         if(file.type.startsWith('audio/')) {
-            wrapper.className = 'video-wrapper is-audio';
-            wrapper.innerHTML = `<audio controls src="${fileURL}"></audio>`;
+            wrapper.className = 'video-wrapper is-audio'; wrapper.innerHTML = `<audio controls src="${URL.createObjectURL(file)}"></audio>`;
         } else {
-            wrapper.className = 'video-wrapper is-video';
-            wrapper.innerHTML = `<video controls src="${fileURL}"></video>`;
+            wrapper.className = 'video-wrapper is-video'; wrapper.innerHTML = `<video controls src="${URL.createObjectURL(file)}"></video>`;
         }
         document.getElementById('media-setup-box').style.display = 'none';
     }
 
+    // FUNGSI WORKSPACE
     function addSection(title = null, skipSave = false) {
         sectionCount++;
         const workspace = document.getElementById('workspace');
         const sectionDiv = document.createElement('div');
         sectionDiv.className = 'section-card';
-        const sectionTitle = title !== null ? title : `Part ${sectionCount}`;
-
         sectionDiv.innerHTML = `
             <div class="section-header">
-                <input type="text" class="section-title" value="${sectionTitle}" oninput="saveData()">
+                <input type="text" class="section-title target-input" value="${title !== null ? title : `Part ${sectionCount}`}" oninput="saveData()">
                 <div>
                     <button class="btn-outline btn-toggle" onclick="toggleCollapse(this)">🔽 Hide</button>
                     <button class="btn-danger" onclick="removeSection(this)">🗑️</button>
@@ -321,8 +249,8 @@
             <div class="answers-container"></div>
             <button class="btn-outline" onclick="addAnswer(this)">+ Tambah Jawaban</button>
         `;
-
         workspace.appendChild(sectionDiv);
+        applyInputProtection(); // Proteksi input dari native keyboard
         
         if(!skipSave) {
             addAnswer(sectionDiv.querySelector('.btn-outline'));
@@ -333,191 +261,226 @@
 
     function toggleCollapse(btn) {
         const container = btn.closest('.section-card').querySelector('.answers-container');
-        if (container.style.display === 'none') {
-            container.style.display = 'flex';
-            btn.innerHTML = '🔽 Hide';
-        } else {
-            container.style.display = 'none';
-            btn.innerHTML = '▶️ Expand';
-        }
+        if (container.style.display === 'none') { container.style.display = 'flex'; btn.innerHTML = '🔽 Hide'; } 
+        else { container.style.display = 'none'; btn.innerHTML = '▶️ Expand'; }
     }
 
     function removeSection(btn) {
-        if(confirm("Hapus section ini dan semua jawabannya?")) {
+        if(confirm("Hapus section ini?")) {
             btn.closest('.section-card').remove();
             if(currentSectionIndex > 0) currentSectionIndex--;
-            updateGlobalNumbering();
-            updateSectionNav();
-            saveData();
+            updateGlobalNumbering(); updateSectionNav(); saveData();
         }
     }
 
     function addAnswer(btn, answerData = {text: "", correct: "null", reason: ""}) {
-        const sectionDiv = btn.closest('.section-card');
-        const answersContainer = sectionDiv.querySelector('.answers-container');
-        const answerRow = document.createElement('div');
-        
-        answerRow.className = 'answer-row';
-        answerRow.dataset.correct = answerData.correct;
-
+        const container = btn.closest('.section-card').querySelector('.answers-container');
+        const row = document.createElement('div');
+        row.className = 'answer-row'; row.dataset.correct = answerData.correct;
         const svgCheck = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
         const svgCross = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>`;
 
-        answerRow.innerHTML = `
+        row.innerHTML = `
             <div class="answer-main">
                 <span class="answer-num"></span>
-                <input type="text" class="answer-input" value="${answerData.text}" placeholder="Tulis jawaban..." oninput="saveData()">
-                <button class="btn-danger remove-btn" onclick="removeAnswer(this)">X</button>
+                <input type="text" class="answer-input target-input" value="${answerData.text}" placeholder="Tulis jawaban..." oninput="saveData()">
+                <button class="btn-danger" onclick="removeAnswer(this)">X</button>
             </div>
             <div class="correction-ui" style="display: ${isCorrectionMode ? 'flex' : 'none'};">
                 <div class="correction-tools">
-                    <button class="btn-icon check" onclick="markCorrect(this, 'true')" title="Benar">${svgCheck}</button>
-                    <button class="btn-icon cross" onclick="markCorrect(this, 'false')" title="Salah">${svgCross}</button>
+                    <button class="btn-icon check" onclick="markCorrect(this, 'true')">${svgCheck}</button>
+                    <button class="btn-icon cross" onclick="markCorrect(this, 'false')">${svgCross}</button>
                 </div>
-                <input type="text" class="reason-input" value="${answerData.reason}" placeholder="Alasan / Jawaban Seharusnya..." oninput="saveData()">
+                <input type="text" class="reason-input target-input" value="${answerData.reason}" placeholder="Alasan Seharusnya..." oninput="saveData()">
             </div>
         `;
-
-        answersContainer.appendChild(answerRow);
-        updateGlobalNumbering();
-        calculateScore();
-        saveData();
+        container.appendChild(row);
+        applyInputProtection();
+        updateGlobalNumbering(); calculateScore(); saveData();
     }
 
-    function removeAnswer(btn) {
-        btn.closest('.answer-row').remove();
-        updateGlobalNumbering();
-        calculateScore();
-        saveData();
-    }
-
-    function updateGlobalNumbering() {
-        const rows = document.querySelectorAll('.answer-row');
-        rows.forEach((row, index) => {
-            row.querySelector('.answer-num').textContent = (index + 1) + ".";
-        });
-    }
+    function removeAnswer(btn) { btn.closest('.answer-row').remove(); updateGlobalNumbering(); calculateScore(); saveData(); }
+    function updateGlobalNumbering() { document.querySelectorAll('.answer-row').forEach((row, i) => { row.querySelector('.answer-num').textContent = (i + 1) + "."; }); }
 
     function updateSectionNav() {
         const sections = document.querySelectorAll('.section-card');
-        if (sections.length === 0) return;
-
-        sections.forEach((sec, index) => {
-            sec.classList.remove('active');
-            if (index === currentSectionIndex) sec.classList.add('active');
-        });
-
+        if (!sections.length) return;
+        sections.forEach((sec, i) => { sec.classList.remove('active'); if (i === currentSectionIndex) sec.classList.add('active'); });
         document.getElementById('btn-prev-sec').disabled = (currentSectionIndex === 0);
         document.getElementById('btn-next-sec').disabled = (currentSectionIndex === sections.length - 1);
         document.getElementById('sec-indicator').textContent = `Part ${currentSectionIndex + 1} dari ${sections.length}`;
     }
-
-    function navigateSection(direction) {
-        const sections = document.querySelectorAll('.section-card');
-        currentSectionIndex += direction;
-        if (currentSectionIndex < 0) currentSectionIndex = 0;
-        if (currentSectionIndex >= sections.length) currentSectionIndex = sections.length - 1;
+    function navigateSection(dir) {
+        const len = document.querySelectorAll('.section-card').length;
+        currentSectionIndex = Math.max(0, Math.min(len - 1, currentSectionIndex + dir));
         updateSectionNav();
     }
 
     function toggleCorrectionMode() {
         isCorrectionMode = !isCorrectionMode;
         const btn = document.getElementById('btn-correction');
-        const scoreBanner = document.getElementById('score-banner');
-        
-        if (isCorrectionMode) {
-            btn.innerHTML = "✍️ Kembali ke Latihan";
-            btn.className = "btn-outline";
-            scoreBanner.style.display = "block";
-        } else {
-            btn.innerHTML = "✅ Mode Koreksi";
-            btn.className = "btn-warning";
-            scoreBanner.style.display = "none";
-        }
-
-        document.querySelectorAll('.correction-ui').forEach(ui => {
-            ui.style.display = isCorrectionMode ? 'flex' : 'none';
-        });
-        
+        if (isCorrectionMode) { btn.innerHTML = "✍️ Latihan"; btn.className = "btn-outline"; document.getElementById('score-banner').style.display = "block"; } 
+        else { btn.innerHTML = "✅ Koreksi"; btn.className = "btn-warning"; document.getElementById('score-banner').style.display = "none"; }
+        document.querySelectorAll('.correction-ui').forEach(ui => ui.style.display = isCorrectionMode ? 'flex' : 'none');
         calculateScore();
     }
+    function markCorrect(btn, status) { btn.closest('.answer-row').dataset.correct = status; calculateScore(); saveData(); }
+    function calculateScore() {
+        const rows = document.querySelectorAll('.answer-row');
+        let correctCount = 0; rows.forEach(row => { if (row.dataset.correct === 'true') correctCount++; });
+        document.getElementById('score-banner').textContent = `Skor Terkini: ${correctCount} / ${rows.length}`;
+    }
 
-    function markCorrect(btn, status) {
-        const row = btn.closest('.answer-row');
-        row.dataset.correct = status;
-        calculateScore();
+    // --- CUSTOM KEYBOARD SYSTEM ---
+    const kbLayouts = {
+        lowercase: [
+            ['q','w','e','r','t','y','u','i','o','p'],
+            ['a','s','d','f','g','h','j','k','l'],
+            ['⇧','z','x','c','v','b','n','m','⌫'],
+            ['123','Aa','Space','Done']
+        ],
+        uppercase: [
+            ['Q','W','E','R','T','Y','U','I','O','P'],
+            ['A','S','D','F','G','H','J','K','L'],
+            ['⬆','Z','X','C','V','B','N','M','⌫'],
+            ['123','Aa','Space','Done']
+        ],
+        symbols: [
+            ['1','2','3','4','5','6','7','8','9','0'],
+            ['-','/',':',';','(',')','$','&','@','"'],
+            ['abc','.','\,','?','!','\'','⌫'],
+            ['abc','Aa','Space','Done']
+        ]
+    };
+
+    function renderKeyboard() {
+        const kb = document.getElementById('custom-keyboard');
+        let layoutName = kbSymbol ? 'symbols' : (kbShift ? 'uppercase' : 'lowercase');
+        kb.innerHTML = '';
+        
+        kbLayouts[layoutName].forEach(row => {
+            const rowDiv = document.createElement('div'); rowDiv.className = 'kb-row';
+            row.forEach(key => {
+                const btn = document.createElement('div'); btn.className = 'kb-key';
+                let label = key;
+                if(key === 'Space') label = 'Spasi';
+                if(key === 'Aa') label = 'Proper';
+                btn.textContent = label;
+
+                if(['⇧','⬆','⌫','123','abc'].includes(key)) btn.classList.add('wide');
+                if(key === 'Space') btn.classList.add('space');
+                if(key === 'Done') btn.classList.add('done');
+                if(key === 'Aa') btn.classList.add('proper');
+
+                // Mencegah blur input dan trigger ketik
+                const triggerKey = (e) => { e.preventDefault(); e.stopPropagation(); handleKey(key); };
+                btn.onmousedown = triggerKey;
+                btn.ontouchstart = triggerKey;
+                rowDiv.appendChild(btn);
+            });
+            kb.appendChild(rowDiv);
+        });
+    }
+
+    function handleKey(key) {
+        if(!activeInputTarget) return;
+        
+        let val = activeInputTarget.value;
+        if(key === '⇧' || key === '⬆') { kbShift = !kbShift; renderKeyboard(); return; }
+        if(key === '123') { kbSymbol = true; renderKeyboard(); return; }
+        if(key === 'abc') { kbSymbol = false; renderKeyboard(); return; }
+        if(key === 'Done') { hideKeyboard(); return; }
+        if(key === 'Space') { activeInputTarget.value = val + ' '; saveData(); return; }
+        if(key === '⌫') { activeInputTarget.value = val.slice(0, -1); saveData(); return; }
+        if(key === 'Aa') { 
+            // PROPER CASE LOGIC (misal: "apple tree" -> "Apple Tree")
+            activeInputTarget.value = val.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+            saveData(); return; 
+        }
+
+        activeInputTarget.value = val + key;
+        
+        // Auto matikan shift kalau ngetik 1 huruf
+        if(kbShift) { kbShift = false; renderKeyboard(); }
         saveData();
     }
 
-    function calculateScore() {
-        const rows = document.querySelectorAll('.answer-row');
-        let correctCount = 0;
-        rows.forEach(row => {
-            if (row.dataset.correct === 'true') correctCount++;
-        });
-        const total = rows.length;
-        document.getElementById('score-banner').textContent = `Skor Terkini: ${correctCount} / ${total}`;
+    function showKeyboard(inputElem) {
+        if(!useCustomKB) return;
+        activeInputTarget = inputElem;
+        document.querySelectorAll('.target-input').forEach(el => el.classList.remove('input-active'));
+        inputElem.classList.add('input-active');
+        document.getElementById('custom-keyboard').classList.add('show');
     }
 
+    function hideKeyboard() {
+        document.getElementById('custom-keyboard').classList.remove('show');
+        if(activeInputTarget) activeInputTarget.classList.remove('input-active');
+        activeInputTarget = null;
+    }
+
+    // Toggle Keyboard Mode (Custom vs Bawaan)
+    function toggleKeyboardMode() {
+        useCustomKB = !useCustomKB;
+        document.getElementById('btn-kb-mode').innerText = useCustomKB ? "⌨️ Custom Keyboard: ON" : "⌨️ Custom Keyboard: OFF";
+        hideKeyboard();
+        applyInputProtection();
+    }
+
+    function applyInputProtection() {
+        // Jika mode custom keyboard ON, matikan keyboard bawaan HP dengan readonly
+        document.querySelectorAll('.target-input').forEach(input => {
+            input.readOnly = useCustomKB;
+        });
+    }
+
+    // Listener Global untuk Klik Input
+    document.addEventListener('click', (e) => {
+        if(e.target.classList.contains('target-input')) {
+            showKeyboard(e.target);
+        } else if(!e.target.closest('#custom-keyboard')) {
+            hideKeyboard(); // Tutup kalau ngeklik tempat kosong
+        }
+    });
+
+    // --- DATA MANAGEMENT ---
     function saveData(showAlert = false) {
         const data = [];
-        document.querySelectorAll('.section-card').forEach(section => {
-            const title = section.querySelector('.section-title').value;
+        document.querySelectorAll('.section-card').forEach(sec => {
             const answers = [];
-            section.querySelectorAll('.answer-row').forEach(row => {
+            sec.querySelectorAll('.answer-row').forEach(row => {
                 answers.push({
                     text: row.querySelector('.answer-input').value,
                     correct: row.dataset.correct,
                     reason: row.querySelector('.reason-input').value
                 });
             });
-            data.push({ title, answers });
+            data.push({ title: sec.querySelector('.section-title').value, answers });
         });
-
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-        if (showAlert) alert("Progress berhasil disimpan!");
+        if (showAlert) alert("Progress disimpan!");
     }
 
     function loadData() {
-        const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (savedData) {
-            const data = JSON.parse(savedData);
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (saved) {
+            const data = JSON.parse(saved);
             if(data.length > 0) {
-                document.getElementById('workspace').innerHTML = '';
-                sectionCount = 0;
-
-                data.forEach((secData, i) => {
+                document.getElementById('workspace').innerHTML = ''; sectionCount = 0;
+                data.forEach(secData => {
                     addSection(secData.title, true);
-                    const sectionsRendered = document.querySelectorAll('.section-card');
-                    const lastSection = sectionsRendered[sectionsRendered.length - 1];
-                    const addBtn = lastSection.querySelector('.btn-outline'); 
-                    
-                    secData.answers.forEach(ans => addAnswer(addBtn, ans));
+                    const lastSec = document.querySelectorAll('.section-card')[document.querySelectorAll('.section-card').length - 1];
+                    secData.answers.forEach(ans => addAnswer(lastSec.querySelector('.btn-outline'), ans));
                 });
-                
-                currentSectionIndex = 0;
-                updateSectionNav();
-                calculateScore();
+                currentSectionIndex = 0; updateSectionNav(); calculateScore();
+                renderKeyboard(); // inisialisasi layout keyboard
                 return;
             }
         }
-        addSection(); 
-        updateSectionNav();
+        addSection(); renderKeyboard();
     }
 
-    function resetData() {
-        if(confirm("Hapus SEMUA jawaban secara permanen?")) {
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            document.getElementById('workspace').innerHTML = '';
-            sectionCount = 0;
-            currentSectionIndex = 0;
-            addSection();
-            calculateScore();
-        }
-    }
-
-    window.onload = () => loadData();
-
+    window.onload = loadData;
 </script>
 </body>
 </html>
