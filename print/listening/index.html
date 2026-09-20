@@ -125,25 +125,44 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            padding: 0 5px;
         }
-        .logos-left { display: flex; gap: 15px; align-items: center; }
-        .header-logos img { height: 35px; object-fit: contain; }
+        .logos-left { display: flex; gap: 20px; align-items: center; }
+        .header-logos img { height: 42px; object-fit: contain; }
 
-        /* --- IDENTIFICATION SECTION (DIperbaiki sangat mirip Asli) --- */
+        /* --- IDENTIFICATION SECTION --- */
         .id-section {
             border: 2px solid var(--ielts-orange);
             margin-bottom: 12px;
             position: relative;
         }
+
+        /* 19 Columns x 2 Rows Grid */
+        .top-grid-container {
+            display: grid;
+            grid-template-columns: repeat(19, 1fr);
+            border-bottom: 2px solid var(--ielts-orange);
+            background-color: white;
+        }
+        .t-cell {
+            height: 18px;
+            border-right: 1px solid var(--ielts-orange);
+            border-bottom: 1px solid var(--ielts-orange);
+        }
+        .t-cell:nth-child(19n) { border-right: none; }
+        .t-cell:nth-child(n+20) { border-bottom: none; }
+
+        /* Judul Section */
         .id-title {
             text-align: center;
             color: var(--ielts-orange);
             font-size: 16px;
             font-weight: bold;
-            padding: 5px 0;
+            padding: 6px 0;
             border-bottom: 2px solid var(--ielts-orange);
             letter-spacing: 0.5px;
         }
+
         .id-body {
             display: flex;
             padding: 8px 12px;
@@ -157,10 +176,8 @@
         .o-label { color: var(--ielts-orange); font-size: 13px; font-weight: bold; }
         .o-sub { color: var(--ielts-orange); font-size: 10px; }
 
-        /* Row Layouts */
+        /* Kotak Isian (Boxes) */
         .flex-row { display: flex; align-items: center; gap: 10px; }
-        
-        /* Kotak Isian Angka */
         .write-boxes { display: flex; gap: 2px; }
         .w-box {
             width: 22px; height: 26px;
@@ -169,18 +186,12 @@
             font-weight: bold; font-family: 'Courier New', Courier, monospace;
         }
 
-        /* Kotak Isian Nama */
         .name-box {
-            width: 95%;
-            height: 28px;
+            width: 95%; height: 28px;
             border: 1px solid #f2ab83;
-            background-color: #fff;
-            outline: none;
-            padding: 4px 8px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            font-weight: bold;
-            text-transform: uppercase;
+            background-color: #fff; outline: none;
+            padding: 4px 8px; font-family: 'Courier New', Courier, monospace;
+            font-size: 14px; font-weight: bold; text-transform: uppercase;
         }
 
         /* Test Date Styling */
@@ -194,52 +205,55 @@
             padding: 0 1px; font-weight: bold;
         }
 
-        /* Right Side: Candidate Grid */
-        .pointer-hand { font-size: 18px; color: var(--ielts-orange); margin-left: 5px; transform: rotate(90deg); display: inline-block;}
-        .pencil-icon { position: absolute; right: 140px; top: -10px; font-size: 28px; transform: rotate(135deg); }
-        .cand-grid { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; width: 100%; align-items: flex-end;}
-        .cand-row { display: flex; gap: 4px; align-items: center; }
+        /* Visual Element Kanan: Ikon & Grid Kandidat */
+        .pointer-hand {
+            font-size: 26px; color: var(--ielts-orange); 
+            margin-left: 5px; transform: rotate(20deg); 
+            display: inline-block; line-height: 1;
+        }
+        .pencil-icon {
+            position: absolute; right: 155px; top: -15px; 
+            width: 35px; height: 35px;
+        }
+
+        .cand-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+        .cand-grid { display: flex; flex-direction: column; width: 100%; }
+        
+        /* WARNA SELANG SELING GRID KANDIDAT */
+        .cand-row { display: flex; gap: 4px; align-items: center; padding: 1.5px 5px; }
+        .cand-row:nth-child(even) { background-color: var(--ielts-light); }
+        .cand-row:nth-child(odd) { background-color: transparent; }
         .cand-row span { color: var(--ielts-orange); font-size: 10px; }
 
         /* --- GRID SOAL 1-40 --- */
-        .listening-grid {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
+        .listening-grid { display: flex; justify-content: space-between; gap: 15px; }
         .grid-column { flex: 1; border: 2px solid var(--ielts-orange); }
-        
         .grid-header {
             background-color: var(--ielts-orange); color: white;
             text-align: center; font-weight: bold; padding: 4px; font-size: 12px;
             letter-spacing: 1px; word-spacing: 10px;
         }
-
         .marker-title {
             text-align: right; font-size: 8px; color: var(--ielts-dark-orange);
             padding: 2px 10px; border-bottom: 1px solid var(--ielts-orange); background-color: white;
         }
-
         .q-row {
             display: flex; border-bottom: 1px solid var(--ielts-orange);
             height: 25px; background-color: #ffffff;
         }
         .q-row:last-child { border-bottom: none; }
-        .q-row:nth-child(even) { background-color: var(--ielts-light); } /* Alternate color */
+        .q-row:nth-child(even) { background-color: var(--ielts-light); } 
 
         .q-num {
             width: 32px; font-weight: bold; color: var(--text-dark);
             display: flex; align-items: center; justify-content: center;
             border-right: 1px solid var(--ielts-orange); font-size: 13px;
         }
-
         .q-ans {
             flex: 1; display: flex; align-items: center; padding: 0 10px;
             font-family: 'Courier New', Courier, monospace; font-size: 14px;
             font-weight: bold; text-transform: uppercase; color: #000;
         }
-
         .q-marker {
             width: 65px; border-left: 1px solid var(--ielts-orange);
             display: flex; align-items: center; justify-content: space-evenly; padding: 0 2px;
@@ -250,7 +264,7 @@
             color: var(--ielts-dark-orange); background: white;
         }
 
-        /* --- FOOTER SKOR --- */
+        /* --- FOOTER SKOR & DENOTE LOGO --- */
         .footer-scores {
             margin-top: 10px; display: flex; gap: 15px;
             border-top: 2px solid #000; padding-top: 6px;
@@ -262,6 +276,14 @@
             height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-dark);
         }
         .score-value { height: 22px; background: white; }
+
+        .print-footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            font-size: 9px; font-weight: bold; margin-top: 5px; color: #000;
+        }
+        .left-text { flex: 1; text-align: left; padding-bottom: 4px; }
+        .right-text { flex: 1; text-align: right; padding-bottom: 4px; }
+        .denote-logo { height: 20px; object-fit: contain; }
 
         /* Print Override */
         @media print {
@@ -279,7 +301,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             Close & Back
         </button>
-        <span class="toolbar-info">💡 Isi indentitas di kotak yang disediakan sebelum print.</span>
+        <span class="toolbar-info">💡 Isi identitas di kotak yang disediakan sebelum klik Print.</span>
         <button class="btn btn-print" onclick="window.print()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Print A4 Document
@@ -295,12 +317,12 @@
         <!-- MAIN KONTEN KERTAS -->
         <div class="main-content">
             
-            <!-- WATERMARK (DIJAMIN DI ATAS & TRANSPARAN) -->
+            <!-- WATERMARK (DI ATAS & TRANSPARAN) -->
             <div class="watermark">
                 FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
             </div>
 
-            <!-- HEADER LOGOS (RAPIH) -->
+            <!-- HEADER LOGOS -->
             <div class="header-logos">
                 <div class="logos-left">
                     <img src="../../Assets/BritCounsil.jpeg" alt="British Council">
@@ -311,11 +333,16 @@
                 </div>
             </div>
 
-            <!-- IDENTIFICATION SECTION (SANGAT MIRIP ASLI) -->
+            <!-- IDENTIFICATION SECTION -->
             <div class="id-section">
+                <!-- 19 x 2 GRID TOP -->
+                <div class="top-grid-container" id="top-grid-boxes"></div>
+
+                <!-- TITLE -->
                 <div class="id-title">IELTS Listening and Reading Answer Sheet</div>
+                
+                <!-- BODY KANDIDAT -->
                 <div class="id-body">
-                    
                     <!-- Kiri: Biodata Text -->
                     <div class="id-left">
                         <div class="flex-row">
@@ -349,16 +376,21 @@
 
                     <!-- Kanan: Grid OMR Candidate Number -->
                     <div class="id-right">
-                        <div class="pencil-icon">✏️</div>
-                        <div class="write-boxes" id="cand-boxes"></div>
-                        <div class="cand-grid" id="cand-rows"></div>
+                        <!-- Custom Orange Pencil Icon SVG -->
+                        <svg class="pencil-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--ielts-orange)">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+
+                        <div class="cand-wrapper">
+                            <div class="write-boxes" id="cand-boxes" style="margin-left: 17px; margin-bottom: 4px;"></div>
+                            <div class="cand-grid" id="cand-rows"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- AREA SOAL 1-40 -->
             <div class="listening-grid">
-                
                 <!-- Kolom 1 (1 - 20) -->
                 <div class="grid-column">
                     <div class="grid-header">Listening Listening Listening</div>
@@ -372,10 +404,9 @@
                     <div class="marker-title">Marker use only</div>
                     <div id="col-21-40"></div>
                 </div>
-
             </div>
 
-            <!-- FOOTER SKOR -->
+            <!-- FOOTER SKOR & DENOTE PRINT -->
             <div class="footer-scores">
                 <div class="score-box-wrapper" style="max-width: 90px;">
                     <div class="score-header">Marker 2<br>Initials</div><div class="score-value"></div>
@@ -391,10 +422,16 @@
                     <div class="score-header">Listening<br>Total</div><div class="score-value"></div>
                 </div>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: bold; margin-top: 5px; color: #000;">
-                <span>IELTS L-R v4.0</span>
-                <span>DP650/394</span>
+            
+            <div class="print-footer">
+                <span class="left-text">IELTS L-R v4.0</span>
+                <!-- Denote Logo Disini -->
+                <div style="flex: 1; text-align: center;">
+                    <img src="../../Assets/denotePrint.jpeg" alt="Denote Print Limited" class="denote-logo">
+                </div>
+                <span class="right-text">DP650/394</span>
             </div>
+
         </div>
 
         <!-- OMR Right Edge -->
@@ -442,7 +479,6 @@
             let omrLeft = '', omrRight = '';
             for(let i=0; i<30; i++) { 
                 omrRight += '<div class="omr-bar"></div>'; 
-                // Left OMR hanya di beberapa bagian untuk keakuratan
                 if(i < 3 || i > 26) { omrLeft += '<div class="omr-bar"></div>'; } 
                 else { omrLeft += '<div class="omr-bar-hidden"></div>'; }
             }
@@ -458,7 +494,12 @@
             generateDates('month-nums', 1, 12);
             generateDates('year-nums', 9, 18);
 
-            // Generate Grid Angka Candidate Number
+            // Generate Grid 19 Kolom 2 Baris di bawah Logo
+            let topGridHtml = '';
+            for(let i=0; i<38; i++) { topGridHtml += '<div class="t-cell"></div>'; }
+            document.getElementById('top-grid-boxes').innerHTML = topGridHtml;
+
+            // Generate Grid Angka Candidate Number (Selang-seling via CSS)
             let candRowsHtml = '';
             for(let r=0; r<6; r++) {
                 candRowsHtml += '<div class="cand-row"><span>►</span>';
@@ -503,4 +544,4 @@
         };
     </script>
 </body>
-                        </html>
+</html>
