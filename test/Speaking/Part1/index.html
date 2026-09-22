@@ -1,1 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaking Part 1 - Practice</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --primary: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --border: #e2e8f0; --text-main: #1e293b; --danger: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        html, body { height: 100%; display: flex; flex-direction: column; background: var(--bg-color); color: var(--text-main); overflow: hidden;}
+        
+        .sticky-header { padding: 15px 20px; background: var(--card-bg); border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; flex-shrink: 0;}
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; color: white; background: var(--primary); }
+        .btn-back { background: #64748b; }
+        .btn-danger { background: var(--danger); }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
+        
+        .main-workspace { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
+        @media (min-width: 800px) { .main-workspace { flex-direction: row; } }
+        
+        /* Video Panel */
+        .video-panel { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; border-right: 2px solid var(--border); overflow-y: auto; background: #0f172a;}
+        .video-container { flex: 1; background: #000; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 300px;}
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .timer { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem; letter-spacing: 1px;}
+        .timer.recording { color: #fca5a5; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
 
+        .cam-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;}
+        .cam-controls .btn { flex: 1; min-width: 120px; justify-content: center; }
+
+        /* Questions Panel */
+        .q-panel { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: var(--bg-color); }
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        
+        .q-card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 10px; }
+        .q-card textarea { flex: 1; border: none; outline: none; resize: none; font-size: 15px; min-height: 50px; }
+        .q-card textarea:focus { border-bottom: 2px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+    <div class="sticky-header">
+        <button class="btn btn-back" onclick="window.location.href='../index.html'">⬅ Back</button>
+        <h2 style="font-size: 1.2rem;">Part 1 (Interview)</h2>
+        <button class="btn btn-outline" onclick="saveQuestions()">💾 Save Qs</button>
+    </div>
+
+    <div class="main-workspace">
+        
+        <!-- Perekam Video -->
+        <div class="video-panel">
+            <div class="video-container">
+                <div class="timer" id="timerDisplay">00:00</div>
+                <video id="liveVideo" autoplay muted playsinline></video>
+                <video id="playbackVideo" controls style="display:none;"></video>
+            </div>
+            
+            <div class="cam-controls">
+                <button class="btn" id="btnSwitchCam" onclick="switchCamera()">🔄 Switch Cam</button>
+                <button class="btn btn-danger" id="btnRecord" onclick="toggleRecording()">🔴 Start Record</button>
+                <button class="btn btn-outline" id="btnDownload" onclick="downloadVideo()" style="display:none; color: white; border-color: white;">⬇ Download Video</button>
+            </div>
+        </div>
+
+        <!-- Daftar Pertanyaan -->
+        <div class="q-panel">
+            <div class="q-header">
+                <h3>Examiner Questions</h3>
+                <button class="btn" onclick="addQuestion()">➕ Add Question</button>
+            </div>
+            <div id="q-list"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'ielts_speak_p1';
+        
+        /* --- WEBRTC VIDEO LOGIC --- */
+        let mediaRecorder;
+        let recordedChunks = [];
+        let currentStream;
+        let isRecording = false;
+        let facingMode = "user"; // "user" = depan, "environment" = belakang
+        let videoBlob = null;
+
+        // Timer Variables
+        let timerInterval;
+        let secondsPassed = 0;
+
+        async function initCamera() {
+            if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); }
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facingMode },
+                    audio: true
+                });
+                document.getElementById('liveVideo').srcObject = currentStream;
+                document.getElementById('liveVideo').style.display = "block";
+                document.getElementById('playbackVideo').style.display = "none";
+                document.getElementById('btnDownload').style.display = "none";
+            } catch (err) {
+                Swal.fire('Camera Error', 'Cannot access camera/microphone. Ensure you have given permissions and are using HTTPS/Localhost.', 'error');
+            }
+        }
+
+        function switchCamera() {
+            facingMode = facingMode === "user" ? "environment" : "user";
+            initCamera();
+        }
+
+        function formatTime(sec) {
+            let m = Math.floor(sec / 60).toString().padStart(2, '0');
+            let s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function toggleRecording() {
+            const btn = document.getElementById('btnRecord');
+            const timerDisplay = document.getElementById('timerDisplay');
+            
+            if (!isRecording) {
+                // START RECORDING
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(currentStream);
+                
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const videoURL = URL.createObjectURL(videoBlob);
+                    
+                    const playback = document.getElementById('playbackVideo');
+                    playback.src = videoURL;
+                    playback.style.display = "block";
+                    document.getElementById('liveVideo').style.display = "none";
+                    document.getElementById('btnDownload').style.display = "inline-flex";
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                btn.innerHTML = "⏹ Stop Record";
+                btn.classList.remove('btn-danger');
+                btn.style.background = "#fbbf24"; // yellow
+
+                // Start Timer
+                secondsPassed = 0;
+                timerDisplay.innerText = "00:00";
+                timerDisplay.classList.add('recording');
+                timerInterval = setInterval(() => {
+                    secondsPassed++;
+                    timerDisplay.innerText = formatTime(secondsPassed);
+                }, 1000);
+
+            } else {
+                // STOP RECORDING
+                mediaRecorder.stop();
+                isRecording = false;
+                btn.innerHTML = "🔴 Re-Record";
+                btn.classList.add('btn-danger');
+                btn.style.background = "";
+
+                // Stop Timer
+                clearInterval(timerInterval);
+                timerDisplay.classList.remove('recording');
+            }
+        }
+
+        function downloadVideo() {
+            if(!videoBlob) return;
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(videoBlob);
+            a.download = `IELTS_Speaking_Part1_${new Date().getTime()}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        /* --- QUESTION LOGIC --- */
+        function addQuestion(text = "") {
+            const list = document.getElementById('q-list');
+            const card = document.createElement('div');
+            card.className = "q-card";
+            card.innerHTML = `
+                <textarea placeholder="e.g. Do you work or are you a student?" oninput="saveQuestions()">${text}</textarea>
+                <button class="btn btn-outline" style="padding: 5px; height: 35px; border:none;" onclick="this.parentElement.remove(); saveQuestions();">❌</button>
+            `;
+            list.appendChild(card);
+        }
+
+        function saveQuestions() {
+            const questions = [];
+            document.querySelectorAll('.q-card textarea').forEach(ta => questions.push(ta.value));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
+        }
+
+        function loadQuestions() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const questions = JSON.parse(saved);
+                if(questions.length > 0) {
+                    questions.forEach(q => addQuestion(q));
+                    return;
+                }
+            }
+            // Default empty box
+            addQuestion("");
+        }
+
+        window.onload = () => {
+            initCamera();
+            loadQuestions();
+        };
+    </script>
+</body>
+</html>
