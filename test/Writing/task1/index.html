@@ -1,1 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Writing - Task 1</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #2563eb; --primary-hover: #1d4ed8;
+            --bg-color: #f1f5f9; --card-bg: #ffffff; --border: #e2e8f0;
+            --text-main: #1e293b; --text-muted: #64748b;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+        html, body { height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
+        
+        /* Sticky Zone */
+        .sticky-zone { flex-shrink: 0; background-color: var(--bg-color); padding: 15px 20px; border-bottom: 2px solid var(--border); z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+        .header-title { font-size: 1.5rem; font-weight: bold; }
+        .top-actions { display: flex; gap: 8px; }
+        
+        button { display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+        button svg { width: 16px; height: 16px; flex-shrink: 0; }
+        button:hover { background: var(--primary-hover); }
+        .btn-success { background: #10b981; } .btn-success:hover { background: #059669; }
+        .btn-danger { background: transparent; border: 1px solid #ef4444; color: #ef4444; } .btn-danger:hover { background: #fef2f2; }
+        .btn-back { background: #64748b; } .btn-back:hover { background: #475569; }
+
+        /* Main Workspace - Desktop Split View */
+        .main-workspace { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
+        .panel { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        @media (min-width: 992px) {
+            .main-workspace { flex-direction: row; }
+            .panel.left { flex: 0 0 45%; border-right: 2px solid var(--border); }
+            .panel.right { flex: 0 0 55%; }
+        }
+
+        /* Card Elements */
+        .card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .card-title { font-weight: bold; margin-bottom: 10px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        
+        .input-full { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 15px; resize: vertical; outline: none; }
+        .input-full:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        
+        .img-preview-box { width: 100%; min-height: 200px; border: 2px dashed var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; background: #f8fafc; margin-bottom: 10px; }
+        .img-preview-box img { max-width: 100%; max-height: 400px; object-fit: contain; display: none; }
+        .upload-btn-wrapper { position: absolute; }
+        .upload-btn-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; width: 100%; }
+
+        /* Word Counter */
+        .word-count-badge { font-size: 12px; background: #e2e8f0; color: #475569; padding: 3px 8px; border-radius: 12px; }
+        .total-words { font-size: 16px; font-weight: bold; padding: 10px; text-align: right; color: var(--text-main); }
+        .target-met { color: #10b981; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sticky-zone">
+        <a href="../index.html" style="text-decoration: none;">
+            <button class="btn-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back</button>
+        </a>
+        <div class="header-title">Task 1 (Report)</div>
+        <div class="top-actions">
+            <button class="btn-success" onclick="saveData(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Save</button>
+            <button class="btn-danger" onclick="clearData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Reset</button>
+        </div>
+    </div>
+
+    <div class="main-workspace">
+        <!-- Left Panel: Question & Image -->
+        <div class="panel left">
+            <div class="card">
+                <div class="card-title">Upload Graph / Diagram</div>
+                <div class="img-preview-box" id="img-box">
+                    <div class="upload-btn-wrapper" id="upload-wrapper">
+                        <button class="btn-back">Choose Image</button>
+                        <input type="file" id="image-upload" accept="image/*" onchange="previewImage(event)">
+                    </div>
+                    <img id="image-preview" src="" alt="Graph">
+                </div>
+                <button class="btn-danger btn-sm" id="btn-remove-img" style="display:none; width: 100%; justify-content:center;" onclick="removeImage()">Remove Image</button>
+            </div>
+
+            <div class="card" style="flex-grow: 1; display: flex; flex-direction: column;">
+                <div class="card-title">Question Prompt</div>
+                <textarea id="question-prompt" class="input-full" style="flex-grow: 1;" placeholder="Type or paste the writing prompt here..." oninput="saveData()"></textarea>
+            </div>
+        </div>
+
+        <!-- Right Panel: Writing Workspace -->
+        <div class="panel right">
+            <div class="total-words" id="total-word-count">Total Words: 0 / 150</div>
+            
+            <div class="card">
+                <div class="card-title">
+                    Introduction
+                    <span class="word-count-badge" id="wc-intro">0 words</span>
+                </div>
+                <textarea id="p-intro" class="input-full paragraph-input" rows="4" placeholder="Paraphrase the prompt here..." oninput="updateWords()"></textarea>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    Overview (or Conclusion)
+                    <span class="word-count-badge" id="wc-overview">0 words</span>
+                </div>
+                <textarea id="p-overview" class="input-full paragraph-input" rows="4" placeholder="Summarize the main trends/differences..." oninput="updateWords()"></textarea>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    Detail Paragraph 1
+                    <span class="word-count-badge" id="wc-detail1">0 words</span>
+                </div>
+                <textarea id="p-detail1" class="input-full paragraph-input" rows="5" placeholder="Support with data..." oninput="updateWords()"></textarea>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    Detail Paragraph 2
+                    <span class="word-count-badge" id="wc-detail2">0 words</span>
+                </div>
+                <textarea id="p-detail2" class="input-full paragraph-input" rows="5" placeholder="Support with data..." oninput="updateWords()"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'ielts_writing_task1_v1';
+
+        function countWords(str) {
+            return str.trim().split(/\s+/).filter(word => word.length > 0).length;
+        }
+
+        function updateWords() {
+            let total = 0;
+            const ids = ['intro', 'overview', 'detail1', 'detail2'];
+            
+            ids.forEach(id => {
+                const text = document.getElementById(`p-${id}`).value;
+                const wc = countWords(text);
+                document.getElementById(`wc-${id}`).innerText = `${wc} words`;
+                total += wc;
+            });
+
+            const totalEl = document.getElementById('total-word-count');
+            totalEl.innerText = `Total Words: ${total} / 150`;
+            if (total >= 150) totalEl.classList.add('target-met');
+            else totalEl.classList.remove('target-met');
+            
+            saveData(false);
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgPreview = document.getElementById('image-preview');
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                    document.getElementById('upload-wrapper').style.display = 'none';
+                    document.getElementById('btn-remove-img').style.display = 'flex';
+                    saveData(false);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('image-preview').src = '';
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('upload-wrapper').style.display = 'block';
+            document.getElementById('btn-remove-img').style.display = 'none';
+            document.getElementById('image-upload').value = '';
+            saveData(false);
+        }
+
+        function saveData(showAlert = false) {
+            const data = {
+                image: document.getElementById('image-preview').src,
+                question: document.getElementById('question-prompt').value,
+                intro: document.getElementById('p-intro').value,
+                overview: document.getElementById('p-overview').value,
+                detail1: document.getElementById('p-detail1').value,
+                detail2: document.getElementById('p-detail2').value
+            };
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                if (showAlert) Swal.fire({ position: 'top-end', icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1000 });
+            } catch(e) {
+                if (showAlert) Swal.fire('Error', 'Image size is too large to save in local storage. Try a smaller image.', 'error');
+            }
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('question-prompt').value = data.question || "";
+                document.getElementById('p-intro').value = data.intro || "";
+                document.getElementById('p-overview').value = data.overview || "";
+                document.getElementById('p-detail1').value = data.detail1 || "";
+                document.getElementById('p-detail2').value = data.detail2 || "";
+                
+                if (data.image && data.image.length > 10) {
+                    document.getElementById('image-preview').src = data.image;
+                    document.getElementById('image-preview').style.display = 'block';
+                    document.getElementById('upload-wrapper').style.display = 'none';
+                    document.getElementById('btn-remove-img').style.display = 'flex';
+                }
+                updateWords();
+            }
+        }
+
+        function clearData() {
+            Swal.fire({ title: 'Are you sure?', text: "This will reset all your writing!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    document.getElementById('question-prompt').value = "";
+                    document.querySelectorAll('.paragraph-input').forEach(el => el.value = "");
+                    removeImage();
+                    updateWords();
+                    Swal.fire('Cleared!', 'Workspace has been reset.', 'success');
+                }
+            });
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
