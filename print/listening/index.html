@@ -19,6 +19,7 @@
             padding: 0;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         body {
@@ -208,13 +209,13 @@
         /* Visual Element Kanan: Ikon & Grid Kandidat */
         .pointer-hand {
             font-size: 26px; color: var(--ielts-orange); 
-            margin-left: 5px; transform: rotate(45deg); /* Berubah menjadi 45 Derajat */
+            margin-left: 5px; transform: rotate(45deg); 
             display: inline-block; line-height: 1;
         }
         .pencil-icon {
             position: absolute; right: 150px; top: -10px; 
             width: 35px; height: 35px;
-            transform: rotate(45deg); /* Berubah menjadi 45 Derajat */
+            transform: rotate(45deg);
         }
 
         .cand-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
@@ -255,6 +256,10 @@
             font-family: 'Courier New', Courier, monospace; font-size: 14px;
             font-weight: bold; text-transform: uppercase; color: #000;
         }
+        
+        /* MODIFIKASI CORRECTION */
+        .correction-text { color: #dc2626; font-size: 11px; margin-left: 8px; font-family: Arial, sans-serif; font-style: italic; text-transform: none; font-weight: normal; }
+
         .q-marker {
             width: 65px; border-left: 1px solid var(--ielts-orange);
             display: flex; align-items: center; justify-content: space-evenly; padding: 0 2px;
@@ -264,6 +269,9 @@
             font-size: 9px; display: flex; justify-content: center; align-items: center;
             color: var(--ielts-dark-orange); background: white;
         }
+
+        /* JIKA DITANDAI BENAR/SALAH OTOMATIS DIHITAMKAN */
+        .mark-box-small.checked { background-color: #000 !important; color: #fff !important; border-color: #000 !important; }
 
         /* --- FOOTER SKOR & DENOTE LOGO --- */
         .footer-scores {
@@ -276,7 +284,7 @@
             padding: 3px; border-bottom: 1px solid var(--ielts-orange);
             height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-dark);
         }
-        .score-value { height: 22px; background: white; }
+        .score-value { height: 22px; background: white; text-align: center; font-weight: bold; font-size: 16px; padding-top: 2px; }
 
         .print-footer {
             display: flex; justify-content: space-between; align-items: flex-end;
@@ -302,7 +310,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             Close & Back
         </button>
-        <span class="toolbar-info">💡 Isi identitas di kotak yang disediakan sebelum klik Print.</span>
+        <span class="toolbar-info">💡 Koreksi dari web akan otomatis ditandai di kertas ini (centang hitam & skor).</span>
         <button class="btn btn-print" onclick="window.print()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Print A4 Document
@@ -318,12 +326,12 @@
         <!-- MAIN KONTEN KERTAS -->
         <div class="main-content">
             
-            <!-- WATERMARK (DI ATAS & TRANSPARAN) -->
+            <!-- WATERMARK -->
             <div class="watermark">
                 FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
             </div>
 
-            <!-- HEADER LOGOS: Kiri, Tengah, Kanan -->
+            <!-- HEADER LOGOS -->
             <div class="header-logos">
                 <div class="logo-box" style="text-align: left;">
                     <img src="../../Assets/BritCounsil.jpeg" alt="British Council">
@@ -379,7 +387,6 @@
 
                     <!-- Kanan: Grid OMR Candidate Number -->
                     <div class="id-right">
-                        <!-- Custom Orange Pencil Icon SVG (Rotasi 45 Derajat) -->
                         <svg class="pencil-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--ielts-orange)">
                             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                         </svg>
@@ -422,13 +429,12 @@
                     <div class="score-header">Band<br>Score</div><div class="score-value"></div>
                 </div>
                 <div class="score-box-wrapper" style="max-width: 90px;">
-                    <div class="score-header">Listening<br>Total</div><div class="score-value"></div>
+                    <div class="score-header">Listening<br>Total</div><div class="score-value" id="total-score-box"></div>
                 </div>
             </div>
             
             <div class="print-footer">
                 <span class="left-text">IELTS L-R v4.0</span>
-                <!-- Denote Logo Disini -->
                 <div style="flex: 1; text-align: center;">
                     <img src="../../Assets/denotePrint.jpeg" alt="Denote Print Limited" class="denote-logo">
                 </div>
@@ -445,29 +451,35 @@
     <script>
         const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
         
-        function getFlatAnswers() {
+        function getDetailedAnswers() {
             const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-            let flat = [];
+            let result = [];
             if (saved) {
                 const data = JSON.parse(saved);
                 data.forEach(section => {
                     section.answers.forEach(ans => {
                         let finalAnswer = ans.type === 'mcq' ? ans.mcqOpt : ans.text;
-                        flat.push(finalAnswer || "");
+                        let trueAnswer = ans.type === 'mcq' ? ans.correctOpt : ans.reason;
+                        
+                        result.push({
+                            userAnswer: finalAnswer || "",
+                            correctStatus: ans.correct, // "true", "false", atau "null"
+                            trueAnswerText: trueAnswer || ""
+                        });
                     });
                 });
             }
-            return flat;
+            return result;
         }
 
-        // Generate Kotak Isian (Centre Number & Candidate Number)
+        // Generate Kotak Isian
         function generateWriteBoxes(id) {
             let html = '';
             for(let i=0; i<6; i++) { html += '<input type="text" class="w-box" maxlength="1">'; }
             document.getElementById(id).innerHTML = html;
         }
 
-        // Generate Tanggal OMR (Day, Month, Year)
+        // Generate Tanggal
         function generateDates(id, start, end) {
             let html = '';
             for(let i=start; i<=end; i++) {
@@ -478,7 +490,6 @@
         }
 
         function initFormElements() {
-            // Generate garis tepi hitam LJK
             let omrLeft = '', omrRight = '';
             for(let i=0; i<30; i++) { 
                 omrRight += '<div class="omr-bar"></div>'; 
@@ -488,24 +499,18 @@
             document.getElementById('omr-right').innerHTML = omrRight;
             document.getElementById('omr-left').innerHTML = omrLeft;
 
-            // Generate Kotak Isian
             generateWriteBoxes('centre-boxes');
             generateWriteBoxes('cand-boxes');
-
-            // Generate Tanggal
             generateDates('day-nums', 1, 31);
             generateDates('month-nums', 1, 12);
             generateDates('year-nums', 9, 18);
 
-            // Generate Grid 19 Kolom 2 Baris di bawah Logo
             let topGridHtml = '';
             for(let i=0; i<38; i++) { topGridHtml += '<div class="t-cell"></div>'; }
             document.getElementById('top-grid-boxes').innerHTML = topGridHtml;
 
-            // Generate Grid Angka Candidate Number Berundak (Indented) 
             let candRowsHtml = '';
             for(let r=0; r<6; r++) {
-                // Memberikan margin bertahap pada setiap baris untuk efek berundak/tangga
                 let indentAmount = r * 10;
                 candRowsHtml += `<div class="cand-row" style="margin-left: ${indentAmount}px;"><span>►</span>`;
                 for(let n=0; n<=9; n++) { candRowsHtml += `<div class="omr-num">${n}</div>`; }
@@ -515,22 +520,43 @@
         }
 
         function renderGrid() {
-            const answers = getFlatAnswers();
+            const answers = getDetailedAnswers();
             const col1 = document.getElementById('col-1-20');
             const col2 = document.getElementById('col-21-40');
+            
+            let totalScore = 0;
+            let totalGraded = 0;
 
             for (let i = 1; i <= 40; i++) {
-                let ansText = answers[i - 1] || "";
+                let ansData = answers[i - 1] || { userAnswer: "", correctStatus: "null", trueAnswerText: "" };
+                
+                let checkClass = "";
+                let crossClass = "";
+                let correctionHtml = "";
 
-                // Kotak Marker Presisi [ ✓ ] [ Angka Soal ] [ ✗ ]
+                // Kalkulasi logic untuk koreksi dan menghitamkan OMR
+                if (ansData.correctStatus === "true") {
+                    checkClass = "checked";
+                    totalScore++;
+                    totalGraded++;
+                } else if (ansData.correctStatus === "false") {
+                    crossClass = "checked";
+                    totalGraded++;
+                    
+                    // Jika ada jawaban benar yang ditulis dari aplikasi utama
+                    if (ansData.trueAnswerText) {
+                        correctionHtml = `<span class="correction-text">(${ansData.trueAnswerText})</span>`;
+                    }
+                }
+
                 let rowHTML = `
                     <div class="q-row">
                         <div class="q-num">${i}</div>
-                        <div class="q-ans">${ansText}</div>
+                        <div class="q-ans">${ansData.userAnswer} ${correctionHtml}</div>
                         <div class="q-marker">
-                            <div class="mark-box-small">✓</div>
+                            <div class="mark-box-small ${checkClass}">✓</div>
                             <div class="mark-box-small" style="color: #999;">${i}</div>
-                            <div class="mark-box-small">✗</div>
+                            <div class="mark-box-small ${crossClass}">✗</div>
                         </div>
                     </div>
                 `;
@@ -540,6 +566,11 @@
                 } else {
                     col2.innerHTML += rowHTML;
                 }
+            }
+
+            // Tampilkan total skor jika form sudah dikoreksi
+            if (totalGraded > 0) {
+                document.getElementById('total-score-box').innerText = totalScore;
             }
         }
 
