@@ -26,7 +26,7 @@
         html, body { height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
 
-        /* --- STICKY TOP ZONE --- */
+        /* --- STICKY TOP ZONE (Mobile: Atas, Desktop: Kiri) --- */
         .sticky-zone {
             flex-shrink: 0; background-color: var(--bg-color); padding-top: 15px; padding-bottom: 10px;
             border-bottom: 2px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); z-index: 100;
@@ -34,8 +34,50 @@
         header h1 { text-align: center; font-size: 1.5rem; margin-bottom: 15px; }
         .top-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
 
-        /* --- SCROLLABLE WORKSPACE --- */
+        /* --- SCROLLABLE WORKSPACE (Mobile: Bawah, Desktop: Kanan) --- */
         .main-scroll-area { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 20px; padding-bottom: 200px; }
+
+        /* --- DESKTOP SPLIT VIEW (Untuk memisahkan Soal dan Jawaban di Layar Besar) --- */
+        @media (min-width: 992px) {
+            body {
+                flex-direction: row;
+            }
+            .sticky-zone {
+                flex: 0 0 50%;
+                height: 100vh;
+                overflow-y: auto;
+                border-bottom: none;
+                border-right: 2px solid var(--border);
+                box-shadow: 4px 0 6px -1px rgba(0,0,0,0.05);
+            }
+            .main-scroll-area {
+                flex: 0 0 50%;
+                height: 100vh;
+            }
+            .container {
+                max-width: 100%;
+                padding: 0 30px;
+            }
+            #custom-keyboard {
+                width: 50%;
+                left: 50%;
+                border-left: 1px solid #94a3b8;
+            }
+            /* Sesuaikan ukuran tombol keyboard sedikit lebih lega untuk Desktop */
+            .kb-key { max-width: 55px !important; }
+            .kb-key.wide { max-width: 80px !important; }
+            .kb-key.space { max-width: 250px !important; }
+            .kb-key.done { max-width: 100px !important; }
+            .kb-key.proper { max-width: 80px !important; }
+        }
+
+        /* Container Limit untuk Layar Ultra Lebar (Monitor Besar) */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 750px;
+                margin: 0 auto;
+            }
+        }
 
         /* --- Media Player --- */
         .media-setup { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
@@ -99,7 +141,7 @@
         .zoom-controls button:hover { background: rgba(255,255,255,0.4); }
         .zoom-controls .zoom-status { color: white; font-size: 12px; font-weight: bold; width: 45px; text-align: center; }
 
-        .score-banner { display: none; background: #10b981; color: white; text-align: center; padding: 10px; font-weight: bold; border-radius: 8px; }
+        .score-banner { display: none; background: #10b981; color: white; text-align: center; padding: 10px; font-weight: bold; border-radius: 8px; margin-bottom: 10px; }
 
         /* --- Workspace --- */
         .section-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--card-bg); padding: 10px 15px; border-radius: 8px; }
@@ -167,9 +209,10 @@
 
         @media print {
             html, body { height: auto !important; overflow: visible !important; display: block !important; }
-            .main-scroll-area { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; }
-            .sticky-zone, .section-nav-bar, .global-actions, button, #custom-keyboard, .time-marks-area, .zoom-controls { display: none !important; }
-            .section-card { display: block !important; box-shadow: none; border: none; border-bottom: 2px solid #000; margin-bottom: 10px; }
+            .sticky-zone { display: none !important; }
+            .main-scroll-area { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; width: 100% !important; flex: none !important; }
+            .section-nav-bar, .global-actions, button, #custom-keyboard, .time-marks-area, .zoom-controls { display: none !important; }
+            .section-card { display: block !important; box-shadow: none; border: none; border-bottom: 2px solid #000; margin-bottom: 10px; padding: 0 !important; }
             .answer-row { background: transparent !important; border: none !important; padding: 5px 0; }
             .answer-input, .reason-input, .mcq-desc, .mcq-correct-desc { border-bottom: 1px solid #000; color: black; }
         }
@@ -179,7 +222,6 @@
 
 <div class="sticky-zone">
     <div class="container">
-        <!-- JUDUL DIUBAH KE READING -->
         <header><h1>IELTS Reading Pro</h1></header>
         <div class="top-actions">
             <button class="btn-success" onclick="saveData(true)">
@@ -191,7 +233,7 @@
                 Correction
             </button>
 
-            <!-- TAUTAN TOMBOL PRINT DIUBAH KE FOLDER READING -->
+            <!-- TAUTAN TOMBOL PRINT -->
             <button class="btn-print" onclick="window.open('../../print/reading/index.html', '_blank')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                 Print
@@ -217,12 +259,12 @@
                 <button onclick="loadYouTube()">Load YT</button>
             </div>
             <div class="input-group">
-                <input type="file" id="local-file" accept="video/mp4,audio/*,video/*">
+                <input type="file" id="local-file" accept="video/mp4,audio/*,video/*,image/*">
                 <button onclick="loadLocalFile()">Load File</button>
             </div>
         </div>
         
-        <!-- WRAPPER VIDEO DENGAN ZOOM FITUR -->
+        <!-- WRAPPER VIDEO / MEDIA DENGAN ZOOM FITUR -->
         <div class="video-wrapper" id="video-wrapper">
             <!-- Overlay Control Zoom -->
             <div id="zoom-controls" class="zoom-controls">
@@ -292,7 +334,7 @@
     let audioCtx = null;
     let isAppLoaded = false;
 
-    // KUNCI PENYIMPANAN DIUBAH MENJADI READING (SANGAT PENTING)
+    // KUNCI PENYIMPANAN READING
     const LOCAL_STORAGE_KEY = 'ielts_reading_pro_v1';
 
     // --- MEDIA PLAYER CONTROL ---
@@ -841,7 +883,6 @@
         
         const dateStr = new Date().toISOString().slice(0,10);
         
-        // NAMA FILE BACKUP DIUBAH MENJADI READING
         a.download = `IELTS_Reading_Backup_${dateStr}.json`;
         
         document.body.appendChild(a);
