@@ -408,30 +408,51 @@
         container.style.transform = `translate(${panX}px, ${panY}px) scale(${currentZoom})`;
     }
 
-    // Logika Drag (Geser)
+    // --- Logika Drag (Geser) Untuk Mouse & Touchscreen ---
     const panOverlay = document.getElementById('pan-overlay');
     
-    panOverlay.addEventListener('mousedown', (e) => {
+    // Fungsi bantuan membaca koordinat (dari Mouse atau Jari)
+    function getPointerPos(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function handleDragStart(e) {
         isDragging = true;
         panOverlay.classList.add('grabbing');
-        startX = e.clientX - panX;
-        startY = e.clientY - panY;
-    });
+        const pos = getPointerPos(e);
+        startX = pos.x - panX;
+        startY = pos.y - panY;
+    }
 
-    window.addEventListener('mousemove', (e) => {
+    function handleDragMove(e) {
         if (!isDragging) return;
-        panX = e.clientX - startX;
-        panY = e.clientY - startY;
-        applyZoomPanTransform(true); // Immediate update tanpa transisi
-    });
+        e.preventDefault(); // Mencegah layar HP ikut terscroll saat menggeser video
+        const pos = getPointerPos(e);
+        panX = pos.x - startX;
+        panY = pos.y - startY;
+        applyZoomPanTransform(true); // Immediate update
+    }
 
-    window.addEventListener('mouseup', () => {
+    function handleDragEnd() {
         if (isDragging) {
             isDragging = false;
             panOverlay.classList.remove('grabbing');
-            applyZoomPanTransform(false); // Kembalikan efek transisi jika ada animasi lain
+            applyZoomPanTransform(false); // Kembalikan efek transisi
         }
-    });
+    }
+
+    // Event untuk Desktop (Mouse)
+    panOverlay.addEventListener('mousedown', handleDragStart);
+    window.addEventListener('mousemove', handleDragMove, { passive: false });
+    window.addEventListener('mouseup', handleDragEnd);
+
+    // Event untuk HP / Tablet (Touch)
+    panOverlay.addEventListener('touchstart', handleDragStart, { passive: false });
+    window.addEventListener('touchmove', handleDragMove, { passive: false });
+    window.addEventListener('touchend', handleDragEnd);
 
     // --- WORKSPACE & TIME MARKS ---
     function addSection(title = null, skipSave = false) {
