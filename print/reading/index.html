@@ -6,7 +6,7 @@
     <title>IELTS Reading - Print Answer Sheet</title>
     <style>
         :root {
-            --ielts-orange: #f0955d; /* Sedikit lebih soft menyesuaikan lembar reading */
+            --ielts-orange: #f0955d; 
             --ielts-light: #fdf3ed;
             --ielts-dark-orange: #d9753c;
             --text-dark: #222222;
@@ -19,6 +19,7 @@
             padding: 0;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         body {
@@ -82,229 +83,84 @@
             align-items: center;
             padding: 10mm 0;
         }
-        .omr-bar {
-            width: 16px;
-            height: 5px;
-            background-color: #000;
-        }
-        .omr-bar-hidden {
-            width: 16px;
-            height: 5px;
-            background-color: transparent;
-        }
+        .omr-bar { width: 16px; height: 5px; background-color: #000; }
+        .omr-bar-hidden { width: 16px; height: 5px; background-color: transparent; }
 
         /* --- WATERMARK --- */
         .watermark {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 55px;
-            font-weight: bold;
-            color: #000000;
-            opacity: 0.10;
-            z-index: 9999; 
-            text-align: center;
-            line-height: 1.2;
-            white-space: nowrap;
-            pointer-events: none; 
-            letter-spacing: 2px;
+            top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 55px; font-weight: bold; color: #000000;
+            opacity: 0.08; z-index: 9999; text-align: center;
+            line-height: 1.2; white-space: nowrap; pointer-events: none; letter-spacing: 2px;
         }
 
         /* --- Konten Utama Kertas --- */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 0 5mm;
-        }
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 5mm; }
 
-        /* --- IDENTIFICATION SECTION (READING LAYOUT) --- */
-        .id-text {
-            color: var(--ielts-orange);
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-
+        /* --- IDENTIFICATION SECTION --- */
+        .id-text { color: var(--ielts-orange); font-size: 11px; margin-bottom: 2px; }
         .line-input {
-            width: 100%;
-            border: none;
-            border-bottom: 1px solid var(--ielts-orange);
-            outline: none;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            padding: 2px 5px;
-            margin-bottom: 15px;
-            background: transparent;
+            width: 100%; border: none; border-bottom: 1px solid var(--ielts-orange);
+            outline: none; font-family: 'Courier New', Courier, monospace;
+            font-size: 16px; font-weight: bold; text-transform: uppercase;
+            padding: 2px 5px; margin-bottom: 15px; background: transparent;
         }
 
         /* Language Code Section */
-        .lang-code-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .lang-left {
-            width: 45%;
-        }
-
-        .lang-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .pencil-icon {
-            width: 40px;
-            height: 40px;
-            transform: rotate(-30deg);
-        }
-
-        .lang-grid-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: var(--ielts-light);
-            padding: 5px 8px;
-            border: 1px solid var(--ielts-orange);
-            border-radius: 2px;
-        }
-
-        .lang-boxes {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 4px;
-        }
-
-        .l-box {
-            width: 20px;
-            height: 24px;
-            border: 1px solid var(--ielts-orange);
-            background: white;
-            text-align: center;
-            font-weight: bold;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .lang-rows {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .lang-row {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .lang-row span {
-            font-size: 10px;
-            color: var(--ielts-orange);
-            font-weight: bold;
-        }
-
-        .omr-num {
-            font-size: 10px; color: var(--ielts-orange);
-            border-top: 1px solid var(--ielts-orange);
-            border-bottom: 1px solid var(--ielts-orange);
-            padding: 0 1px; font-weight: bold;
-        }
+        .lang-code-section { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; margin-bottom: 15px; }
+        .lang-left { width: 45%; }
+        .lang-right { display: flex; align-items: center; gap: 15px; }
+        .pencil-icon { width: 40px; height: 40px; transform: rotate(-30deg); }
+        .lang-grid-wrapper { display: flex; flex-direction: column; align-items: center; background: var(--ielts-light); padding: 5px 8px; border: 1px solid var(--ielts-orange); border-radius: 2px; }
+        .lang-boxes { display: flex; gap: 5px; margin-bottom: 4px; }
+        .l-box { width: 20px; height: 24px; border: 1px solid var(--ielts-orange); background: white; text-align: center; font-weight: bold; font-size: 14px; outline: none; }
+        .lang-rows { display: flex; flex-direction: column; gap: 2px; }
+        .lang-row { display: flex; align-items: center; gap: 3px; }
+        .lang-row span { font-size: 10px; color: var(--ielts-orange); font-weight: bold; }
+        .omr-num { font-size: 10px; color: var(--ielts-orange); border-top: 1px solid var(--ielts-orange); border-bottom: 1px solid var(--ielts-orange); padding: 0 1px; font-weight: bold; }
 
         /* Checkboxes (Gender & Module) */
-        .check-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--ielts-orange);
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .c-box {
-            width: 25px;
-            height: 8px;
-            border: 1px solid var(--ielts-orange);
-            background: white;
-            cursor: pointer;
-        }
+        .check-group { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .check-item { display: flex; align-items: center; gap: 5px; color: var(--ielts-orange); font-size: 13px; font-weight: bold; }
+        .c-box { width: 25px; height: 8px; border: 1px solid var(--ielts-orange); background: white; cursor: pointer; }
 
         /* Reading Banner */
-        .reading-banner {
-            background-color: var(--ielts-orange);
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            font-size: 16px;
-            padding: 4px;
-            letter-spacing: 2px;
-            word-spacing: 20px;
-            margin-bottom: 15px;
-        }
+        .reading-banner { background-color: var(--ielts-orange); color: white; text-align: center; font-weight: bold; font-size: 16px; padding: 4px; letter-spacing: 2px; word-spacing: 20px; margin-bottom: 15px; }
 
         /* --- GRID SOAL 1-40 --- */
         .reading-grid { display: flex; justify-content: space-between; gap: 15px; }
         .grid-column { flex: 1; border: 2px solid var(--ielts-orange); border-top: none; }
         
-        .marker-title {
-            text-align: right; font-size: 9px; color: var(--ielts-dark-orange);
-            padding: 3px 10px; border-bottom: 1px solid var(--ielts-orange); 
-            border-top: 1px solid var(--ielts-orange); background-color: white;
-        }
+        .marker-title { text-align: right; font-size: 9px; color: var(--ielts-dark-orange); padding: 3px 10px; border-bottom: 1px solid var(--ielts-orange); border-top: 1px solid var(--ielts-orange); background-color: white; }
         
-        .q-row {
-            display: flex; border-bottom: 1px solid var(--ielts-orange);
-            height: 24.5px; background-color: #ffffff;
-        }
+        .q-row { display: flex; border-bottom: 1px solid var(--ielts-orange); height: 24.5px; background-color: #ffffff; }
         .q-row:last-child { border-bottom: none; }
         .q-row:nth-child(even) { background-color: var(--ielts-light); } 
 
-        .q-num {
-            width: 32px; font-weight: bold; color: var(--text-dark);
-            display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid var(--ielts-orange); font-size: 13px;
-        }
-        .q-ans {
-            flex: 1; display: flex; align-items: center; padding: 0 10px;
-            font-family: 'Courier New', Courier, monospace; font-size: 14px;
-            font-weight: bold; text-transform: uppercase; color: #000;
-        }
-        .q-marker {
-            width: 65px; border-left: 1px solid var(--ielts-orange);
-            display: flex; align-items: center; justify-content: space-evenly; padding: 0 2px;
-        }
-        .mark-box-small {
-            border: 1px solid var(--ielts-orange); width: 15px; height: 13px;
-            font-size: 9px; display: flex; justify-content: center; align-items: center;
-            color: var(--ielts-dark-orange); background: white;
-        }
+        .q-num { width: 32px; font-weight: bold; color: var(--text-dark); display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--ielts-orange); font-size: 13px; }
+        .q-ans { flex: 1; display: flex; align-items: center; padding: 0 10px; font-family: 'Courier New', Courier, monospace; font-size: 14px; font-weight: bold; text-transform: uppercase; color: #000; }
+        
+        /* Modifikasi Correction */
+        .correction-text { color: #dc2626; font-size: 11px; margin-left: 8px; font-family: Arial, sans-serif; font-style: italic; text-transform: none; font-weight: normal; }
+        
+        .q-marker { width: 65px; border-left: 1px solid var(--ielts-orange); display: flex; align-items: center; justify-content: space-evenly; padding: 0 2px; }
+        .mark-box-small { border: 1px solid var(--ielts-orange); width: 15px; height: 13px; font-size: 9px; display: flex; justify-content: center; align-items: center; color: var(--ielts-dark-orange); background: white; }
+        
+        /* Jika ditandai benar/salah otomatis dihitamkan */
+        .mark-box-small.checked { background-color: #000 !important; color: #fff !important; border-color: #000 !important; }
 
         /* --- FOOTER SKOR & DENOTE LOGO --- */
-        .footer-scores {
-            margin-top: 10px; display: flex; gap: 15px;
-            border-top: 2px solid #000; padding-top: 8px;
-        }
+        .footer-scores { margin-top: 10px; display: flex; gap: 15px; border-top: 2px solid #000; padding-top: 8px; }
         .score-box-wrapper { flex: 1; border: 1px solid var(--ielts-orange); display: flex; flex-direction: column; }
-        .score-header {
-            background-color: var(--ielts-light); text-align: center; font-size: 10px;
-            padding: 3px; border-bottom: 1px solid var(--ielts-orange);
-            height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-dark);
-        }
-        .score-value { height: 22px; background: white; }
+        .score-header { background-color: var(--ielts-light); text-align: center; font-size: 10px; padding: 3px; border-bottom: 1px solid var(--ielts-orange); height: 28px; display: flex; align-items: center; justify-content: center; color: var(--text-dark); }
+        .score-value { height: 22px; background: white; text-align: center; font-weight: bold; font-size: 16px; padding-top: 2px; }
 
+        @media print {
+            .no-print-toolbar { display: none !important; }
+            body { padding: 0; background: white; }
+            .a4-page { box-shadow: none; }
+        }
     </style>
 </head>
 <body>
@@ -315,7 +171,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             Close & Back
         </button>
-        <span class="toolbar-info">💡 Isi identitas (Nama & Nomor) secara manual sebelum klik Print.</span>
+        <span class="toolbar-info">💡 Koreksi dari web akan otomatis ditandai di kertas ini (centang hitam & skor).</span>
         <button class="btn btn-print" onclick="window.print()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
             Print Reading Sheet
@@ -324,13 +180,11 @@
 
     <!-- Lembar A4 -->
     <div class="a4-page">
-        
         <!-- OMR Left Edge -->
         <div class="omr-col" id="omr-left"></div>
 
         <!-- MAIN KONTEN KERTAS -->
         <div class="main-content">
-            
             <div class="watermark">
                 FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
             </div>
@@ -355,18 +209,14 @@
                 </div>
                 <div class="lang-right">
                     <div class="id-text" style="font-size: 24px; transform: translateY(10px);">☛</div>
-                    
                     <div class="lang-grid-wrapper">
                         <div class="lang-boxes">
                             <input type="text" class="l-box" maxlength="1">
                             <input type="text" class="l-box" maxlength="1">
                             <input type="text" class="l-box" maxlength="1">
                         </div>
-                        <div class="lang-rows" id="lang-rows-container">
-                            <!-- JS Will Generate Grid -->
-                        </div>
+                        <div class="lang-rows" id="lang-rows-container"></div>
                     </div>
-
                     <!-- Pencil Icon -->
                     <svg class="pencil-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333">
                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
@@ -421,13 +271,11 @@
                     <div class="score-header">Band<br>Score</div><div class="score-value"></div>
                 </div>
                 <div class="score-box-wrapper" style="max-width: 90px;">
-                    <div class="score-header">Reading<br>Total</div><div class="score-value"></div>
+                    <div class="score-header">Reading<br>Total</div><div class="score-value" id="total-score-box"></div>
                 </div>
             </div>
             
-            <!-- Black Mark Footer -->
             <div style="width: 100%; height: 8px; background: #000; margin-top: 15px;"></div>
-
         </div>
 
         <!-- OMR Right Edge -->
@@ -436,27 +284,30 @@
 
     <!-- SCRIPTS -->
     <script>
-        // PENTING: Key Local Storage ini dibuat khusus untuk Reading
-        // Nanti saat Anda membuat aplikasi test/reading/index.html, pastikan JS-nya menyimpan ke key ini!
         const LOCAL_STORAGE_KEY = 'ielts_reading_pro_v1';
         
-        function getFlatAnswers() {
+        function getDetailedAnswers() {
             const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-            let flat = [];
+            let result = [];
             if (saved) {
                 const data = JSON.parse(saved);
                 data.forEach(section => {
                     section.answers.forEach(ans => {
                         let finalAnswer = ans.type === 'mcq' ? ans.mcqOpt : ans.text;
-                        flat.push(finalAnswer || "");
+                        let trueAnswer = ans.type === 'mcq' ? ans.correctOpt : ans.reason;
+                        
+                        result.push({
+                            userAnswer: finalAnswer || "",
+                            correctStatus: ans.correct, // "true", "false", atau "null"
+                            trueAnswerText: trueAnswer || ""
+                        });
                     });
                 });
             }
-            return flat;
+            return result;
         }
 
         function initFormElements() {
-            // Generate garis tepi hitam LJK
             let omrLeft = '', omrRight = '';
             for(let i=0; i<32; i++) { 
                 omrRight += '<div class="omr-bar"></div>'; 
@@ -466,10 +317,9 @@
             document.getElementById('omr-right').innerHTML = omrRight;
             document.getElementById('omr-left').innerHTML = omrLeft;
 
-            // Generate Language Grid (3 Baris yang bentuknya berundak/tangga)
             let langRowsHtml = '';
             for(let r=0; r<3; r++) {
-                let indentAmount = r * 15; // Berundak
+                let indentAmount = r * 15;
                 langRowsHtml += `<div class="lang-row" style="margin-left: ${indentAmount}px;"><span>►</span>`;
                 for(let n=0; n<=9; n++) { langRowsHtml += `<div class="omr-num">${n}</div>`; }
                 langRowsHtml += '</div>';
@@ -478,21 +328,43 @@
         }
 
         function renderGrid() {
-            const answers = getFlatAnswers();
+            const answers = getDetailedAnswers();
             const col1 = document.getElementById('col-1-20');
             const col2 = document.getElementById('col-21-40');
+            
+            let totalScore = 0;
+            let totalGraded = 0;
 
             for (let i = 1; i <= 40; i++) {
-                let ansText = answers[i - 1] || "";
+                let ansData = answers[i - 1] || { userAnswer: "", correctStatus: "null", trueAnswerText: "" };
+                
+                let checkClass = "";
+                let crossClass = "";
+                let correctionHtml = "";
+
+                // Hitung skor dan tentukan kotak mana yang dihitamkan
+                if (ansData.correctStatus === "true") {
+                    checkClass = "checked";
+                    totalScore++;
+                    totalGraded++;
+                } else if (ansData.correctStatus === "false") {
+                    crossClass = "checked";
+                    totalGraded++;
+                    
+                    // Tampilkan jawaban yang benar disampingnya (jika diisi)
+                    if (ansData.trueAnswerText) {
+                        correctionHtml = `<span class="correction-text">(${ansData.trueAnswerText})</span>`;
+                    }
+                }
 
                 let rowHTML = `
                     <div class="q-row">
                         <div class="q-num">${i}</div>
-                        <div class="q-ans">${ansText}</div>
+                        <div class="q-ans">${ansData.userAnswer} ${correctionHtml}</div>
                         <div class="q-marker">
-                            <div class="mark-box-small">✓</div>
+                            <div class="mark-box-small ${checkClass}">✓</div>
                             <div class="mark-box-small" style="color: #999;">${i}</div>
-                            <div class="mark-box-small">✗</div>
+                            <div class="mark-box-small ${crossClass}">✗</div>
                         </div>
                     </div>
                 `;
@@ -502,6 +374,11 @@
                 } else {
                     col2.innerHTML += rowHTML;
                 }
+            }
+
+            // Jika ada soal yang dikoreksi, tampilkan skor total di kotak bawah
+            if (totalGraded > 0) {
+                document.getElementById('total-score-box').innerText = totalScore;
             }
         }
 
