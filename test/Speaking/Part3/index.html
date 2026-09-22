@@ -3,114 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS Speaking Practice Pro</title>
+    <title>Speaking Part 3 - Practice</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            --primary: #2563eb; --primary-hover: #1d4ed8;
-            --bg-color: #f1f5f9; --card-bg: #ffffff; --border: #e2e8f0;
-            --text-main: #1e293b; --text-muted: #64748b;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 30px 20px; }
+        :root { --primary: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --border: #e2e8f0; --text-main: #1e293b; --danger: #ef4444; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        html, body { height: 100%; display: flex; flex-direction: column; background: var(--bg-color); color: var(--text-main); overflow: hidden;}
         
-        .header { text-align: center; margin-bottom: 30px; }
-        .header h1 { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
-        .header p { color: var(--text-muted); font-size: 1.1rem; }
+        .sticky-header { padding: 15px 20px; background: var(--card-bg); border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; flex-shrink: 0;}
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; color: white; background: var(--primary); }
+        .btn-back { background: #64748b; }
+        .btn-danger { background: var(--danger); }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #eff6ff; }
+        
+        .main-workspace { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
+        @media (min-width: 800px) { .main-workspace { flex-direction: row; } }
+        
+        /* Video Panel */
+        .video-panel { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; border-right: 2px solid var(--border); overflow-y: auto; background: #0f172a;}
+        .video-container { flex: 1; background: #000; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 300px;}
+        video { width: 100%; height: 100%; object-fit: cover; }
+        
+        .timer { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem;}
+        .timer.recording { color: #fca5a5; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* Navigation Cards */
-        .cards-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; max-width: 900px; width: 100%; margin-bottom: 40px; }
-        .task-card {
-            background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
-            padding: 25px; flex: 1; min-width: 280px; text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: transform 0.2s;
-            text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center;
-        }
-        .task-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .task-icon { width: 60px; height: 60px; background: #eff6ff; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-        .task-icon svg { width: 30px; height: 30px; }
-        .task-card h2 { font-size: 1.3rem; margin-bottom: 10px; }
-        .task-card p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; flex-grow: 1; }
-        .btn-start { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer; transition: 0.2s;}
-        .task-card:hover .btn-start { background: var(--primary-hover); }
+        .cam-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;}
+        .cam-controls .btn { flex: 1; min-width: 120px; justify-content: center; }
 
-        /* Concept Guide Table */
-        .guide-container { max-width: 1000px; width: 100%; background: var(--card-bg); border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow-x: auto;}
-        .guide-container h3 { margin-bottom: 20px; color: var(--primary); text-align: center; font-size: 1.5rem; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th, td { border: 1px solid var(--border); padding: 12px 15px; text-align: left; vertical-align: top; }
-        th { background-color: #eff6ff; color: var(--primary); font-weight: bold; }
-        td { font-size: 0.95rem; line-height: 1.5; }
-        ul { margin-left: 20px; margin-top: 5px; }
-        .badge { background: #fee2e2; color: #dc2626; padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 5px;}
+        /* Questions Panel */
+        .q-panel { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: var(--bg-color); }
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        
+        .q-card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 10px; }
+        .q-card textarea { flex: 1; border: none; outline: none; resize: none; font-size: 15px; min-height: 50px; }
+        .q-card textarea:focus { border-bottom: 2px solid var(--primary); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>IELTS Speaking Practice</h1>
-        <p>Record your video, manage questions, and evaluate your performance.</p>
+    <div class="sticky-header">
+        <button class="btn btn-back" onclick="window.location.href='../index.html'">⬅ Back</button>
+        <h2 style="font-size: 1.2rem;">Part 3 (Discussion)</h2>
+        <button class="btn btn-outline" onclick="saveQuestions()">💾 Save Qs</button>
     </div>
 
-    <!-- Modul Pilihan -->
-    <div class="cards-container">
-        <a href="./Part1/index.html" class="task-card">
-            <div class="task-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-            <h2>Part 1</h2>
-            <p>Introduction & Interview (4-5 mins). Answer basic daily life questions fluently.</p>
-            <button class="btn-start">Start Part 1</button>
-        </a>
-        <a href="./Part2/index.html" class="task-card">
-            <div class="task-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></div>
-            <h2>Part 2</h2>
-            <p>Long Turn / Monologue (3-4 mins). Speak based on a specific Cue Card topic.</p>
-            <button class="btn-start">Start Part 2</button>
-        </a>
-        <a href="./Part3/index.html" class="task-card">
-            <div class="task-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
-            <h2>Part 3</h2>
-            <p>Two-way Discussion (4-5 mins). Deep dive into abstract concepts and global issues.</p>
-            <button class="btn-start">Start Part 3</button>
-        </a>
+    <div class="main-workspace">
+        <!-- Perekam Video -->
+        <div class="video-panel">
+            <div class="video-container">
+                <div class="timer" id="timerDisplay">00:00</div>
+                <video id="liveVideo" autoplay muted playsinline></video>
+                <video id="playbackVideo" controls style="display:none;"></video>
+            </div>
+            
+            <div class="cam-controls">
+                <button class="btn" id="btnSwitchCam" onclick="switchCamera()">🔄 Switch Cam</button>
+                <button class="btn btn-danger" id="btnRecord" onclick="toggleRecording()">🔴 Start Record</button>
+                <button class="btn btn-outline" id="btnDownload" onclick="downloadVideo()" style="display:none; color: white; border-color: white;">⬇ Download Video</button>
+            </div>
+        </div>
+
+        <!-- Daftar Pertanyaan -->
+        <div class="q-panel">
+            <div class="q-header">
+                <h3>Follow-up Questions</h3>
+                <button class="btn" onclick="addQuestion()">➕ Add Question</button>
+            </div>
+            <div id="q-list"></div>
+        </div>
     </div>
 
-    <!-- Panduan -->
-    <div class="guide-container">
-        <h3>📚 IELTS Speaking Guide & Strategies</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Bagian (Part)</th>
-                    <th>Durasi & Soal</th>
-                    <th>Detail Sesi</th>
-                    <th>📚 Contoh Topik</th>
-                    <th>🏆 Tips & Trik Rahasia Band 9</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Part 1</strong><br>(Intro & Interview)</td>
-                    <td>4 – 5 menit<br>(8 – 12 pertanyaan)</td>
-                    <td>Penguji menanyakan info dasar (identitas) lalu memberikan pertanyaan seputar kehidupan sehari-hari.</td>
-                    <td><ul><li>Science/Technology di sekolah</li><li>Metode belajar favorit</li><li>Pengaruh matematika dalam hidup</li></ul></td>
-                    <td><span class="badge">A.R.E Method</span><br>Langsung jawab + kembangkan: Gunakan rumus Answer + Reason + Example. Bicara santai tapi grammar akurat (effortless fluency).</td>
-                </tr>
-                <tr>
-                    <td><strong>Part 2</strong><br>(Long Turn)</td>
-                    <td>3 – 4 menit<br>(1 Cue Card)</td>
-                    <td>Waktu 1 menit persiapan membuat catatan. Wajib berbicara sendiri (monolog) selama 1–2 menit tanpa henti.</td>
-                    <td><ul><li>Presentasi akademis yang dibuat</li><li>Dosen/guru yang menginspirasi</li><li>Artikel berita atau jurnal ilmiah</li></ul></td>
-                    <td><span class="badge">P.P.F Strategy</span><br>Gunakan 1 menit persiapan untuk menulis kata kunci berdasarkan PPF (Past, Present, Future) untuk variasi tenses.</td>
-                </tr>
-                <tr>
-                    <td><strong>Part 3</strong><br>(Discussion)</td>
-                    <td>4 – 5 menit<br>(4 – 6 pertanyaan)</td>
-                    <td>Diskusi dua arah mendalam dan abstrak. Pertanyaan pengembangan dari tema di Part 2.</td>
-                    <td><ul><li>Dampak AI pada pendidikan</li><li>Etika riset ilmiah & masa depan</li><li>Peran sistem edukasi di ekonomi</li></ul></td>
-                    <td><span class="badge">Think Macro</span><br>Jangan pakai opini pribadi. Gunakan sudut pandang global ("From a societal perspective..."). Padukan dengan discourse markers.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <script>
+        const STORAGE_KEY = 'ielts_speak_p3'; // Key berbeda untuk Part 3
+        
+        /* --- WEBRTC VIDEO LOGIC (Sama persis dengan P1) --- */
+        let mediaRecorder; let recordedChunks = []; let currentStream; let isRecording = false; let facingMode = "user"; let videoBlob = null;
+        let timerInterval; let secondsPassed = 0;
 
-</body>
-</html>
+        async function initCamera() {
+            if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); }
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode }, audio: true });
+                document.getElementById('liveVideo').srcObject = currentStream;
+                document.getElementById('liveVideo').style.display = "block";
+                document.getElementById('playbackVideo').style.display = "none";
+                document.getElementById('btnDownload').style.display = "none";
+            } catch (err) { Swal.fire('Camera Error', 'Cannot access camera/microphone.', 'error'); }
+        }
+
+        function switchCamera() { facingMode = facingMode === "user" ? "environment" : "user"; initCamera(); }
+
+        function formatTime(sec) {
+            let m = Math.floor(sec / 60).toString().padStart(2, '0');
+            let s = (sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function toggleRecording() {
+            const btn = document.getElementById('btnRecord'); const timerDisplay = document.getElementById('timerDisplay');
+            if (!isRecording) {
+                recordedChunks = []; mediaRecorder = new MediaRecorder(currentStream);
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    videoBlob = new Blob(record
