@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IELTS Listening Practice Pro</title>
+    <title>IELTS Reading Practice Pro</title>
     <!-- Load YouTube Iframe API -->
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- Load SweetAlert2 -->
@@ -179,7 +179,8 @@
 
 <div class="sticky-zone">
     <div class="container">
-        <header><h1>IELTS Listening Pro</h1></header>
+        <!-- JUDUL DIUBAH KE READING -->
+        <header><h1>IELTS Reading Pro</h1></header>
         <div class="top-actions">
             <button class="btn-success" onclick="saveData(true)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
@@ -189,10 +190,13 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 Correction
             </button>
+
+            <!-- TAUTAN TOMBOL PRINT DIUBAH KE FOLDER READING -->
             <button class="btn-print" onclick="window.open('../../print/reading/index.html', '_blank')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                 Print
             </button>
+
             <!-- RESET & BACKUP BUTTON -->
             <button class="btn-danger" onclick="clearLocalStorage()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -209,7 +213,7 @@
         </div>
         <div class="media-setup" id="media-setup-box">
             <div class="input-group">
-                <input type="text" id="yt-link" placeholder="YouTube Link...">
+                <input type="text" id="yt-link" placeholder="YouTube Link (Optional for Reading)...">
                 <button onclick="loadYouTube()">Load YT</button>
             </div>
             <div class="input-group">
@@ -287,7 +291,9 @@
     let activeInputTarget = null;
     let audioCtx = null;
     let isAppLoaded = false;
-    const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
+
+    // KUNCI PENYIMPANAN DIUBAH MENJADI READING (SANGAT PENTING)
+    const LOCAL_STORAGE_KEY = 'ielts_reading_pro_v1';
 
     // --- MEDIA PLAYER CONTROL ---
     let ytPlayer = null;
@@ -813,7 +819,9 @@
         a.href = url;
         
         const dateStr = new Date().toISOString().slice(0,10);
-        a.download = `IELTS_Listening_Backup_${dateStr}.json`;
+        
+        // NAMA FILE BACKUP DIUBAH MENJADI READING
+        a.download = `IELTS_Reading_Backup_${dateStr}.json`;
         
         document.body.appendChild(a);
         a.click();
