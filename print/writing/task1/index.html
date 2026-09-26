@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=850, user-scalable=yes">
-    <title>IELTS Writing Task 1 - Answer Sheet</title>
+    <title>IELTS Writing Task 1 - Print Sheet</title>
     <style>
         :root {
             --text-dark: #222222;
@@ -84,7 +84,7 @@
             font-size: 55px;
             font-weight: bold;
             color: #000000;
-            opacity: 0.12;
+            opacity: 0.10;
             z-index: 9999; 
             text-align: center;
             line-height: 1.2;
@@ -93,163 +93,111 @@
             letter-spacing: 2px;
         }
 
-        /* --- Header Logos --- */
+        /* --- Header Logos (Perbaikan Posisi Tengah) --- */
         .header-logos {
             display: flex;
-            justify-content: space-between;
+            justify-content: center; /* Di tengah */
             align-items: center;
-            margin-bottom: 5px;
+            gap: 60px; /* Jarak terdistribusi rapi */
+            margin-bottom: 10px;
             padding: 0 10px;
+            width: 100%;
         }
-        .logos-left { display: flex; gap: 20px; align-items: center; }
         .header-logos img { height: 40px; object-fit: contain; }
 
-        /* --- Grey Title Banner --- */
+        /* --- Lembar Soal (Question Page) --- */
+        .question-header {
+            text-align: center; font-size: 18px; font-weight: bold; 
+            margin: 20px 0; border-bottom: 2px solid var(--box-border); padding-bottom: 10px;
+        }
+        .question-text { font-size: 16px; margin-bottom: 25px; line-height: 1.5; font-weight: bold;}
+        .question-img-container { flex-grow: 1; display: flex; justify-content: center; align-items: flex-start; margin-top: 10px;}
+        .question-img-container img { max-width: 90%; max-height: 600px; object-fit: contain; border: 1px solid #ccc; padding: 5px;}
+
+        /* --- Halaman Kriteria (Band Descriptors) --- */
+        .criteria-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 15px; background: var(--text-dark); color: white; padding: 8px;}
+        .criteria-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .criteria-table th, .criteria-table td { border: 1px solid #000; padding: 6px; vertical-align: top; }
+        .criteria-table th { background-color: var(--light-grey); text-align: center; font-size: 11px;}
+        .criteria-table .band-col { text-align: center; font-weight: bold; font-size: 14px; background-color: var(--grey-bg); width: 40px;}
+
+        /* --- Komponen Form LJK --- */
         .grey-banner {
             background-color: var(--grey-bg);
-            text-align: center;
-            font-weight: bold;
-            font-size: 14px;
-            padding: 4px 0;
-            color: var(--text-dark);
-            margin-bottom: 15px;
+            text-align: center; font-weight: bold; font-size: 14px;
+            padding: 4px 0; color: var(--text-dark); margin-bottom: 15px;
         }
-
-        /* --- Candidate Info Section (Page 1) --- */
-        .candidate-info-wrapper {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .barcode-section {
-            width: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .barcode-text {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
-            font-size: 9px;
-            letter-spacing: 3px;
-        }
-        .barcode-lines {
-            width: 14px;
-            height: 100%;
-            background: repeating-linear-gradient(to bottom, #000, #000 2px, transparent 2px, transparent 5px, #000 5px, #000 6px, transparent 6px, transparent 8px);
-        }
-
-        .info-form {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            font-size: 11px;
-        }
-
+        .candidate-info-wrapper { display: flex; gap: 15px; margin-bottom: 10px; }
+        .barcode-section { width: 35px; display: flex; align-items: center; justify-content: space-between; }
+        .barcode-text { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9px; letter-spacing: 3px; }
+        .barcode-lines { width: 14px; height: 100%; background: repeating-linear-gradient(to bottom, #000, #000 2px, transparent 2px, transparent 5px, #000 5px, #000 6px, transparent 6px, transparent 8px); }
+        .info-form { flex: 1; display: flex; flex-direction: column; gap: 10px; font-size: 11px; }
         .row-info { display: flex; align-items: center; gap: 10px; }
         .label { width: 110px; font-weight: normal; }
-        
-        .name-box {
-            flex: 1; height: 26px; border: 1px solid var(--box-border);
-        }
-
+        .name-box { flex: 1; height: 26px; border: 1px solid var(--box-border); }
         .box-group { display: flex; gap: 0px; }
         .bx { width: 20px; height: 24px; border: 1px solid var(--box-border); border-right: none; }
         .bx:last-child { border-right: 1px solid var(--box-border); }
-
         .chk-box { width: 14px; height: 12px; border: 1px solid var(--box-border); display: inline-block; vertical-align: middle; margin-left: 5px;}
-
-        /* Test Date Blocks */
         .date-blocks { display: flex; gap: 15px; align-items: flex-start; }
         .d-col { display: flex; flex-direction: column; align-items: center; gap: 2px;}
         .d-col span { font-size: 10px; word-spacing: 5px; }
 
-        /* --- Task 1 Title --- */
+        /* --- Garis Tulis (Writing Lines) --- */
         .task-title {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 5px 0;
-            border-top: 1px solid var(--box-border);
-            border-bottom: 1px solid var(--box-border);
-            margin: 10px 0;
-            letter-spacing: 1px;
+            text-align: center; font-size: 18px; font-weight: bold;
+            padding: 5px 0; border-top: 1px solid var(--box-border); border-bottom: 1px solid var(--box-border);
+            margin: 10px 0; letter-spacing: 1px;
         }
-
-        /* --- Writing Lines --- */
         .writing-lines {
             width: 100%;
             background-image: repeating-linear-gradient(to bottom, transparent, transparent 31px, var(--line-color) 31px, var(--line-color) 32px);
-            background-size: 100% 32px;
-            background-position: top;
-            line-height: 32px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 15px;
-            color: #000;
-            outline: none;
-            overflow: hidden;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+            background-size: 100% 32px; background-position: top;
+            line-height: 32px; font-family: 'Courier New', Courier, monospace;
+            font-size: 15px; color: #000; outline: none; overflow: hidden;
+            white-space: pre-wrap; word-wrap: break-word;
         }
+        #write-page-1 { height: 480px; } 
+        #write-page-2 { height: 640px; }
 
-        /* Explicit heights to match exact line counts for overflow */
-        #write-page-1 { height: 480px; } /* 15 Lines */
-        #write-page-2 { height: 640px; } /* 20 Lines */
-
-        /* --- Footers --- */
-        .dnw-text {
-            text-align: center;
-            font-size: 10px;
-            font-weight: bold;
-            border-top: 1px solid var(--box-border);
-            padding-top: 3px;
-            margin-top: auto;
-        }
-
-        .footer-grey-box {
-            background-color: var(--grey-bg);
-            height: 120px;
-            width: 100%;
-            margin-top: 5px;
-            position: relative;
-        }
+        /* --- Footer --- */
+        .dnw-text { text-align: center; font-size: 10px; font-weight: bold; border-top: 1px solid var(--box-border); padding-top: 3px; margin-top: auto; }
+        .footer-grey-box { background-color: var(--grey-bg); height: 120px; width: 100%; margin-top: 5px; position: relative; }
         .footer-grey-box span { position: absolute; bottom: 5px; left: 5px; font-size: 8px; }
 
-        /* --- OFFICIAL USE ONLY GRID (Page 2) --- */
+        /* --- Official Use Only --- */
         .official-use { margin-top: 5px; }
-        .official-title {
-            background: #000; color: #fff; text-align: center;
-            font-size: 11px; font-weight: bold; padding: 3px 0;
-        }
-        .off-row {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-top: 8px; font-size: 9px; font-weight: bold;
-        }
+        .official-title { background: #000; color: #fff; text-align: center; font-size: 11px; font-weight: bold; padding: 3px 0; }
+        .off-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 9px; font-weight: bold; }
         .off-left { display: flex; align-items: center; width: 45%; }
         .off-left .label { width: 130px; font-size: 9px;}
         .off-right { display: flex; gap: 0; }
-        
-        .score-box {
-            border: 1px solid #000; border-right: none;
-            display: flex; flex-direction: column;
-            width: 45px; height: 35px;
-        }
+        .score-box { border: 1px solid #000; border-right: none; display: flex; flex-direction: column; width: 45px; height: 35px; }
         .score-box:last-child { border-right: 1px solid #000; }
-        .s-head { 
-            height: 15px; border-bottom: 1px solid #000; 
-            display: flex; align-items: center; justify-content: center;
-        }
+        .s-head { height: 15px; border-bottom: 1px solid #000; display: flex; align-items: center; justify-content: center; }
         .s-body { flex: 1; }
-        
         .pen-box { width: 55px; }
 
-        /* Print Override */
+        /* --- PRINT SETTINGS (A4 FIX) --- */
+        @page {
+            size: A4;
+            margin: 0; /* Menghilangkan margin default browser agar ukuran A4 akurat */
+        }
+        
         @media print {
-            body { padding: 0; background: white; }
-            .no-print-toolbar { display: none; }
-            .a4-page { box-shadow: none; margin: 0; break-after: page; }
+            body { 
+                padding: 0; 
+                background: white; 
+                margin: 0; 
+                -webkit-print-color-adjust: exact; 
+            }
+            .no-print-toolbar { display: none !important; }
+            .a4-page { 
+                box-shadow: none; 
+                margin: 0; 
+                break-after: page; 
+                page-break-after: always;
+            }
         }
     </style>
 </head>
@@ -264,28 +212,41 @@
         <span class="toolbar-info">💡 Teks yang panjang akan secara otomatis mengalir dan membuat halaman baru jika perlu.</span>
         <button class="btn btn-print" onclick="window.print()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            Print Answer Sheet
+            Print Sheet
         </button>
     </div>
 
     <!-- Container for dynamic pages -->
     <div id="pages-container">
 
+        <!-- ================= HALAMAN SOAL (Dari User Upload) ================= -->
+        <div class="a4-page" id="page-question" style="display: none;">
+            <div class="header-logos">
+                <img src="../../../Assets/BritCounsil.jpeg" alt="British Council">
+                <img src="../../../Assets/IdpEdu.jpeg" alt="IDP Education">
+                <img src="../../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
+            </div>
+            
+            <div class="question-header">IELTS WRITING TASK 1 - QUESTION PROMPT</div>
+            
+            <!-- Tempat Prompt Teks -->
+            <div class="question-text" id="q-text"></div>
+            
+            <!-- Tempat Gambar/Grafik -->
+            <div class="question-img-container">
+                <img id="q-img" src="" alt="Task 1 Graph" style="display: none;">
+            </div>
+        </div>
+
+
         <!-- ================= PAGE 1 ================= -->
         <div class="a4-page" id="page-1">
-            <div class="watermark">
-                FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
-            </div>
+            <div class="watermark">FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM</div>
 
-            <!-- Header Logos -->
             <div class="header-logos">
-                <div class="logos-left">
-                    <img src="../../../Assets/BritCounsil.jpeg" alt="British Council">
-                    <img src="../../../Assets/IdpEdu.jpeg" alt="IDP Education">
-                </div>
-                <div>
-                    <img src="../../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
-                </div>
+                <img src="../../../Assets/BritCounsil.jpeg" alt="British Council">
+                <img src="../../../Assets/IdpEdu.jpeg" alt="IDP Education">
+                <img src="../../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
             </div>
 
             <div class="grey-banner">IELTS Writing Answer Sheet – TASK 1</div>
@@ -298,72 +259,42 @@
                 </div>
 
                 <div class="info-form">
-                    <div class="row-info">
-                        <div class="label">Candidate Name</div>
-                        <div class="name-box"></div>
-                    </div>
-                    
+                    <div class="row-info"><div class="label">Candidate Name</div><div class="name-box"></div></div>
                     <div class="row-info" style="margin-top: 4px;">
                         <div class="label">Centre Number</div>
-                        <div class="box-group">
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                        </div>
+                        <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
                         <div class="label" style="margin-left: 20px; width: 100px;">Candidate Number</div>
-                        <div class="box-group">
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                        </div>
+                        <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
                     </div>
-
                     <div class="row-info">
                         <div class="label">Module (shade one box):</div>
                         <div>Academic <div class="chk-box"></div></div>
                         <div style="margin-left: 20px;">General Training <div class="chk-box"></div></div>
                     </div>
-
                     <div class="row-info">
                         <div class="label">Test date</div>
                         <div class="date-blocks">
-                            <div class="d-col">
-                                <div class="box-group"><div class="bx"></div><div class="bx"></div></div>
-                                <span>D D</span>
-                            </div>
-                            <div class="d-col">
-                                <div class="box-group"><div class="bx"></div><div class="bx"></div></div>
-                                <span>M M</span>
-                            </div>
-                            <div class="d-col">
-                                <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
-                                <span>Y Y Y Y</span>
-                            </div>
+                            <div class="d-col"><div class="box-group"><div class="bx"></div><div class="bx"></div></div><span>D D</span></div>
+                            <div class="d-col"><div class="box-group"><div class="bx"></div><div class="bx"></div></div><span>M M</span></div>
+                            <div class="d-col"><div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div><span>Y Y Y Y</span></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Title & Writing Lines -->
             <div class="task-title">TASK 1</div>
             <div class="writing-lines" id="write-page-1"></div>
 
-            <!-- Footer P1 -->
             <div class="dnw-text">Do not write below this line</div>
-            <div class="footer-grey-box">
-                <span>100913/2</span>
-            </div>
+            <div class="footer-grey-box"><span>100913/2</span></div>
         </div>
-
 
         <!-- ================= PAGE 2 ================= -->
         <div class="a4-page" id="page-2">
-            <div class="watermark">
-                FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
-            </div>
+            <div class="watermark">FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM</div>
 
-            <!-- Lines starts immediately on Page 2 -->
             <div class="writing-lines" id="write-page-2"></div>
 
-            <!-- Footer P2 -->
             <div class="dnw-text">Do not write below this line</div>
             
             <div class="official-use" id="official-use-block">
@@ -373,10 +304,7 @@
                 <div class="off-row">
                     <div class="off-left">
                         <div class="label">Candidate Number:</div>
-                        <div class="box-group">
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                        </div>
+                        <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
                     </div>
                     <div class="off-right" style="padding-right: 110px;">
                         <div class="score-box"><div class="s-head">TA</div><div class="s-body"></div></div>
@@ -390,10 +318,7 @@
                 <div class="off-row">
                     <div class="off-left">
                         <div class="label">Examiner 2 Number:</div>
-                        <div class="box-group">
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                        </div>
+                        <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
                     </div>
                     <div class="off-right">
                         <div class="score-box pen-box"><div class="s-head">Underlength</div><div class="s-body"></div></div>
@@ -409,10 +334,7 @@
                 <div class="off-row">
                     <div class="off-left">
                         <div class="label">Candidate Number:</div>
-                        <div class="box-group">
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                        </div>
+                        <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
                     </div>
                     <div class="off-right" style="padding-right: 110px;">
                         <div class="score-box"><div class="s-head">TA</div><div class="s-body"></div></div>
@@ -426,10 +348,7 @@
                 <div class="off-row" style="margin-bottom: 5px;">
                     <div class="off-left">
                         <div class="label">Examiner 1 Number:</div>
-                        <div class="box-group">
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
-                        </div>
+                        <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
                     </div>
                     <div class="off-right">
                         <div class="score-box pen-box"><div class="s-head">Underlength</div><div class="s-body"></div></div>
@@ -440,17 +359,62 @@
                         <div class="score-box pen-box"><div class="s-head">Illegible</div><div class="s-body"></div></div>
                     </div>
                 </div>
-
             </div>
         </div>
+
+        <!-- ================= PAGE MARKING CRITERIA (Selalu di akhir) ================= -->
+        <div class="a4-page" id="page-criteria">
+            <div class="criteria-title">IELTS WRITING TASK 1 - ASSESSMENT CRITERIA (BAND 0 - 9)</div>
+            <table class="criteria-table">
+                <thead>
+                    <tr>
+                        <th class="band-col">Band</th>
+                        <th>Task Achievement (TA)</th>
+                        <th>Coherence & Cohesion (CC)</th>
+                        <th>Lexical Resource (LR)</th>
+                        <th>Grammatical Range & Accuracy (GRA)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="band-col">9</td><td>Fully satisfies all requirements. Clearly presents a fully developed response.</td><td>Uses cohesion in such a way that it attracts no attention. Skilfully manages paragraphing.</td><td>Uses a wide range of vocabulary with very natural and sophisticated control of lexical features.</td><td>Uses a wide range of structures with full flexibility and accuracy; rare minor errors.</td></tr>
+                    <tr><td class="band-col">8</td><td>Covers all requirements sufficiently. Highlights and clearly illustrates key features/bullet points.</td><td>Sequences information logically. Manages all aspects of cohesion well. Uses paragraphing sufficiently.</td><td>Uses a wide vocabulary fluently and flexibly to convey precise meanings. Occasional inaccuracies.</td><td>Uses a wide range of structures. The majority of sentences are error-free.</td></tr>
+                    <tr><td class="band-col">7</td><td>Covers the requirements. Presents a clear overview of main trends. Highlights key features but could be more fully extended.</td><td>Logically organises information; clear progression throughout. Uses a range of cohesive devices appropriately.</td><td>Uses sufficient vocabulary to allow flexibility. Uses less common lexical items with some awareness of style.</td><td>Uses a variety of complex structures. Produces frequent error-free sentences. Good control of grammar.</td></tr>
+                    <tr><td class="band-col">6</td><td>Addresses the requirements. Presents an overview with information appropriately selected. Details may be irrelevant/inaccurate.</td><td>Arranges information coherently. Uses cohesive devices effectively, but cohesion within/between sentences may be faulty.</td><td>Uses an adequate range of vocabulary. Attempts to use less common vocabulary but with some inaccuracy.</td><td>Uses a mix of simple and complex sentence forms. Makes some errors in grammar and punctuation.</td></tr>
+                    <tr><td class="band-col">5</td><td>Generally addresses the task. Recounts detail mechanically with no clear overview. Data presentation may be incomplete.</td><td>Presents information with some organisation but lack of progression. Inadequate or over-use of cohesive devices.</td><td>Uses limited vocabulary, minimally adequate for the task. May make noticeable errors in spelling/word formation.</td><td>Uses only a limited range of structures. Attempts complex sentences but these tend to be less accurate.</td></tr>
+                    <tr><td class="band-col">4</td><td>Attempts to address the task but does not cover all key features. The format may be inappropriate.</td><td>Presents information but it is not arranged coherently. No clear progression. Inaccurate use of cohesive devices.</td><td>Uses only basic vocabulary which may be used repetitively. Errors in spelling/word formation may cause strain for the reader.</td><td>Uses a very limited range of structures with only rare use of subordinate clauses. Frequent grammatical errors.</td></tr>
+                    <tr><td class="band-col">3</td><td>Fails to address the task adequately. Misses key features/trends. Much detail may be irrelevant.</td><td>Does not organise ideas logically. Uses a very limited range of cohesive devices.</td><td>Uses only a very limited range of words and expressions with very limited control of word formation.</td><td>Attempts sentence forms but errors in grammar and punctuation predominate.</td></tr>
+                    <tr><td class="band-col">2</td><td>Answer is barely related to the task.</td><td>Has very little control of organisational features.</td><td>Uses extremely limited vocabulary; essentially isolated words.</td><td>Cannot use sentence forms except in memorised phrases.</td></tr>
+                    <tr><td class="band-col">1</td><td>Answer is completely unrelated to the task.</td><td>Fails to communicate any message.</td><td>Can only use a few isolated words.</td><td>Cannot use sentence forms at all.</td></tr>
+                    <tr><td class="band-col">0</td><td colspan="4" style="text-align: center; font-style: italic;">Does not attend / Does not attempt the task in any way / Writes a completely memorised response.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
     </div> <!-- End pages container -->
 
     <script>
-        // Simulasi Teks Esai. Bisa diganti dengan mengambil data dari localStorage sesungguhnya
-        // misal: const rawText = localStorage.getItem('ielts_writing_task1_pro') || "";
+        // 1. Ambil data Teks Esai LJK
         let rawText = localStorage.getItem('ielts_writing_task1_pro');
         
-        // Dummy text if local storage is empty
+        // 2. Ambil data Soal & Gambar dari Workspace
+        let workspaceData = JSON.parse(localStorage.getItem('ielts_writing_task1_workspace') || "{}");
+
+        // --- Render Halaman Soal (Jika ada soal / gambar) ---
+        if (workspaceData.question || (workspaceData.image && workspaceData.image.length > 10)) {
+            const pageQuestion = document.getElementById('page-question');
+            pageQuestion.style.display = 'flex'; // Munculkan halaman soal
+            
+            if (workspaceData.question) {
+                document.getElementById('q-text').innerText = workspaceData.question;
+            }
+            if (workspaceData.image && workspaceData.image.length > 10) {
+                const imgEl = document.getElementById('q-img');
+                imgEl.src = workspaceData.image;
+                imgEl.style.display = 'block';
+            }
+        }
+
+        // Dummy text jika essay kosong
         if (!rawText) {
             rawText = "This is a sample essay for IELTS Writing Task 1. ".repeat(60) + 
                       "\n\nThe layout automatically detects overflow and will seamlessly move the text to the next page. " +
@@ -458,7 +422,7 @@
         }
 
         function autoPaginateText(text) {
-            const words = text.split(/( )/); // Memisahkan dengan spasi namun tetap menyimpan spasinya
+            const words = text.split(/( )/); 
             let pageNum = 1;
             let currentBox = document.getElementById(`write-page-${pageNum}`);
             currentBox.innerText = "";
@@ -466,22 +430,19 @@
             for (let i = 0; i < words.length; i++) {
                 currentBox.appendChild(document.createTextNode(words[i]));
 
-                // Jika text melewati batas tinggi (overflow)
+                // Jika text overflow
                 if (currentBox.scrollHeight > currentBox.clientHeight) {
-                    // Hapus kata terakhir yang bikin overflow
                     currentBox.innerText = currentBox.innerText.slice(0, -(words[i].length));
                     
-                    // Pindah ke Halaman Berikutnya
                     pageNum++;
                     currentBox = document.getElementById(`write-page-${pageNum}`);
                     
-                    // Jika elemen halaman belum ada, buat Halaman Ekstra (Kloning)
+                    // Kloning Halaman Ekstra
                     if (!currentBox) {
                         createNewExtraPage(pageNum);
                         currentBox = document.getElementById(`write-page-${pageNum}`);
                     }
                     
-                    // Masukkan kembali kata yang dihapus tadi ke halaman baru
                     currentBox.appendChild(document.createTextNode(words[i]));
                 }
             }
@@ -492,20 +453,20 @@
             const newPage = templatePage.cloneNode(true);
             newPage.id = `page-${pageNum}`;
             
-            // Bersihkan teks sebelumnya
             const writingArea = newPage.querySelector('.writing-lines');
             writingArea.id = `write-page-${pageNum}`;
             writingArea.innerText = "";
-            writingArea.style.height = "800px"; // Memberikan lebih banyak ruang karena kotak examiner dihapus
+            writingArea.style.height = "800px"; 
 
-            // Hapus blok 'OFFICIAL USE ONLY' di halaman tambahan (biasanya kertas ke-3 hanya bergaris full)
             const offBlock = newPage.querySelector('.official-use');
             if (offBlock) offBlock.remove();
 
-            document.getElementById('pages-container').appendChild(newPage);
+            // PENTING: Masukkan halaman baru SEBELUM halaman kriteria agar kriteria selalu paling bawah
+            const container = document.getElementById('pages-container');
+            const criteriaPage = document.getElementById('page-criteria');
+            container.insertBefore(newPage, criteriaPage);
         }
 
-        // Jalankan Script Autoflow saat window ter-load
         window.onload = () => {
             if (rawText.trim().length > 0) {
                 autoPaginateText(rawText);
