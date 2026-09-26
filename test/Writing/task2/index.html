@@ -3,73 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS Writing - Task 2</title>
+    <title>IELTS Writing - Task 2 (Premium Workspace)</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         :root {
-            --primary: #2563eb; --primary-hover: #1d4ed8;
-            --bg-color: #f1f5f9; --card-bg: #ffffff; --border: #e2e8f0;
-            --text-main: #1e293b; --text-muted: #64748b;
+            --primary: #4f46e5;         /* Premium Indigo */
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;        /* Soft slate background */
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-        html, body { height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
         
-        /* Sticky Zone */
-        .sticky-zone { flex-shrink: 0; background-color: var(--bg-color); padding: 15px 20px; border-bottom: 2px solid var(--border); z-index: 100; display: flex; justify-content: space-between; align-items: center; }
-        .header-title { font-size: 1.5rem; font-weight: bold; }
-        .top-actions { display: flex; gap: 8px; }
+        /* Menggunakan 100dvh agar pas sempurna di browser mobile */
+        html, body { height: 100dvh; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
         
-        button { display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: 0.2s; }
-        button svg { width: 16px; height: 16px; flex-shrink: 0; }
-        button:hover { background: var(--primary-hover); }
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* --- Sticky Header --- */
+        .sticky-zone { 
+            flex-shrink: 0; background-color: var(--card-bg); padding: 12px 20px; 
+            border-bottom: 1px solid var(--border); z-index: 100; display: flex; 
+            justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm);
+        }
+        .header-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px;}
+        .top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        /* --- Buttons --- */
+        button { 
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px; 
+            background: var(--primary); color: white; border: none; padding: 8px 16px; 
+            border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 600; 
+            transition: all 0.2s ease; box-shadow: var(--shadow-sm);
+        }
+        button svg { width: 18px; height: 18px; flex-shrink: 0; }
+        button:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        
         .btn-success { background: #10b981; } .btn-success:hover { background: #059669; }
-        .btn-danger { background: transparent; border: 1px solid #ef4444; color: #ef4444; } .btn-danger:hover { background: #fef2f2; }
-        .btn-back { background: #64748b; } .btn-back:hover { background: #475569; }
+        .btn-danger { background: #fff; border: 1px solid #ef4444; color: #ef4444; box-shadow: none;} 
+        .btn-danger:hover { background: #fef2f2; border-color:#dc2626; color: #dc2626;}
+        .btn-back { background: #f1f5f9; color: var(--text-main); box-shadow: none; border: 1px solid var(--border);} 
+        .btn-back:hover { background: #e2e8f0; }
 
-        /* Main Workspace - Desktop Split View */
-        .main-workspace { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
-        .panel { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        /* --- Main Workspace --- */
+        .main-workspace { display: flex; flex-direction: column; flex-grow: 1; overflow-y: auto; }
+        .panel { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
         
+        /* Desktop Split View */
         @media (min-width: 992px) {
-            .main-workspace { flex-direction: row; }
-            .panel.left { flex: 0 0 35%; border-right: 2px solid var(--border); } /* Kolom kiri lebih kecil untuk Task 2 */
-            .panel.right { flex: 0 0 65%; }
+            .main-workspace { flex-direction: row; overflow: hidden; }
+            .panel { overflow-y: auto; height: 100%; }
+            .panel.left { flex: 0 0 38%; border-right: 1px solid var(--border); background: var(--bg-color); }
+            .panel.right { flex: 0 0 62%; background: #ffffff; }
         }
 
-        /* Card Elements */
-        .card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
-        .card-title { font-weight: bold; margin-bottom: 10px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        /* --- Cards --- */
+        .card { 
+            background: var(--card-bg); padding: 20px; border-radius: 12px; 
+            border: 1px solid var(--border); box-shadow: var(--shadow-md); 
+            display: flex; flex-direction: column;
+        }
+        .card-title { 
+            font-weight: 700; margin-bottom: 12px; color: var(--text-main); 
+            display: flex; justify-content: space-between; align-items: center; font-size: 15px;
+        }
         
-        .input-full { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 15px; resize: vertical; outline: none; line-height: 1.5; }
-        .input-full:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        
-        /* Word Counter */
-        .word-count-badge { font-size: 12px; background: #e2e8f0; color: #475569; padding: 3px 8px; border-radius: 12px; }
-        .total-words { font-size: 16px; font-weight: bold; padding: 10px; text-align: right; color: var(--text-main); }
+        /* --- Inputs --- */
+        .input-full { 
+            width: 100%; padding: 12px 15px; border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 15px; resize: vertical; outline: none; 
+            background: #f8fafc; color: var(--text-main); line-height: 1.6; transition: all 0.2s;
+        }
+        .input-full:focus { 
+            background: #ffffff; border-color: var(--primary); 
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); 
+        }
+
+        /* --- Word Counter --- */
+        .word-count-badge { font-size: 12px; font-weight: 600; background: #f1f5f9; color: var(--text-muted); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);}
+        .total-words { font-size: 16px; font-weight: 700; padding: 10px; text-align: right; color: var(--text-muted); }
         .target-met { color: #10b981; }
 
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .header-title { display: none; } /* Hide title on very small screens to fit buttons */
+            .panel { padding: 15px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="sticky-zone">
         <a href="../index.html" style="text-decoration: none;">
-            <button class="btn-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> Back</button>
+            <button class="btn-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg> 
+                Back
+            </button>
         </a>
-        <div class="header-title">Task 2 (Essay)</div>
+        <div class="header-title">Writing Task 2</div>
         <div class="top-actions">
-            <button class="btn-success" onclick="saveData(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Save</button>
-            <button class="btn-danger" onclick="clearData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Reset</button>
+            <button class="btn-danger" onclick="clearData()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+            <button class="btn-success" onclick="saveData(true)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> 
+                Save
+            </button>
+            <button onclick="printSheet()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg> 
+                Print Sheet
+            </button>
         </div>
     </div>
 
     <div class="main-workspace">
         <!-- Left Panel: Question -->
         <div class="panel left">
-            <div class="card" style="flex-grow: 1; display: flex; flex-direction: column;">
+            <div class="card" style="flex-grow: 1;">
                 <div class="card-title">Essay Prompt (Question)</div>
-                <textarea id="question-prompt" class="input-full" style="flex-grow: 1; min-height: 200px;" placeholder="Type or paste your Task 2 question here (e.g. To what extent do you agree...)" oninput="saveData()"></textarea>
+                <textarea id="question-prompt" class="input-full" style="flex-grow: 1; min-height: 200px;" placeholder="Type or paste your Task 2 question here (e.g., To what extent do you agree or disagree?)..." oninput="saveData()"></textarea>
             </div>
         </div>
 
@@ -106,13 +170,16 @@
                     Conclusion
                     <span class="word-count-badge" id="wc-conclusion">0 words</span>
                 </div>
-                <textarea id="p-conclusion" class="input-full paragraph-input" rows="3" placeholder="Summary of main points and final thought..." oninput="updateWords()"></textarea>
+                <textarea id="p-conclusion" class="input-full paragraph-input" rows="4" placeholder="Summary of main points and final thought..." oninput="updateWords()"></textarea>
             </div>
         </div>
     </div>
 
     <script>
-        const STORAGE_KEY = 'ielts_writing_task2_v1';
+        // Key untuk UI Editor Internal
+        const WORKSPACE_KEY = 'ielts_writing_task2_workspace';
+        // Key yang dibaca oleh halaman Print Sheet Anda (Task 2)
+        const PRINT_KEY = 'ielts_writing_task2_pro';
 
         function countWords(str) {
             return str.trim().split(/\s+/).filter(word => word.length > 0).length;
@@ -131,6 +198,7 @@
 
             const totalEl = document.getElementById('total-word-count');
             totalEl.innerText = `Total Words: ${total} / 250`;
+            // Syarat minimal Task 2 adalah 250 kata
             if (total >= 250) totalEl.classList.add('target-met');
             else totalEl.classList.remove('target-met');
             
@@ -145,12 +213,26 @@
                 detail2: document.getElementById('p-detail2').value,
                 conclusion: document.getElementById('p-conclusion').value
             };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            if (showAlert) Swal.fire({ position: 'top-end', icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1000 });
+
+            // Menggabungkan paragraf untuk Lembar Print
+            // Memisahkan tiap paragraf dengan dua line breaks (Enter) agar berjarak di kertasnya
+            const combinedEssay = `${data.intro}\n\n${data.detail1}\n\n${data.detail2}\n\n${data.conclusion}`.replace(/\n{3,}/g, '\n\n').trim();
+
+            try {
+                // Simpan text editor state
+                localStorage.setItem(WORKSPACE_KEY, JSON.stringify(data));
+                
+                // Simpan teks mentah tergabung untuk halaman Print Sheet Task 2
+                localStorage.setItem(PRINT_KEY, combinedEssay);
+                
+                if (showAlert) Swal.fire({ position: 'top-end', icon: 'success', title: 'Saved!', showConfirmButton: false, timer: 1000 });
+            } catch(e) {
+                if (showAlert) Swal.fire('Error', 'Storage quota exceeded.', 'error');
+            }
         }
 
         function loadData() {
-            const saved = localStorage.getItem(STORAGE_KEY);
+            const saved = localStorage.getItem(WORKSPACE_KEY);
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('question-prompt').value = data.question || "";
@@ -165,13 +247,23 @@
         function clearData() {
             Swal.fire({ title: 'Are you sure?', text: "This will reset all your writing!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(WORKSPACE_KEY);
+                    localStorage.removeItem(PRINT_KEY);
                     document.getElementById('question-prompt').value = "";
                     document.querySelectorAll('.paragraph-input').forEach(el => el.value = "");
                     updateWords();
                     Swal.fire('Cleared!', 'Workspace has been reset.', 'success');
                 }
             });
+        }
+
+        function printSheet() {
+            // Pastikan data tersimpan sebelum berpindah tab
+            saveData(false);
+            
+            // Path diarahkan mundur 3 folder, lalu masuk ke print/writing/task2
+            const printPath = '../../../print/writing/task2/index.html'; 
+            window.open(printPath, '_blank');
         }
 
         window.onload = loadData;
