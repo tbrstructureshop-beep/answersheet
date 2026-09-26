@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=850, user-scalable=yes">
+    <title>IELTS Writing Task 1 - Answer Sheet</title>
+    <style>
+        :root {
+            --text-dark: #222222;
+            --box-border: #000000;
+            --grey-bg: #c9c9c9;
+            --light-grey: #e6e6e6;
+            --line-color: #7a7a7a;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- Toolbar (No Print) --- */
+        .no-print-toolbar {
+            width: 210mm;
+            background: #ffffff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .btn-print { background-color: #4f46e5; color: white; }
+        .btn-print:hover { background-color: #4338ca; }
+        .btn-back { background-color: #64748b; color: white; }
+        .btn-back:hover { background-color: #475569; }
+        .toolbar-info { font-size: 13px; color: #64748b; }
+
+        /* --- Kertas A4 --- */
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            padding: 15mm 15mm; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        /* --- WATERMARK --- */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 55px;
+            font-weight: bold;
+            color: #000000;
+            opacity: 0.12;
+            z-index: 9999; 
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            pointer-events: none; 
+            letter-spacing: 2px;
+        }
+
+        /* --- Header Logos --- */
+        .header-logos {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            padding: 0 10px;
+        }
+        .logos-left { display: flex; gap: 20px; align-items: center; }
+        .header-logos img { height: 40px; object-fit: contain; }
+
+        /* --- Grey Title Banner --- */
+        .grey-banner {
+            background-color: var(--grey-bg);
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            padding: 4px 0;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+        }
+
+        /* --- Candidate Info Section (Page 1) --- */
+        .candidate-info-wrapper {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .barcode-section {
+            width: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .barcode-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 9px;
+            letter-spacing: 3px;
+        }
+        .barcode-lines {
+            width: 14px;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom, #000, #000 2px, transparent 2px, transparent 5px, #000 5px, #000 6px, transparent 6px, transparent 8px);
+        }
+
+        .info-form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        .row-info { display: flex; align-items: center; gap: 10px; }
+        .label { width: 110px; font-weight: normal; }
+        
+        .name-box {
+            flex: 1; height: 26px; border: 1px solid var(--box-border);
+        }
+
+        .box-group { display: flex; gap: 0px; }
+        .bx { width: 20px; height: 24px; border: 1px solid var(--box-border); border-right: none; }
+        .bx:last-child { border-right: 1px solid var(--box-border); }
+
+        .chk-box { width: 14px; height: 12px; border: 1px solid var(--box-border); display: inline-block; vertical-align: middle; margin-left: 5px;}
+
+        /* Test Date Blocks */
+        .date-blocks { display: flex; gap: 15px; align-items: flex-start; }
+        .d-col { display: flex; flex-direction: column; align-items: center; gap: 2px;}
+        .d-col span { font-size: 10px; word-spacing: 5px; }
+
+        /* --- Task 1 Title --- */
+        .task-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 5px 0;
+            border-top: 1px solid var(--box-border);
+            border-bottom: 1px solid var(--box-border);
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+
+        /* --- Writing Lines --- */
+        .writing-lines {
+            width: 100%;
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 31px, var(--line-color) 31px, var(--line-color) 32px);
+            background-size: 100% 32px;
+            background-position: top;
+            line-height: 32px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            color: #000;
+            outline: none;
+            overflow: hidden;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* Explicit heights to match exact line counts for overflow */
+        #write-page-1 { height: 480px; } /* 15 Lines */
+        #write-page-2 { height: 640px; } /* 20 Lines */
+
+        /* --- Footers --- */
+        .dnw-text {
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            border-top: 1px solid var(--box-border);
+            padding-top: 3px;
+            margin-top: auto;
+        }
+
+        .footer-grey-box {
+            background-color: var(--grey-bg);
+            height: 120px;
+            width: 100%;
+            margin-top: 5px;
+            position: relative;
+        }
+        .footer-grey-box span { position: absolute; bottom: 5px; left: 5px; font-size: 8px; }
+
+        /* --- OFFICIAL USE ONLY GRID (Page 2) --- */
+        .official-use { margin-top: 5px; }
+        .official-title {
+            background: #000; color: #fff; text-align: center;
+            font-size: 11px; font-weight: bold; padding: 3px 0;
+        }
+        .off-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 8px; font-size: 9px; font-weight: bold;
+        }
+        .off-left { display: flex; align-items: center; width: 45%; }
+        .off-left .label { width: 130px; font-size: 9px;}
+        .off-right { display: flex; gap: 0; }
+        
+        .score-box {
+            border: 1px solid #000; border-right: none;
+            display: flex; flex-direction: column;
+            width: 45px; height: 35px;
+        }
+        .score-box:last-child { border-right: 1px solid #000; }
+        .s-head { 
+            height: 15px; border-bottom: 1px solid #000; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        .s-body { flex: 1; }
+        
+        .pen-box { width: 55px; }
+
+        /* Print Override */
+        @media print {
+            body { padding: 0; background: white; }
+            .no-print-toolbar { display: none; }
+            .a4-page { box-shadow: none; margin: 0; break-after: page; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toolbar -->
+    <div class="no-print-toolbar">
+        <button class="btn btn-back" onclick="window.close()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Close & Back
+        </button>
+        <span class="toolbar-info">💡 Teks yang panjang akan secara otomatis mengalir dan membuat halaman baru jika perlu.</span>
+        <button class="btn btn-print" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print Answer Sheet
+        </button>
+    </div>
+
+    <!-- Container for dynamic pages -->
+    <div id="pages-container">
+
+        <!-- ================= PAGE 1 ================= -->
+        <div class="a4-page" id="page-1">
+            <div class="watermark">
+                FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
+            </div>
+
+            <!-- Header Logos -->
+            <div class="header-logos">
+                <div class="logos-left">
+                    <img src="../../../Assets/BritCounsil.jpeg" alt="British Council">
+                    <img src="../../../Assets/IdpEdu.jpeg" alt="IDP Education">
+                </div>
+                <div>
+                    <img src="../../../Assets/CambridgeEsol.jpeg" alt="Cambridge ESOL">
+                </div>
+            </div>
+
+            <div class="grey-banner">IELTS Writing Answer Sheet – TASK 1</div>
+
+            <!-- Candidate Info -->
+            <div class="candidate-info-wrapper">
+                <div class="barcode-section">
+                    <div class="barcode-text">* 0 1 8 1 9 3 8 7 4 2 *</div>
+                    <div class="barcode-lines"></div>
+                </div>
+
+                <div class="info-form">
+                    <div class="row-info">
+                        <div class="label">Candidate Name</div>
+                        <div class="name-box"></div>
+                    </div>
+                    
+                    <div class="row-info" style="margin-top: 4px;">
+                        <div class="label">Centre Number</div>
+                        <div class="box-group">
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                        </div>
+                        <div class="label" style="margin-left: 20px; width: 100px;">Candidate Number</div>
+                        <div class="box-group">
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                        </div>
+                    </div>
+
+                    <div class="row-info">
+                        <div class="label">Module (shade one box):</div>
+                        <div>Academic <div class="chk-box"></div></div>
+                        <div style="margin-left: 20px;">General Training <div class="chk-box"></div></div>
+                    </div>
+
+                    <div class="row-info">
+                        <div class="label">Test date</div>
+                        <div class="date-blocks">
+                            <div class="d-col">
+                                <div class="box-group"><div class="bx"></div><div class="bx"></div></div>
+                                <span>D D</span>
+                            </div>
+                            <div class="d-col">
+                                <div class="box-group"><div class="bx"></div><div class="bx"></div></div>
+                                <span>M M</span>
+                            </div>
+                            <div class="d-col">
+                                <div class="box-group"><div class="bx"></div><div class="bx"></div><div class="bx"></div><div class="bx"></div></div>
+                                <span>Y Y Y Y</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Title & Writing Lines -->
+            <div class="task-title">TASK 1</div>
+            <div class="writing-lines" id="write-page-1"></div>
+
+            <!-- Footer P1 -->
+            <div class="dnw-text">Do not write below this line</div>
+            <div class="footer-grey-box">
+                <span>100913/2</span>
+            </div>
+        </div>
+
+
+        <!-- ================= PAGE 2 ================= -->
+        <div class="a4-page" id="page-2">
+            <div class="watermark">
+                FOR EXERCISE PURPOSES ONLY<br>UNOFFICIAL EXAM
+            </div>
+
+            <!-- Lines starts immediately on Page 2 -->
+            <div class="writing-lines" id="write-page-2"></div>
+
+            <!-- Footer P2 -->
+            <div class="dnw-text">Do not write below this line</div>
+            
+            <div class="official-use" id="official-use-block">
+                <div class="official-title">OFFICIAL USE ONLY</div>
+                
+                <!-- ROW 1 -->
+                <div class="off-row">
+                    <div class="off-left">
+                        <div class="label">Candidate Number:</div>
+                        <div class="box-group">
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                        </div>
+                    </div>
+                    <div class="off-right" style="padding-right: 110px;">
+                        <div class="score-box"><div class="s-head">TA</div><div class="s-body"></div></div>
+                        <div class="score-box"><div class="s-head">CC</div><div class="s-body"></div></div>
+                        <div class="score-box"><div class="s-head">LR</div><div class="s-body"></div></div>
+                        <div class="score-box"><div class="s-head">GRA</div><div class="s-body"></div></div>
+                    </div>
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="off-row">
+                    <div class="off-left">
+                        <div class="label">Examiner 2 Number:</div>
+                        <div class="box-group">
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                        </div>
+                    </div>
+                    <div class="off-right">
+                        <div class="score-box pen-box"><div class="s-head">Underlength</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box" style="width:70px;"><div class="s-head">No. of words</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box"><div class="s-head">Penalty</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box"><div class="s-head">Off-topic</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box" style="width:65px;"><div class="s-head">Memorised</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box"><div class="s-head">Illegible</div><div class="s-body"></div></div>
+                    </div>
+                </div>
+
+                <!-- ROW 3 -->
+                <div class="off-row">
+                    <div class="off-left">
+                        <div class="label">Candidate Number:</div>
+                        <div class="box-group">
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                        </div>
+                    </div>
+                    <div class="off-right" style="padding-right: 110px;">
+                        <div class="score-box"><div class="s-head">TA</div><div class="s-body"></div></div>
+                        <div class="score-box"><div class="s-head">CC</div><div class="s-body"></div></div>
+                        <div class="score-box"><div class="s-head">LR</div><div class="s-body"></div></div>
+                        <div class="score-box"><div class="s-head">GRA</div><div class="s-body"></div></div>
+                    </div>
+                </div>
+
+                <!-- ROW 4 -->
+                <div class="off-row" style="margin-bottom: 5px;">
+                    <div class="off-left">
+                        <div class="label">Examiner 1 Number:</div>
+                        <div class="box-group">
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                            <div class="bx"></div><div class="bx"></div><div class="bx"></div>
+                        </div>
+                    </div>
+                    <div class="off-right">
+                        <div class="score-box pen-box"><div class="s-head">Underlength</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box" style="width:70px;"><div class="s-head">No. of words</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box"><div class="s-head">Penalty</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box"><div class="s-head">Off-topic</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box" style="width:65px;"><div class="s-head">Memorised</div><div class="s-body"></div></div>
+                        <div class="score-box pen-box"><div class="s-head">Illegible</div><div class="s-body"></div></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div> <!-- End pages container -->
+
+    <script>
+        // Simulasi Teks Esai. Bisa diganti dengan mengambil data dari localStorage sesungguhnya
+        // misal: const rawText = localStorage.getItem('ielts_writing_task1_pro') || "";
+        let rawText = localStorage.getItem('ielts_writing_task1_pro');
+        
+        // Dummy text if local storage is empty
+        if (!rawText) {
+            rawText = "This is a sample essay for IELTS Writing Task 1. ".repeat(60) + 
+                      "\n\nThe layout automatically detects overflow and will seamlessly move the text to the next page. " +
+                      "If the user writes an exceptionally long essay, it will even clone a third page dynamically just like in the real computer/paper tests. ".repeat(30);
+        }
+
+        function autoPaginateText(text) {
+            const words = text.split(/( )/); // Memisahkan dengan spasi namun tetap menyimpan spasinya
+            let pageNum = 1;
+            let currentBox = document.getElementById(`write-page-${pageNum}`);
+            currentBox.innerText = "";
+
+            for (let i = 0; i < words.length; i++) {
+                currentBox.appendChild(document.createTextNode(words[i]));
+
+                // Jika text melewati batas tinggi (overflow)
+                if (currentBox.scrollHeight > currentBox.clientHeight) {
+                    // Hapus kata terakhir yang bikin overflow
+                    currentBox.innerText = currentBox.innerText.slice(0, -(words[i].length));
+                    
+                    // Pindah ke Halaman Berikutnya
+                    pageNum++;
+                    currentBox = document.getElementById(`write-page-${pageNum}`);
+                    
+                    // Jika elemen halaman belum ada, buat Halaman Ekstra (Kloning)
+                    if (!currentBox) {
+                        createNewExtraPage(pageNum);
+                        currentBox = document.getElementById(`write-page-${pageNum}`);
+                    }
+                    
+                    // Masukkan kembali kata yang dihapus tadi ke halaman baru
+                    currentBox.appendChild(document.createTextNode(words[i]));
+                }
+            }
+        }
+
+        function createNewExtraPage(pageNum) {
+            const templatePage = document.getElementById('page-2');
+            const newPage = templatePage.cloneNode(true);
+            newPage.id = `page-${pageNum}`;
+            
+            // Bersihkan teks sebelumnya
+            const writingArea = newPage.querySelector('.writing-lines');
+            writingArea.id = `write-page-${pageNum}`;
+            writingArea.innerText = "";
+            writingArea.style.height = "800px"; // Memberikan lebih banyak ruang karena kotak examiner dihapus
+
+            // Hapus blok 'OFFICIAL USE ONLY' di halaman tambahan (biasanya kertas ke-3 hanya bergaris full)
+            const offBlock = newPage.querySelector('.official-use');
+            if (offBlock) offBlock.remove();
+
+            document.getElementById('pages-container').appendChild(newPage);
+        }
+
+        // Jalankan Script Autoflow saat window ter-load
+        window.onload = () => {
+            if (rawText.trim().length > 0) {
+                autoPaginateText(rawText);
+            }
+        };
+    </script>
+</body>
+</html>
