@@ -1,1 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=850, user-scalable=yes">
+    <title>IELTS Writing Task 1 - Lexical Resource Comparative Benchmark (Band 1 to 9)</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-hover: #6d28d9;
+            --text-dark: #0f172a;
+            --box-border: #000000;
+            --grey-bg: #e2e8f0;
+            --light-grey: #f8fafc;
+            --line-color: #94a3b8;
+            
+            /* Highlighting Palettes for Lexical Resource */
+            --hl-green-bg: #dcfce7;
+            --hl-green-text: #14532d;
+            --hl-green-border: #86efac;
 
+            --hl-amber-bg: #fef3c7;
+            --hl-amber-text: #78350f;
+            --hl-amber-border: #fcd34d;
+
+            --hl-red-bg: #fee2e2;
+            --hl-red-text: #7f1d1d;
+            --hl-red-border: #fca5a5;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        /* --- STICKY NAVIGATOR TOOLBAR (No Print) --- */
+        .no-print-toolbar {
+            position: sticky;
+            top: 10px;
+            z-index: 10000;
+            width: 210mm;
+            background: #ffffff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toolbar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-print { background-color: var(--primary); color: white; }
+        .btn-print:hover { background-color: var(--primary-hover); }
+        .btn-back { background-color: #64748b; color: white; }
+        .btn-back:hover { background-color: #475569; }
+        .btn-mode { background-color: #0f172a; color: white; }
+
+        /* Nav Pills */
+        .band-navigator {
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            flex: 1;
+            min-width: 60px;
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #334155;
+            transition: 0.15s ease-in-out;
+        }
+
+        .nav-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3);
+        }
+
+        /* --- A4 Page Container --- */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            height: 297mm;
+            background: white;
+            padding: 13mm 15mm;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 25px;
+            page-break-after: always;
+            break-after: page;
+        }
+
+        /* --- Watermark --- */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 52px;
+            font-weight: 800;
+            color: #000000;
+            opacity: 0.08;
+            z-index: 999;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+
+        /* --- Header Logos --- */
+        .header-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 8px;
+            padding: 0 10px;
+            width: 100%;
+        }
+        .header-logos img { height: 38px; object-fit: contain; }
+
+        /* --- Prompt Card --- */
+        .prompt-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+        .prompt-title { font-weight: bold; font-size: 14px; color: var(--primary); margin-bottom: 4px; }
+
+        .graph-preview {
+            width: 100%;
+            max-height: 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .graph-preview img {
+            max-width: 100%;
+            max-height: 440px;
+            object-fit: contain;
+        }
+
+        /* --- Banner --- */
+        .band-header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: white;
+            padding: 6px 14px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .bh-left { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+        .bh-badge {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* --- Highlight Legend --- */
+        .highlight-legend {
+            display: flex;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+        /* --- Highlighting Styles for Lexical Resource --- */
+        .hl-lex-advanced {
+            background-color: var(--hl-green-bg);
+            color: var(--hl-green-text);
+            border-bottom: 2px solid var(--hl-green-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .hl-lex-repetitive {
+            background-color: var(--hl-amber-bg);
+            color: var(--hl-amber-text);
+            border-bottom: 2px solid var(--hl-amber-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .hl-lex-error {
+            background-color: var(--hl-red-bg);
+            color: var(--hl-red-text);
+            border-bottom: 2px dashed var(--hl-red-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* --- Answer Sheet Box --- */
+        .answer-sample-card {
+            border: 1px solid var(--box-border);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #ffffff;
+            position: relative;
+        }
+        .sample-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .writing-lines-sample {
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, var(--line-color) 29px, var(--line-color) 30px);
+            background-size: 100% 30px;
+            line-height: 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13.5px;
+            color: #000;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 240px;
+            padding-bottom: 4px;
+        }
+
+        /* --- Examiner Commentary Box --- */
+        .examiner-analysis {
+            background: #fdfefe;
+            border: 1px solid #0f172a;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: auto;
+            border-radius: 4px;
+        }
+
+        .ea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+
+        .ea-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+
+        .ea-score-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            background: #334155;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 11px;
+            line-height: 1.45;
+            color: #334155;
+            margin-top: 4px;
+        }
+
+        .analysis-block {
+            background: #f8fafc;
+            padding: 6px 8px;
+            border-left: 3px solid #64748b;
+            border-radius: 2px;
+        }
+        .ab-label { font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+
+        .examiner-quote {
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: #1e293b;
+            font-style: italic;
+            background: #f1f5f9;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary);
+            margin-top: 4px;
+        }
+
+        /* --- Print Stylesheet --- */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .no-print-toolbar { display: none !important; }
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                display: flex !important;
+                height: 297mm;
+                page-break-after: always;
+                break-after: page;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= STICKY TOOLBAR (NO-PRINT) ================= -->
+    <div class="no-print-toolbar">
+        <div class="toolbar-top">
+            <div class="toolbar-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="9" y1="7" x2="15" y2="7"></line><line x1="9" y1="11" x2="13" y2="11"></line></svg>
+                Task 1 Benchmark: Lexical Resource (Band 1 - Band 9)
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn btn-back" onclick="window.history.back()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Back
+                </button>
+                <button class="btn btn-mode" id="btn-toggle-view" onclick="toggleViewMode()">
+                    Show All Pages (Print Mode)
+                </button>
+                <button class="btn btn-print" onclick="window.print()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print
+                </button>
+            </div>
+        </div>
+
+        <!-- 10 Fast Switch Pills -->
+        <div class="band-navigator">
+            <button class="nav-pill active" onclick="showBand('prompt')">Graph Prompt</button>
+            <button class="nav-pill" onclick="showBand(1)">See Band 1</button>
+            <button class="nav-pill" onclick="showBand(2)">See Band 2</button>
+            <button class="nav-pill" onclick="showBand(3)">See Band 3</button>
+            <button class="nav-pill" onclick="showBand(4)">See Band 4</button>
+            <button class="nav-pill" onclick="showBand(5)">See Band 5</button>
+            <button class="nav-pill" onclick="showBand(6)">See Band 6</button>
+            <button class="nav-pill" onclick="showBand(7)">See Band 7</button>
+            <button class="nav-pill" onclick="showBand(8)">See Band 8</button>
+            <button class="nav-pill" onclick="showBand(9)">See Band 9</button>
+        </div>
+    </div>
+
+    <!-- ================= PAGES CONTAINER ================= -->
+    <div id="pages-container">
+
+        <!-- ================= PAGE 0: PROMPT & LEXICAL FOUNDATION ================= -->
+        <div class="a4-page" id="page-prompt">
+            <div class="watermark">LEXICAL RESOURCE<br>IELTS TASK 1</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background:#1e293b;">
+                <div class="bh-left">LEXICAL BENCHMARK: VOCABULARY, STYLE &amp; COLLOCATION</div>
+                <div class="bh-badge">Band Descriptor Focus</div>
+            </div>
+
+            <div class="prompt-box">
+                <div class="prompt-title">Writing Task 1 Question Prompt:</div>
+                You should spend about 20 minutes on this task.<br>
+                <strong>The line graph below shows the percentage of households with internet access in three countries (Country A, Country B, and Country C) between 2000 and 2020.</strong><br>
+                <em>Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</em>
+            </div>
+
+            <div class="graph-preview">
+                <img src="../../../../../Assets/Comparison/img1.jpg" onerror="this.onerror=null; this.src='../../../../Assets/Comparison/img1.jpg';" alt="Percentage of Households with Internet Access (2000-2020)">
+            </div>
+
+            <div class="examiner-analysis" style="margin-top: 8px;">
+                <div class="ea-header">
+                    <div class="ea-title">KEY EVALUATION DOMAINS FOR LEXICAL RESOURCE (LR)</div>
+                    <span class="ea-score-tag" style="background:var(--primary);">Assessment Foundation</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">1. Range &amp; Flexibility:</div>
+                        Ability to avoid repetitive verbs (<em>went up, was</em>) by utilizing precise trend terminology (<em>accelerated, surged, crested, climbed steadily</em>).
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">2. Precision &amp; Collocation:</div>
+                        Natural pairings of academic words (e.g., <em>penetration rate, narrowing the disparity, unbroken expansion, baseline figure</em>).
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">3. Awareness of Academic Style:</div>
+                        Avoiding informal or conversational terms (<em>a lot of money, poor, catch up</em>) in favor of formal objective phrases.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">4. Spelling &amp; Word Formation:</div>
+                        Accurate noun-verb-adjective transformations (<em>expand &rarr; expansion; accelerate &rarr; acceleration; three &rarr; threefold</em>).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 1 ================= -->
+        <div class="a4-page" id="page-band-1" style="display: none;">
+            <div class="watermark">BAND 1 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #991b1b;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 1</div>
+                <div class="bh-badge">Isolated Words / Severe Spelling Distortion</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 13 words</span>
+                </div>
+                <div class="writing-lines-sample">computer internet year 2000 2020 <span class="hl-lex-error">contry</span> good house line <span class="hl-lex-error">scren</span> <span class="hl-lex-error">blu</span> red <span class="hl-lex-error">gren</span> <span class="hl-lex-error">persent</span>.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 1)</div>
+                    <span class="ea-score-tag" style="background:#991b1b;">LR Band Score: 1</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Lexical Range:</div>
+                        The text consists exclusively of isolated single words. No descriptive or analytical vocabulary exists.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Word Formation &amp; Spelling:</div>
+                        Nearly every word attempted suffers from severe phonological misspelling ('contry', 'scren', 'blu', 'gren', 'persent').
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The writer knows almost no English words. The words written are copied with heavy spelling mistakes ('contry', 'scren', 'persent'). There is no vocabulary to describe data or trends. This clearly matches Band 1."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 2 ================= -->
+        <div class="a4-page" id="page-band-2" style="display: none;">
+            <div class="watermark">BAND 2 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #b91c1c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 2</div>
+                <div class="bh-badge">Extremely Limited Vocabulary / Bare Words</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 26 words</span>
+                </div>
+                <div class="writing-lines-sample">Country A <span class="hl-lex-repetitive">internet</span> 40% in 2000. Then 85% in 2020. Country B 15% and Country C 5%. Internet <span class="hl-lex-error">go up</span> for house country. Line <span class="hl-lex-repetitive">high</span>.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 2)</div>
+                    <span class="ea-score-tag" style="background:#b91c1c;">LR Band Score: 2</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Lexical Range:</div>
+                        Extremely limited vocabulary. The writer repeats 'internet' and simple words like 'house' and 'line'.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Collocations &amp; Word Forms:</div>
+                        Inappropriate forms ('go up for house country', 'Line high'). The student lacks adjectives or adverbs to describe degrees of change.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The candidate only knows very simple words ('line', 'high', 'go up'). They cannot use proper words like 'increase', 'proportion', or 'households'. The vocabulary is too limited to describe the graph."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 3 ================= -->
+        <div class="a4-page" id="page-band-3" style="display: none;">
+            <div class="watermark">BAND 3 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #c2410c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 3</div>
+                <div class="bh-badge">Informal Vocabulary / Severe Distortion</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 68 words</span>
+                </div>
+                <div class="writing-lines-sample">This <span class="hl-lex-repetitive">picture</span> is about internet. I like the internet very much because students can study English and play computer games at home. In Country A, people have <span class="hl-lex-error">a lot of money</span> and <span class="hl-lex-repetitive">good jobs</span>, so 40% had internet in 2000 and 85% in 2020. But Country C is <span class="hl-lex-error">poor</span> so only 5% had internet. The government should build free Wi-Fi for everyone in Country C.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 3)</div>
+                    <span class="ea-score-tag" style="background:#c2410c;">LR Band Score: 3</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Lexical Style:</div>
+                        Inappropriate, colloquial vocabulary ('picture', 'a lot of money', 'good jobs', 'poor'). Lacks formal academic register.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Data Terminology:</div>
+                        Total absence of statistical lexical items. Words like 'percentage', 'access', 'rate', and 'trend' are not produced.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The candidate uses everyday conversational words ('a lot of money', 'poor', 'computer games'). These words are not suitable for an academic task. There are no statistical words to describe the line graph."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 4 ================= -->
+        <div class="a4-page" id="page-band-4" style="display: none;">
+            <div class="watermark">BAND 4 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #ea580c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 4</div>
+                <div class="bh-badge">Basic / Repetitive Vocabulary / Inaccurate Verbs</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 64 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph shows the <span class="hl-lex-repetitive">percentage</span> of <span class="hl-lex-error">house</span> with internet in Country A, B and C.
+In 2000, Country A <span class="hl-lex-repetitive">was</span> 40% and Country B was 15%. In 2020, Country A <span class="hl-lex-repetitive">went up</span> to 85% and Country C was 35%. Country B <span class="hl-lex-repetitive">became</span> 75%. People love internet now. In conclusion, Country C must buy more computers to <span class="hl-lex-error">catch</span> Country A.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 4)</div>
+                    <span class="ea-score-tag" style="background:#ea580c;">LR Band Score: 4</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Lexical Limitations:</div>
+                        Relies on basic, repetitive verbs ('was', 'went up', 'became'). Uses 'house' instead of 'households'.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Inaccurate Word Choice:</div>
+                        'Catch' is an informal, inaccurate verb for data comparison; should be 'close the gap with' or 'converge with'.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Clear Pedagogical Explanation:</strong><br>
+                    "The candidate's vocabulary is strictly rudimentary. Verbs of change are limited to 'went up' and 'became'. Errors in word choice like using 'house' for 'households' and 'catch' for 'narrow the gap' keep Lexical Resource at Band 4."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 5 ================= -->
+        <div class="a4-page" id="page-band-5" style="display: none;">
+            <div class="watermark">BAND 5 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #d97706;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 5</div>
+                <div class="bh-badge">Minimally Adequate / Heavy Verb Repetition</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 112 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph <span class="hl-lex-repetitive">gives information about</span> the <span class="hl-lex-repetitive">percentage of households with internet access</span> in three countries from 2000 to 2020.
+In 2000, Country A <span class="hl-lex-repetitive">was</span> 40%, Country B <span class="hl-lex-repetitive">was</span> 15%, and Country C <span class="hl-lex-repetitive">was</span> 5%. In 2005, Country A <span class="hl-lex-repetitive">was</span> 55%, Country B <span class="hl-lex-repetitive">was</span> 30%, and Country C <span class="hl-lex-repetitive">was</span> 12%. In 2010, Country A <span class="hl-lex-repetitive">had</span> 70%, Country B <span class="hl-lex-repetitive">had</span> 48%, and Country C <span class="hl-lex-repetitive">had</span> 20%. In 2015, Country A <span class="hl-lex-repetitive">increased</span> to 78%, Country B <span class="hl-lex-repetitive">increased</span> to 63%, and Country C <span class="hl-lex-repetitive">was</span> 28%. In 2020, Country A <span class="hl-lex-repetitive">reached</span> 85%, Country B <span class="hl-lex-repetitive">reached</span> 75%, and Country C <span class="hl-lex-repetitive">was</span> 35%. Overall, all countries <span class="hl-lex-repetitive">went up</span>.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 5)</div>
+                    <span class="ea-score-tag" style="background:#d97706;">LR Band Score: 5</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Lexical Range:</div>
+                        Minimally adequate. The student copies the prompt verbatim ('percentage of households with internet access').
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Extreme Repetition:</div>
+                        Relies solely on four repetitive verbs: 'was' (7 times), 'had' (3 times), 'increased' (2 times), and 'reached' (2 times).
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Intermediate Analytical Explanation:</strong><br>
+                    "The candidate possesses just enough vocabulary to convey basic data points, but exhibits zero lexical variety. The introduction is largely copied from the prompt, and the verbs are repeated relentlessly without attempting adverbs or descriptive adjectives."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 6 ================= -->
+        <div class="a4-page" id="page-band-6" style="display: none;">
+            <div class="watermark">BAND 6 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #2563eb;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 6</div>
+                <div class="bh-badge">Adequate Range / Conventional Academic Words</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 154 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph <span class="hl-lex-advanced">illustrates</span> the <span class="hl-lex-advanced">proportion</span> of households that had <span class="hl-lex-repetitive">access to the internet</span> in Country A, Country B, and Country C between 2000 and 2020.
+Overall, it is clear that internet access <span class="hl-lex-repetitive">rose</span> in all three countries over the twenty-year period. Country A <span class="hl-lex-advanced">consistently</span> had the highest proportion of households with internet, whereas Country C remained the lowest.
+In 2000, Country A began with 40% of households <span class="hl-lex-advanced">connected</span> to the internet. This figure experienced a <span class="hl-lex-advanced">continuous increase</span>, reaching 70% in 2010 and finally finishing at <span class="hl-lex-advanced">approximately</span> 85% by 2020.
+Looking at the other two nations, Country B started at around 15% in 2000 and grew to <span class="hl-lex-advanced">roughly</span> 48% in 2010, before <span class="hl-lex-advanced">climbing further</span> to 75% in 2020. Similarly, Country C showed an <span class="hl-lex-advanced">upward trend</span>, beginning at 5% in 2000 and <span class="hl-lex-advanced">gradually increasing</span> to 35% in 2020.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 6)</div>
+                    <span class="ea-score-tag" style="background:#2563eb;">LR Band Score: 6</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Effective Vocabulary:</div>
+                        Standard Task 1 vocabulary is deployed accurately: 'illustrates', 'proportion', 'consistently', 'continuous increase', 'upward trend'.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Why Not Band 7?</div>
+                        Lexical choices are safe and predictable. Lacks less-common collocations or comparative multipliers ('twofold', 'surge', 'narrow the gap').
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Upper-Intermediate Evaluation:</strong><br>
+                    "The candidate demonstrates an adequate vocabulary for the task, successfully paraphrasing 'percentage' to 'proportion' and utilizing standard descriptive collocations ('gradually increasing', 'upward trend'). However, the lexical range lacks higher-level flexibility or precision, anchoring it firmly at Band 6."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 7 ================= -->
+        <div class="a4-page" id="page-band-7" style="display: none;">
+            <div class="watermark">BAND 7 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0284c7;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 7</div>
+                <div class="bh-badge">Sufficient Range &amp; Flexibility / Less Common Items</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 178 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph <span class="hl-lex-advanced">illustrates</span> the <span class="hl-lex-advanced">proportion</span> of households with <span class="hl-lex-advanced">internet connectivity</span> across three nations—Country A, Country B, and Country C—over a twenty-year period from 2000 to 2020.
+Overall, all three countries witnessed <span class="hl-lex-advanced">substantial growth</span> in <span class="hl-lex-advanced">domestic internet accessibility</span> throughout the surveyed period. While Country A consistently maintained the highest <span class="hl-lex-advanced">penetration rate</span>, Country B exhibited the most <span class="hl-lex-advanced">dramatic increase</span>, significantly <span class="hl-lex-advanced">narrowing the gap</span> with the leader. Country C, despite <span class="hl-lex-advanced">steady progress</span>, consistently recorded the lowest figures.
+In 2000, Country A held the lead with 40% of homes connected, which was <span class="hl-lex-advanced">over double</span> the proportion in Country B (15%) and <span class="hl-lex-advanced">eight times</span> that of Country C (5%). Over the subsequent decade, the former's figure rose steadily to 70% in 2010, before <span class="hl-lex-advanced">culminating</span> at approximately 85% in 2020.
+Meanwhile, Country B demonstrated the <span class="hl-lex-advanced">fastest trajectory</span>, <span class="hl-lex-advanced">accelerating</span> from 30% in 2005 to 48% in 2010, and ultimately concluding at 75%, just 10 <span class="hl-lex-advanced">percentage points</span> behind Country A. By contrast, although internet access in Country C climbed <span class="hl-lex-advanced">sevenfold</span> to finish at 35%, its final figure remained lower than Country A's <span class="hl-lex-advanced">initial level</span> in 2000.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 7)</div>
+                    <span class="ea-score-tag" style="background:#0284c7;">LR Band Score: 7</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Advanced Collocations:</div>
+                        'Internet connectivity', 'domestic internet accessibility', 'penetration rate', 'dramatic increase', 'narrowing the gap'.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Mathematical Precision:</div>
+                        Correctly differentiates between 'percentage' and 'percentage points', alongside relative multipliers ('over double', 'eight times', 'sevenfold').
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Advanced Academic Appraisal:</strong><br>
+                    "The response demonstrates sufficient range and flexibility. The writer utilizes less-common lexical items with an acute awareness of style and collocation ('penetration rate', 'fastest trajectory', 'culminating'). Occasional minor slips do not impede meaning, fulfilling Band 7 criteria."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 8 ================= -->
+        <div class="a4-page" id="page-band-8" style="display: none;">
+            <div class="watermark">BAND 8 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0d9488;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 8</div>
+                <div class="bh-badge">Wide Vocabulary / Fluent &amp; Flexible Collocations</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 189 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph provides a <span class="hl-lex-advanced">comparative analysis</span> of the percentage of households equipped with internet access in three <span class="hl-lex-advanced">distinct countries</span> from 2000 to 2020.
+Overall, <span class="hl-lex-advanced">internet penetration</span> expanded <span class="hl-lex-advanced">markedly</span> across all three <span class="hl-lex-advanced">surveyed jurisdictions</span> over the two-decade timeline. While Country A consistently <span class="hl-lex-advanced">retained its dominance</span> throughout, Country B recorded the most <span class="hl-lex-advanced">formidable rate of expansion</span>, progressively <span class="hl-lex-advanced">closing the disparity</span> with the <span class="hl-lex-advanced">frontrunner</span>. Conversely, Country C <span class="hl-lex-advanced">persistently trailed</span> as the <span class="hl-lex-advanced">least connected nation</span> despite experiencing <span class="hl-lex-advanced">unceasing growth</span>.
+At the <span class="hl-lex-advanced">commencement of the period</span> in 2000, internet connectivity was predominantly concentrated in Country A at 40%, vastly <span class="hl-lex-advanced">outpacing</span> Country B (15%) and Country C (5%). Over the following ten years, this metric climbed smoothly to 70%, eventually <span class="hl-lex-advanced">cresting</span> at around 85% in 2020.
+Most remarkably, Country B registered an exceptional <span class="hl-lex-advanced">fivefold surge</span>; after moderate initial increases up to 2005 (30%), its adoption <span class="hl-lex-advanced">accelerated substantially</span>, reaching 48% in 2010 and ultimately reaching 75% in 2020—trailing Country A by a <span class="hl-lex-advanced">mere 10%</span>. Meanwhile, Country C exhibited a consistent <span class="hl-lex-advanced">linear ascent</span> from 5% to 35%, though its concluding proportion was still <span class="hl-lex-advanced">eclipsed</span> by Country A's starting <span class="hl-lex-advanced">baseline</span> twenty years earlier.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 8)</div>
+                    <span class="ea-score-tag" style="background:#0d9488;">LR Band Score: 8</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Lexical Sophistication:</div>
+                        'Surveyed jurisdictions', 'retained its dominance', 'formidable rate of expansion', 'closing the disparity', 'frontrunner', 'cresting'.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Style &amp; Precision:</div>
+                        Seamlessly integrates dynamic verbs and metaphorical academic idioms ('eclipsed by Country A's baseline', 'linear ascent').
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Sophisticated Examiner Review:</strong><br>
+                    "A wide vocabulary is deployed with high fluency and flexibility. The candidate avoids formulaic vocabulary entirely, choosing instead nuanced lexical items ('outpacing', 'fivefold surge', 'persistently trailed') that capture exact comparative dynamics with effortless precision."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 9 ================= -->
+        <div class="a4-page" id="page-band-9" style="display: none;">
+            <div class="watermark">BAND 9 SIMULATION<br>UNOFFICIAL MASTER SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #047857;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 9</div>
+                <div class="bh-badge">Sophisticated &amp; Natural Control / Full Mastery</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Advanced Academic Vocabulary</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Repetitive / Basic / Generic</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Error / Inaccurate / Informal</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 209 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph <span class="hl-lex-advanced">delineates</span> the <span class="hl-lex-advanced">trajectory</span> of <span class="hl-lex-advanced">domestic internet accessibility</span> across three nations—designated Country A, Country B, and Country C—over a twenty-year <span class="hl-lex-advanced">epoch</span> spanning from 2000 to 2020.
+Overall, household internet penetration underwent substantial, <span class="hl-lex-advanced">unbroken expansion</span> across all three examined territories. Country A asserted an <span class="hl-lex-advanced">uninterrupted hegemony</span> throughout the timeframe, yet the standout feature was the rapid acceleration of Country B, which drastically <span class="hl-lex-advanced">curtailed the initial disparity</span> with the <span class="hl-lex-advanced">market leader</span>. In <span class="hl-lex-advanced">stark contrast</span>, Country C remained systematically <span class="hl-lex-advanced">entrenched</span> at the <span class="hl-lex-advanced">bottom of the spectrum</span>.
+In 2000, connectivity was heavily <span class="hl-lex-advanced">skewed toward</span> Country A at 40%, outstripping Country B (15%) nearly <span class="hl-lex-advanced">threefold</span> and Country C (5%) <span class="hl-lex-advanced">eightfold</span>. Over the ensuing two decades, the primary nation documented a measured, <span class="hl-lex-advanced">near-linear appreciation</span> of approximately 45 percentage points, culminating in an <span class="hl-lex-advanced">authoritative peak</span> of 85.5% by 2020.
+Conversely, Country B exhibited the most <span class="hl-lex-advanced">pronounced dynamism</span>. Following a moderate start, its rate of connectivity surged past the midpoint in 2011 to attain 75.5% in 2020, effectively <span class="hl-lex-advanced">reducing its deficit</span> against Country A from 25 to just 10 percentage points. Meanwhile, Country C displayed a modest yet steady <span class="hl-lex-advanced">upward gradient</span>, rising sevenfold to conclude at 35.5%; nevertheless, this final figure failed even to rival the introductory <span class="hl-lex-advanced">benchmark</span> established by Country A two decades prior.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (LEXICAL RESOURCE: BAND 9)</div>
+                    <span class="ea-score-tag" style="background:#047857;">LR Band Score: 9</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Lexical Mastery:</div>
+                        'Delineates', 'trajectory', 'epoch', 'unbroken expansion', 'uninterrupted hegemony', 'curtailed the initial disparity', 'entrenched at the bottom of the spectrum'.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Nuanced Stylistic Control:</div>
+                        Terms like 'near-linear appreciation', 'authoritative peak', 'pronounced dynamism', and 'upward gradient' represent native-level academic register.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Mastery-Level Examiner Appraisal:</strong><br>
+                    "Exemplifies full lexical mastery. Vocabulary is used with consummate naturalness and sophisticated academic control. The lexical repertoire elevates statistical commentary into an authoritative analytical narrative, without any forced or pretentious diction."
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End Pages Container -->
+
+    <!-- ================= SCRIPT LOGIC ================= -->
+    <script>
+        let isShowAllMode = false;
+
+        function showBand(band) {
+            isShowAllMode = false;
+            document.getElementById('btn-toggle-view').innerText = "Show All Pages (Print Mode)";
+            
+            // Hide all pages
+            const allPages = document.querySelectorAll('.a4-page');
+            allPages.forEach(page => page.style.display = 'none');
+
+            // Deactivate all pills
+            const allPills = document.querySelectorAll('.nav-pill');
+            allPills.forEach(pill => pill.classList.remove('active'));
+
+            // Show selected page
+            const targetId = (band === 'prompt') ? 'page-prompt' : `page-band-${band}`;
+            const targetPage = document.getElementById(targetId);
+            if (targetPage) {
+                targetPage.style.display = 'flex';
+            }
+
+            // Activate corresponding button
+            allPills.forEach(pill => {
+                if (band === 'prompt' && pill.innerText.includes('Prompt')) {
+                    pill.classList.add('active');
+                } else if (pill.innerText.includes(`Band ${band}`)) {
+                    pill.classList.add('active');
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleViewMode() {
+            isShowAllMode = !isShowAllMode;
+            const btn = document.getElementById('btn-toggle-view');
+            const allPages = document.querySelectorAll('.a4-page');
+            const allPills = document.querySelectorAll('.nav-pill');
+
+            if (isShowAllMode) {
+                btn.innerText = "Single Page Focus Mode";
+                allPages.forEach(page => page.style.display = 'flex');
+                allPills.forEach(pill => pill.classList.remove('active'));
+            } else {
+                btn.innerText = "Show All Pages (Print Mode)";
+                showBand('prompt');
+            }
+        }
+
+        // Default initial load: show prompt first
+        window.onload = () => {
+            showBand('prompt');
+        };
+    </script>
+</body>
+</html>
