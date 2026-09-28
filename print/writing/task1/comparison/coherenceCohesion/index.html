@@ -1,1 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=850, user-scalable=yes">
+    <title>IELTS Writing Task 1 - Coherence & Cohesion Comparative Benchmark (Band 1 to 9)</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-dark: #0f172a;
+            --box-border: #000000;
+            --grey-bg: #e2e8f0;
+            --light-grey: #f8fafc;
+            --line-color: #94a3b8;
+            
+            /* Highlighting Palettes */
+            --hl-green-bg: #dcfce7;
+            --hl-green-text: #166534;
+            --hl-green-border: #86efac;
 
+            --hl-amber-bg: #fef3c7;
+            --hl-amber-text: #92400e;
+            --hl-amber-border: #fcd34d;
+
+            --hl-red-bg: #fee2e2;
+            --hl-red-text: #991b1b;
+            --hl-red-border: #fca5a5;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        /* --- STICKY NAVIGATOR TOOLBAR (No Print) --- */
+        .no-print-toolbar {
+            position: sticky;
+            top: 10px;
+            z-index: 10000;
+            width: 210mm;
+            background: #ffffff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toolbar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-print { background-color: var(--primary); color: white; }
+        .btn-print:hover { background-color: var(--primary-hover); }
+        .btn-back { background-color: #64748b; color: white; }
+        .btn-back:hover { background-color: #475569; }
+        .btn-mode { background-color: #0f172a; color: white; }
+
+        /* Nav Pills */
+        .band-navigator {
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            flex: 1;
+            min-width: 60px;
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #334155;
+            transition: 0.15s ease-in-out;
+        }
+
+        .nav-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+
+        /* --- A4 Page Container --- */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            height: 297mm;
+            background: white;
+            padding: 13mm 15mm;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 25px;
+            page-break-after: always;
+            break-after: page;
+        }
+
+        /* --- Watermark --- */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 50px;
+            font-weight: 800;
+            color: #000000;
+            opacity: 0.08;
+            z-index: 999;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+
+        /* --- Header Logos --- */
+        .header-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 8px;
+            padding: 0 10px;
+            width: 100%;
+        }
+        .header-logos img { height: 38px; object-fit: contain; }
+
+        /* --- Prompt Card --- */
+        .prompt-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+        .prompt-title { font-weight: bold; font-size: 14px; color: var(--primary); margin-bottom: 4px; }
+
+        .graph-preview {
+            width: 100%;
+            max-height: 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .graph-preview img {
+            max-width: 100%;
+            max-height: 440px;
+            object-fit: contain;
+        }
+
+        /* --- Banner --- */
+        .band-header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: white;
+            padding: 6px 14px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .bh-left { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+        .bh-badge {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* --- Highlight Legend --- */
+        .highlight-legend {
+            display: flex;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+        /* --- Highlighting Styles --- */
+        .hl-effective {
+            background-color: var(--hl-green-bg);
+            color: var(--hl-green-text);
+            border-bottom: 2px solid var(--hl-green-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .hl-mechanical {
+            background-color: var(--hl-amber-bg);
+            color: var(--hl-amber-text);
+            border-bottom: 2px solid var(--hl-amber-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .hl-faulty {
+            background-color: var(--hl-red-bg);
+            color: var(--hl-red-text);
+            border-bottom: 2px dashed var(--hl-red-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* --- Answer Sheet Box --- */
+        .answer-sample-card {
+            border: 1px solid var(--box-border);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #ffffff;
+            position: relative;
+        }
+        .sample-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .writing-lines-sample {
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, var(--line-color) 29px, var(--line-color) 30px);
+            background-size: 100% 30px;
+            line-height: 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13.5px;
+            color: #000;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 240px;
+            padding-bottom: 4px;
+        }
+
+        /* --- Examiner Commentary Box --- */
+        .examiner-analysis {
+            background: #fdfefe;
+            border: 1px solid #0f172a;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: auto;
+            border-radius: 4px;
+        }
+
+        .ea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+
+        .ea-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+
+        .ea-score-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            background: #334155;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 11px;
+            line-height: 1.45;
+            color: #334155;
+            margin-top: 4px;
+        }
+
+        .analysis-block {
+            background: #f8fafc;
+            padding: 6px 8px;
+            border-left: 3px solid #64748b;
+            border-radius: 2px;
+        }
+        .ab-label { font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+
+        .examiner-quote {
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: #1e293b;
+            font-style: italic;
+            background: #f1f5f9;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary);
+            margin-top: 4px;
+        }
+
+        /* --- Print Stylesheet --- */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .no-print-toolbar { display: none !important; }
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                display: flex !important;
+                height: 297mm;
+                page-break-after: always;
+                break-after: page;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= STICKY TOOLBAR (NO-PRINT) ================= -->
+    <div class="no-print-toolbar">
+        <div class="toolbar-top">
+            <div class="toolbar-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                Task 1 Benchmark: Coherence &amp; Cohesion (Band 1 - Band 9)
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn btn-back" onclick="window.history.back()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Back
+                </button>
+                <button class="btn btn-mode" id="btn-toggle-view" onclick="toggleViewMode()">
+                    Show All Pages (Print Mode)
+                </button>
+                <button class="btn btn-print" onclick="window.print()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print
+                </button>
+            </div>
+        </div>
+
+        <!-- 10 Fast Switch Pills -->
+        <div class="band-navigator">
+            <button class="nav-pill active" onclick="showBand('prompt')">Graph Prompt</button>
+            <button class="nav-pill" onclick="showBand(1)">See Band 1</button>
+            <button class="nav-pill" onclick="showBand(2)">See Band 2</button>
+            <button class="nav-pill" onclick="showBand(3)">See Band 3</button>
+            <button class="nav-pill" onclick="showBand(4)">See Band 4</button>
+            <button class="nav-pill" onclick="showBand(5)">See Band 5</button>
+            <button class="nav-pill" onclick="showBand(6)">See Band 6</button>
+            <button class="nav-pill" onclick="showBand(7)">See Band 7</button>
+            <button class="nav-pill" onclick="showBand(8)">See Band 8</button>
+            <button class="nav-pill" onclick="showBand(9)">See Band 9</button>
+        </div>
+    </div>
+
+    <!-- ================= PAGES CONTAINER ================= -->
+    <div id="pages-container">
+
+        <!-- ================= PAGE 0: PROMPT & CRITERIA FOUNDATION ================= -->
+        <div class="a4-page" id="page-prompt">
+            <div class="watermark">COHERENCE &amp; COHESION<br>IELTS TASK 1</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background:#1e293b;">
+                <div class="bh-left">CORE DISCOURSE STIMULUS: COHERENCE &amp; COHESION CRITERIA</div>
+                <div class="bh-badge">Band Descriptor Focus</div>
+            </div>
+
+            <div class="prompt-box">
+                <div class="prompt-title">Writing Task 1 Question Prompt:</div>
+                You should spend about 20 minutes on this task.<br>
+                <strong>The line graph below shows the percentage of households with internet access in three countries (Country A, Country B, and Country C) between 2000 and 2020.</strong><br>
+                <em>Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</em>
+            </div>
+
+            <div class="graph-preview">
+                <img src="../../../../../Assets/Comparison/img1.jpg" onerror="this.onerror=null; this.src='../../../../Assets/Comparison/img1.jpg';" alt="Percentage of Households with Internet Access (2000-2020)">
+            </div>
+
+            <div class="examiner-analysis" style="margin-top: 8px;">
+                <div class="ea-header">
+                    <div class="ea-title">WHAT EXAMINERS LOOK FOR UNDER COHERENCE &amp; COHESION (CC)</div>
+                    <span class="ea-score-tag" style="background:var(--primary);">Assessment Foundation</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">1. Logical Progression (Macro-Coherence):</div>
+                        Information must advance logically from introduction to overview, followed by grouping of data without disjointed jumping between categories.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">2. Cohesive Devices (Micro-Cohesion):</div>
+                        Connectors, transition signals, and conjunctions must be accurate, varied, and not repetitive or mechanically placed at every sentence start.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">3. Referencing &amp; Substitution:</div>
+                        Skillful use of pronouns and noun phrases (<em>this metric, the former, that of, the market leader</em>) to avoid repeating exact country names or numbers.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">4. Logical Paragraphing:</div>
+                        Clear thematic separation between the global overview and discrete body paragraphs (e.g., contrasting the top tier vs. the laggard).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 1 ================= -->
+        <div class="a4-page" id="page-band-1" style="display: none;">
+            <div class="watermark">BAND 1 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #991b1b;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 1</div>
+                <div class="bh-badge">Fails to Communicate Any Message</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 13 words</span>
+                </div>
+                <div class="writing-lines-sample">computer internet year 2000 2020 country good house line screen blue red green percent.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 1)</div>
+                    <span class="ea-score-tag" style="background:#991b1b;">CC Band Score: 1</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Progression &amp; Structure:</div>
+                        None. The submission lacks grammatical sentences, logical order, or syntactic hierarchy.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Cohesive Ties:</div>
+                        Zero cohesive devices or punctuation markers link any of the written words together.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "There is no connection between the words. The text does not contain sentences, pronouns, or conjunctions. It is impossible to see any progression or organization. Therefore, it is Band 1."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 2 ================= -->
+        <div class="a4-page" id="page-band-2" style="display: none;">
+            <div class="watermark">BAND 2 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #b91c1c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 2</div>
+                <div class="bh-badge">Very Little Control of Organizational Features</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 26 words</span>
+                </div>
+                <div class="writing-lines-sample">Country A internet 40% in 2000. <span class="hl-mechanical">Then</span> 85% in 2020. Country B 15% <span class="hl-effective">and</span> Country C 5%. Internet going up for house country. Line high.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 2)</div>
+                    <span class="ea-score-tag" style="background:#b91c1c;">CC Band Score: 2</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Highlighted Words Analysis:</div>
+                        Only rudimentary linkers ('Then', 'and') are attempted, but they do not connect full grammatical predicates.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Referencing &amp; Paragraphing:</div>
+                        No paragraphing exists. Referencing is absent; nouns are repeated or left without articles.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The writer uses 'Then' and 'and', but cannot organize information into paragraphs or logical clauses. Ideas stop abruptly without showing how Country A relates to B or C."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 3 ================= -->
+        <div class="a4-page" id="page-band-3" style="display: none;">
+            <div class="watermark">BAND 3 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #c2410c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 3</div>
+                <div class="bh-badge">Fails to Organize Ideas Logically</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 68 words</span>
+                </div>
+                <div class="writing-lines-sample">This picture is about internet. I like the internet very much <span class="hl-effective">because</span> students can study English <span class="hl-effective">and</span> play computer games at home. In Country A, people have a lot of money and good jobs, <span class="hl-mechanical">so</span> 40% had internet in 2000 <span class="hl-effective">and</span> 85% in 2020. <span class="hl-faulty">But</span> Country C is poor <span class="hl-mechanical">so</span> only 5% had internet. The government should build free Wi-Fi for everyone in Country C.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 3)</div>
+                    <span class="ea-score-tag" style="background:#c2410c;">CC Band Score: 3</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Highlighted Words Analysis:</div>
+                        Heavy reliance on simple conjunctions ('because', 'and', 'so'). 'But' is used to start a broken, informal sentence.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Logical Progression:</div>
+                        The train of thought is erratic. Sentences wander into personal opinions rather than organizing factual data sequentially.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "Connectors like 'so' and 'because' are used, but they link opinions instead of reporting data. There is no logical sequence of graph trends, and sentence transitions are faulty."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 4 ================= -->
+        <div class="a4-page" id="page-band-4" style="display: none;">
+            <div class="watermark">BAND 4 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #ea580c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 4</div>
+                <div class="bh-badge">Repetitive Connectors / Inappropriate Progression</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 64 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph shows the percentage of house with internet in Country A, B and C.
+In 2000, Country A was 40% <span class="hl-effective">and</span> Country B was 15%. In 2020, Country A went up to 85% <span class="hl-effective">and</span> Country C was 35%. Country B became 75%. People love internet <span class="hl-faulty">now</span>. <span class="hl-faulty">In conclusion</span>, Country C must buy more computers to catch Country A.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 4)</div>
+                    <span class="ea-score-tag" style="background:#ea580c;">CC Band Score: 4</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Highlighted Words Analysis:</div>
+                        'In conclusion' is inappropriately imported from Task 2 essays. 'Now' lacks clear temporal reference.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Paragraphing &amp; Progression:</div>
+                        Paragraphing is arbitrary. Ideas jump between years (2000 to 2020) and back to countries without transitional signposts.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Clear Pedagogical Explanation:</strong><br>
+                    "The candidate relies excessively on simple 'and' to glue numbers together. Using 'In conclusion' in an academic report is inappropriate, and there is no coherent paragraphing strategy."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 5 ================= -->
+        <div class="a4-page" id="page-band-5" style="display: none;">
+            <div class="watermark">BAND 5 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #d97706;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 5</div>
+                <div class="bh-badge">Mechanical / Repetitive Cohesive Devices</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 112 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph gives information about the percentage of households with internet access in three countries from 2000 to 2020.
+In 2000, Country A was 40%, Country B was 15%, and Country C was 5%. <span class="hl-mechanical">Then</span> in 2005, Country A was 55%, Country B was 30%, and Country C was 12%. <span class="hl-mechanical">After that</span> in 2010, Country A had 70%, Country B had 48%, and Country C had 20%. <span class="hl-mechanical">Next</span> in 2015, Country A increased to 78%, Country B increased to 63%, and Country C was 28%. <span class="hl-mechanical">Finally</span> in 2020, Country A reached 85%, Country B reached 75%, and Country C was 35%. <span class="hl-mechanical">Overall</span>, all countries went up.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 5)</div>
+                    <span class="ea-score-tag" style="background:#d97706;">CC Band Score: 5</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Highlighted Words Analysis:</div>
+                        'Then', 'After that', 'Next', and 'Finally' represent classic mechanical markers. They are slapped at the head of repetitive sentence formulas.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Referencing &amp; Substitution:</div>
+                        Severely repetitive. The phrase 'Country A was X, Country B was Y' is duplicated five times with zero pronoun substitution.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Intermediate Analytical Explanation:</strong><br>
+                    "This text illustrates mechanical cohesion. Instead of grouping trends, the writer relies on a rigid chronological sequence of linkers (Then, After that, Next, Finally). There is no substitution for country names, making it repetitive and characteristic of Band 5."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 6 ================= -->
+        <div class="a4-page" id="page-band-6" style="display: none;">
+            <div class="watermark">BAND 6 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #2563eb;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 6</div>
+                <div class="bh-badge">Coherent Progression / Some Mechanical Linkers</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 154 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph illustrates the percentage of households that had access to the internet in Country A, Country B, and Country C between 2000 and 2020.
+<span class="hl-effective">Overall</span>, it is clear that internet access rose in all three countries over the twenty-year period. Country A consistently had the highest proportion of households with internet, <span class="hl-effective">whereas</span> Country C remained the lowest.
+<span class="hl-mechanical">Firstly</span>, in 2000, Country A began with 40% of households connected to the internet. <span class="hl-effective">This figure</span> experienced a continuous increase, reaching 70% in 2010 and <span class="hl-effective">finally</span> finishing at approximately 85% by 2020.
+<span class="hl-mechanical">Secondly</span>, looking at the other two nations, Country B started at around 15% in 2000 and grew to roughly 48% in 2010, <span class="hl-effective">before</span> climbing further to 75% in 2020. <span class="hl-effective">Similarly</span>, Country C showed an upward trend, beginning at 5% in 2000 and gradually increasing to 35% in 2020.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 6)</div>
+                    <span class="ea-score-tag" style="background:#2563eb;">CC Band Score: 6</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Highlighted Words Analysis:</div>
+                        Good referencing ('This figure', 'the other two nations') and conjunctions ('whereas', 'before climbing'). However, 'Firstly' and 'Secondly' are formulaic.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Paragraphing Logic:</div>
+                        Clear overall progression across 4 paragraphs. But paragraphs are segregated by country rather than interconnected by analytical themes.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Upper-Intermediate Evaluation:</strong><br>
+                    "The essay demonstrates clear overall progression and divides information into logical paragraphs. Referencing like 'this figure' works well. However, opening paragraphs with 'Firstly' and 'Secondly' feels mechanical, restricting the Coherence &amp; Cohesion score to Band 6."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 7 ================= -->
+        <div class="a4-page" id="page-band-7" style="display: none;">
+            <div class="watermark">BAND 7 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0284c7;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 7</div>
+                <div class="bh-badge">Logical Progression / Flexible Referencing</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 178 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph illustrates the proportion of households with internet connectivity across three nations—Country A, Country B, and Country C—over a twenty-year period from 2000 to 2020.
+<span class="hl-effective">Overall</span>, all three countries witnessed substantial growth in domestic internet accessibility throughout the surveyed period. <span class="hl-effective">While</span> Country A consistently maintained the highest penetration rate, Country B exhibited the most dramatic increase, significantly narrowing the gap with <span class="hl-effective">the leader</span>. Country C, <span class="hl-effective">despite</span> steady progress, consistently recorded the lowest figures.
+In 2000, Country A held the lead with 40% of homes connected, <span class="hl-effective">which was</span> over double the proportion in Country B (15%) and eight times <span class="hl-effective">that of</span> Country C (5%). Over the subsequent decade, <span class="hl-effective">the former's</span> figure rose steadily to 70% in 2010, <span class="hl-effective">before</span> culminating at approximately 85% in 2020.
+<span class="hl-effective">Meanwhile</span>, Country B demonstrated the fastest trajectory, accelerating from 30% in 2005 to 48% in 2010, and <span class="hl-effective">ultimately</span> concluding at 75%, just 10 percentage points behind Country A. <span class="hl-effective">By contrast</span>, <span class="hl-effective">although</span> internet access in Country C climbed sevenfold to finish at 35%, <span class="hl-effective">its final figure</span> remained lower than Country A's initial level in 2000.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 7)</div>
+                    <span class="ea-score-tag" style="background:#0284c7;">CC Band Score: 7</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Highlighted Referencing:</div>
+                        Skillful noun phrase substitution: 'the leader', 'that of', 'the former's', and 'its final figure'. Avoids repetitive naming of countries.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Discourse Connectors:</div>
+                        Uses a diverse array of transitions ('While', 'which was', 'before culminating', 'Meanwhile', 'By contrast', 'although') with clear purpose.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Advanced Academic Appraisal:</strong><br>
+                    "Information is logically sequenced with clear progression throughout. The candidate uses a varied range of cohesive devices appropriately. The substitution of nouns and pronouns ('the former', 'that of') prevents lexical redundancy, fully earning Band 7."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 8 ================= -->
+        <div class="a4-page" id="page-band-8" style="display: none;">
+            <div class="watermark">BAND 8 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0d9488;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 8</div>
+                <div class="bh-badge">Logical Sequencing / Well-Managed Cohesion</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 189 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph provides a comparative analysis of the percentage of households equipped with internet access in three distinct countries from 2000 to 2020.
+<span class="hl-effective">Overall</span>, internet penetration expanded markedly across all three surveyed jurisdictions over the two-decade timeline. <span class="hl-effective">While</span> Country A consistently retained its dominance throughout, Country B recorded the most formidable rate of expansion, <span class="hl-effective">progressively closing the disparity with the frontrunner</span>. <span class="hl-effective">Conversely</span>, Country C persistently trailed as the least connected nation <span class="hl-effective">despite</span> experiencing unceasing growth.
+<span class="hl-effective">At the commencement of the period in 2000</span>, internet connectivity was predominantly concentrated in Country A at 40%, vastly outpacing Country B (15%) and Country C (5%). Over the following ten years, <span class="hl-effective">this metric</span> climbed smoothly to 70%, <span class="hl-effective">eventually cresting</span> at around 85% in 2020.
+<span class="hl-effective">Most remarkably</span>, Country B registered an exceptional fivefold surge; <span class="hl-effective">after moderate initial increases up to 2005 (30%)</span>, its adoption accelerated substantially, reaching 48% in 2010 and <span class="hl-effective">ultimately reaching 75% in 2020</span>—<span class="hl-effective">trailing Country A by a mere 10%</span>. <span class="hl-effective">Meanwhile</span>, Country C exhibited a consistent linear ascent from 5% to 35%, <span class="hl-effective">though</span> its concluding proportion was still eclipsed by Country A's starting baseline twenty years earlier.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 8)</div>
+                    <span class="ea-score-tag" style="background:#0d9488;">CC Band Score: 8</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Embedded Syntactic Cohesion:</div>
+                        Transitions are integrated into participle clauses ('progressively closing', 'eventually cresting') rather than standing as isolated adverbial markers.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Referencing &amp; Paragraphing:</div>
+                        Exemplary paragraph structuring. Contrasts the dominant cluster (A &amp; B) with the isolated bottom tier (C) smoothly and logically.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Sophisticated Examiner Review:</strong><br>
+                    "The response sequences information logically and seamlessly. Cohesion is managed skillfully across paragraph boundaries. Referencing elements like 'this metric' and 'the frontrunner' maintain clear coherence without lexical strain."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 9 ================= -->
+        <div class="a4-page" id="page-band-9" style="display: none;">
+            <div class="watermark">BAND 9 SIMULATION<br>UNOFFICIAL MASTER SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #047857;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 9</div>
+                <div class="bh-badge">Cohesion Attracts No Attention / Skilful Paragraphing</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Effective Referencing / Linker</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Mechanical / Repetitive</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Faulty / Inappropriate</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 209 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph delineates the trajectory of domestic internet accessibility across three nations—designated Country A, Country B, and Country C—over a twenty-year epoch spanning from 2000 to 2020.
+<span class="hl-effective">Overall</span>, household internet penetration underwent substantial, unbroken expansion across all three examined territories. Country A asserted an uninterrupted hegemony throughout the timeframe, <span class="hl-effective">yet the standout feature was</span> the rapid acceleration of Country B, <span class="hl-effective">which</span> drastically curtailed the initial disparity with <span class="hl-effective">the market leader</span>. <span class="hl-effective">In stark contrast</span>, Country C remained systematically entrenched at the bottom of the spectrum.
+In 2000, connectivity was heavily skewed toward Country A at 40%, outstripping Country B (15%) nearly threefold and Country C (5%) eightfold. Over the ensuing two decades, <span class="hl-effective">the primary nation</span> documented a measured, near-linear appreciation of approximately 45 percentage points, <span class="hl-effective">culminating in</span> an authoritative peak of 85.5% by 2020.
+<span class="hl-effective">Conversely</span>, Country B exhibited the most pronounced dynamism. <span class="hl-effective">Following a moderate start</span>, its rate of connectivity surged past the midpoint in 2011 to attain 75.5% in 2020, <span class="hl-effective">effectively reducing its deficit against Country A</span> from 25 to just 10 percentage points. <span class="hl-effective">Meanwhile</span>, Country C displayed a modest yet steady upward gradient, rising sevenfold to conclude at 35.5%; <span class="hl-effective">nevertheless</span>, <span class="hl-effective">this final figure</span> failed even to rival the introductory benchmark established by Country A two decades prior.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (COHERENCE &amp; COHESION: BAND 9)</div>
+                    <span class="ea-score-tag" style="background:#047857;">CC Band Score: 9</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Invisible Cohesion:</div>
+                        Cohesion operates through conceptual flow and lexical chains ('hegemony' &rarr; 'the primary nation' &rarr; 'the market leader'). No connectors feel artificial.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Discourse Architecture:</div>
+                        Impeccable paragraphing. Relationships between categories (e.g., C's final ceiling vs. A's starting floor) are woven into syntactic architecture effortlessly.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Mastery-Level Examiner Appraisal:</strong><br>
+                    "A textbook Band 9 performance where cohesion attracts no attention whatsoever. The progression of thought is completely organic. Sentence subordination, dynamic prepositional phrases, and referential chains guide the reader without any mechanical friction."
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End Pages Container -->
+
+    <!-- ================= SCRIPT LOGIC ================= -->
+    <script>
+        let isShowAllMode = false;
+
+        function showBand(band) {
+            isShowAllMode = false;
+            document.getElementById('btn-toggle-view').innerText = "Show All Pages (Print Mode)";
+            
+            // Hide all pages
+            const allPages = document.querySelectorAll('.a4-page');
+            allPages.forEach(page => page.style.display = 'none');
+
+            // Deactivate all pills
+            const allPills = document.querySelectorAll('.nav-pill');
+            allPills.forEach(pill => pill.classList.remove('active'));
+
+            // Show selected page
+            const targetId = (band === 'prompt') ? 'page-prompt' : `page-band-${band}`;
+            const targetPage = document.getElementById(targetId);
+            if (targetPage) {
+                targetPage.style.display = 'flex';
+            }
+
+            // Activate corresponding button
+            allPills.forEach(pill => {
+                if (band === 'prompt' && pill.innerText.includes('Prompt')) {
+                    pill.classList.add('active');
+                } else if (pill.innerText.includes(`Band ${band}`)) {
+                    pill.classList.add('active');
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleViewMode() {
+            isShowAllMode = !isShowAllMode;
+            const btn = document.getElementById('btn-toggle-view');
+            const allPages = document.querySelectorAll('.a4-page');
+            const allPills = document.querySelectorAll('.nav-pill');
+
+            if (isShowAllMode) {
+                btn.innerText = "Single Page Focus Mode";
+                allPages.forEach(page => page.style.display = 'flex');
+                allPills.forEach(pill => pill.classList.remove('active'));
+            } else {
+                btn.innerText = "Show All Pages (Print Mode)";
+                showBand('prompt');
+            }
+        }
+
+        // Default initial load: show prompt first
+        window.onload = () => {
+            showBand('prompt');
+        };
+    </script>
+</body>
+</html>
