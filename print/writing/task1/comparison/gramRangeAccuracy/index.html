@@ -1,1 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=850, user-scalable=yes">
+    <title>IELTS Writing Task 1 - Grammatical Range & Accuracy Comparative Benchmark (Band 1 to 9)</title>
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --text-dark: #0f172a;
+            --box-border: #000000;
+            --grey-bg: #e2e8f0;
+            --light-grey: #f8fafc;
+            --line-color: #94a3b8;
+            
+            /* Highlighting Palettes for Grammatical Range & Accuracy */
+            --hl-green-bg: #dcfce7;
+            --hl-green-text: #14532d;
+            --hl-green-border: #86efac;
 
+            --hl-amber-bg: #fef3c7;
+            --hl-amber-text: #78350f;
+            --hl-amber-border: #fcd34d;
+
+            --hl-red-bg: #fee2e2;
+            --hl-red-text: #7f1d1d;
+            --hl-red-border: #fca5a5;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        /* --- STICKY NAVIGATOR TOOLBAR (No Print) --- */
+        .no-print-toolbar {
+            position: sticky;
+            top: 10px;
+            z-index: 10000;
+            width: 210mm;
+            background: #ffffff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toolbar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-print { background-color: var(--primary); color: white; }
+        .btn-print:hover { background-color: var(--primary-hover); }
+        .btn-back { background-color: #64748b; color: white; }
+        .btn-back:hover { background-color: #475569; }
+        .btn-mode { background-color: #0f172a; color: white; }
+
+        /* Nav Pills */
+        .band-navigator {
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            flex: 1;
+            min-width: 60px;
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #334155;
+            transition: 0.15s ease-in-out;
+        }
+
+        .nav-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(13, 148, 136, 0.3);
+        }
+
+        /* --- A4 Page Container --- */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            height: 297mm;
+            background: white;
+            padding: 13mm 15mm;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 25px;
+            page-break-after: always;
+            break-after: page;
+        }
+
+        /* --- Watermark --- */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 52px;
+            font-weight: 800;
+            color: #000000;
+            opacity: 0.08;
+            z-index: 999;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+
+        /* --- Header Logos --- */
+        .header-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 8px;
+            padding: 0 10px;
+            width: 100%;
+        }
+        .header-logos img { height: 38px; object-fit: contain; }
+
+        /* --- Prompt Card --- */
+        .prompt-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+        .prompt-title { font-weight: bold; font-size: 14px; color: var(--primary); margin-bottom: 4px; }
+
+        .graph-preview {
+            width: 100%;
+            max-height: 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .graph-preview img {
+            max-width: 100%;
+            max-height: 440px;
+            object-fit: contain;
+        }
+
+        /* --- Banner --- */
+        .band-header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: white;
+            padding: 6px 14px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+        }
+        .bh-left { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; }
+        .bh-badge {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* --- Highlight Legend --- */
+        .highlight-legend {
+            display: flex;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+        /* --- Highlighting Styles for Grammatical Range & Accuracy --- */
+        .hl-gra-complex {
+            background-color: var(--hl-green-bg);
+            color: var(--hl-green-text);
+            border-bottom: 2px solid var(--hl-green-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .hl-gra-simple {
+            background-color: var(--hl-amber-bg);
+            color: var(--hl-amber-text);
+            border-bottom: 2px solid var(--hl-amber-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .hl-gra-error {
+            background-color: var(--hl-red-bg);
+            color: var(--hl-red-text);
+            border-bottom: 2px dashed var(--hl-red-border);
+            padding: 0 3px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        /* --- Answer Sheet Box --- */
+        .answer-sample-card {
+            border: 1px solid var(--box-border);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: #ffffff;
+            position: relative;
+        }
+        .sample-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .writing-lines-sample {
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, var(--line-color) 29px, var(--line-color) 30px);
+            background-size: 100% 30px;
+            line-height: 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13.5px;
+            color: #000;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 240px;
+            padding-bottom: 4px;
+        }
+
+        /* --- Examiner Commentary Box --- */
+        .examiner-analysis {
+            background: #fdfefe;
+            border: 1px solid #0f172a;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: auto;
+            border-radius: 4px;
+        }
+
+        .ea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+
+        .ea-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+
+        .ea-score-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            background: #334155;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 11px;
+            line-height: 1.45;
+            color: #334155;
+            margin-top: 4px;
+        }
+
+        .analysis-block {
+            background: #f8fafc;
+            padding: 6px 8px;
+            border-left: 3px solid #64748b;
+            border-radius: 2px;
+        }
+        .ab-label { font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+
+        .examiner-quote {
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: #1e293b;
+            font-style: italic;
+            background: #f1f5f9;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary);
+            margin-top: 4px;
+        }
+
+        /* --- Print Stylesheet --- */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .no-print-toolbar { display: none !important; }
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                display: flex !important;
+                height: 297mm;
+                page-break-after: always;
+                break-after: page;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= STICKY TOOLBAR (NO-PRINT) ================= -->
+    <div class="no-print-toolbar">
+        <div class="toolbar-top">
+            <div class="toolbar-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                Task 1 Benchmark: Grammatical Range &amp; Accuracy (Band 1 - Band 9)
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn btn-back" onclick="window.history.back()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Back
+                </button>
+                <button class="btn btn-mode" id="btn-toggle-view" onclick="toggleViewMode()">
+                    Show All Pages (Print Mode)
+                </button>
+                <button class="btn btn-print" onclick="window.print()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print
+                </button>
+            </div>
+        </div>
+
+        <!-- 10 Fast Switch Pills -->
+        <div class="band-navigator">
+            <button class="nav-pill active" onclick="showBand('prompt')">Graph Prompt</button>
+            <button class="nav-pill" onclick="showBand(1)">See Band 1</button>
+            <button class="nav-pill" onclick="showBand(2)">See Band 2</button>
+            <button class="nav-pill" onclick="showBand(3)">See Band 3</button>
+            <button class="nav-pill" onclick="showBand(4)">See Band 4</button>
+            <button class="nav-pill" onclick="showBand(5)">See Band 5</button>
+            <button class="nav-pill" onclick="showBand(6)">See Band 6</button>
+            <button class="nav-pill" onclick="showBand(7)">See Band 7</button>
+            <button class="nav-pill" onclick="showBand(8)">See Band 8</button>
+            <button class="nav-pill" onclick="showBand(9)">See Band 9</button>
+        </div>
+    </div>
+
+    <!-- ================= PAGES CONTAINER ================= -->
+    <div id="pages-container">
+
+        <!-- ================= PAGE 0: PROMPT & GRAMMATICAL FOUNDATION ================= -->
+        <div class="a4-page" id="page-prompt">
+            <div class="watermark">GRAMMAR &amp; ACCURACY<br>IELTS TASK 1</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background:#1e293b;">
+                <div class="bh-left">SYNTACTIC BENCHMARK: SENTENCE STRUCTURES &amp; ACCURACY</div>
+                <div class="bh-badge">Band Descriptor Focus</div>
+            </div>
+
+            <div class="prompt-box">
+                <div class="prompt-title">Writing Task 1 Question Prompt:</div>
+                You should spend about 20 minutes on this task.<br>
+                <strong>The line graph below shows the percentage of households with internet access in three countries (Country A, Country B, and Country C) between 2000 and 2020.</strong><br>
+                <em>Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</em>
+            </div>
+
+            <div class="graph-preview">
+                <img src="../../../../../Assets/Comparison/img1.jpg" onerror="this.onerror=null; this.src='../../../../Assets/Comparison/img1.jpg';" alt="Percentage of Households with Internet Access (2000-2020)">
+            </div>
+
+            <div class="examiner-analysis" style="margin-top: 8px;">
+                <div class="ea-header">
+                    <div class="ea-title">WHAT EXAMINERS LOOK FOR UNDER GRAMMATICAL RANGE &amp; ACCURACY (GRA)</div>
+                    <span class="ea-score-tag" style="background:var(--primary);">Assessment Foundation</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">1. Range of Complex Structures:</div>
+                        Use of non-defining relative clauses, participial adverbials (<em>reaching, climbing, culminating</em>), passive voice, and comparative subordination.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">2. Proportion of Error-Free Sentences:</div>
+                        Band 7 requires "frequent error-free sentences"; Band 8 demands "the majority of sentences are error-free".
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">3. Tense &amp; Aspect Consistency:</div>
+                        Accurate use of past simple for historical timelines (2000-2020), past perfect where sequence matters, and present simple for graphic descriptions.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">4. Punctuation Control:</div>
+                        Proper deployment of commas in complex compound sentences, parenthetical dashes, and semicolons to link closely related comparative clauses.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 1 ================= -->
+        <div class="a4-page" id="page-band-1" style="display: none;">
+            <div class="watermark">BAND 1 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #991b1b;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 1</div>
+                <div class="bh-badge">Cannot Use Sentence Forms at All</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 13 words</span>
+                </div>
+                <div class="writing-lines-sample">computer internet year 2000 2020 country good house line screen blue red green percent.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 1)</div>
+                    <span class="ea-score-tag" style="background:#991b1b;">GRA Band Score: 1</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Sentence Production:</div>
+                        Zero grammatical structures exist. There are no verbs, subjects, or functional syntax.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Accuracy &amp; Mechanics:</div>
+                        Punctuation is non-functional; text is simply an unpunctuated string of nominal fragments.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The writer cannot make English sentences. There are no verbs (actions) or subjects. It is just a list of nouns without grammar. This is Band 1."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 2 ================= -->
+        <div class="a4-page" id="page-band-2" style="display: none;">
+            <div class="watermark">BAND 2 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #b91c1c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 2</div>
+                <div class="bh-badge">Cannot Form Sentences Except Memorised Fragments</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 26 words</span>
+                </div>
+                <div class="writing-lines-sample">Country A internet 40% in 2000. Then 85% in 2020. Country B 15% and Country C 5%. <span class="hl-gra-error">Internet going up for house country.</span> <span class="hl-gra-error">Line high.</span></div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 2)</div>
+                    <span class="ea-score-tag" style="background:#b91c1c;">GRA Band Score: 2</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Syntactic Range:</div>
+                        Severely fragmented clauses. Sentences lack finite verbs ('Country A internet 40%', 'Line high').
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Grammatical Errors:</div>
+                        Missing auxiliary verbs ('Internet [is] going up') and missing prepositions/articles throughout.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The candidate cannot write complete sentences. 'Line high' has no verb. 'Internet going up' has no helper verb like 'is'. Punctuation is used randomly between incomplete fragments."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 3 ================= -->
+        <div class="a4-page" id="page-band-3" style="display: none;">
+            <div class="watermark">BAND 3 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #c2410c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 3</div>
+                <div class="bh-badge">Errors Predominate / Severe Agreement Distortions</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 68 words</span>
+                </div>
+                <div class="writing-lines-sample"><span class="hl-gra-simple">This picture is about internet.</span> I <span class="hl-gra-simple">like the internet very much</span> because students <span class="hl-gra-simple">can study English</span> and <span class="hl-gra-simple">play computer games</span> at home. In Country A, <span class="hl-gra-error">people has</span> a lot of money, so 40% <span class="hl-gra-simple">had internet</span> in 2000 and 85% in 2020. But <span class="hl-gra-error">Country C are poor</span> so only 5% <span class="hl-gra-error">having</span> internet. The government <span class="hl-gra-simple">should build</span> free Wi-Fi for everyone in Country C.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 3)</div>
+                    <span class="ea-score-tag" style="background:#c2410c;">GRA Band Score: 3</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Agreement Errors:</div>
+                        Chronic subject-verb clashes: 'people has' (plural subject with singular verb), 'Country C are' (singular country with plural verb).
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Faulty Verb Forms:</div>
+                        Incorrect participle used as main verb ('5% having internet'). Comma splices and fragmented coordinating clauses.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The writer attempts sentences, but grammatical errors are everywhere. 'People has' is wrong grammar. 'Country C are' is wrong grammar. 'Having' cannot be used alone as a main verb. Errors distort the meaning."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 4 ================= -->
+        <div class="a4-page" id="page-band-4" style="display: none;">
+            <div class="watermark">BAND 4 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #ea580c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 4</div>
+                <div class="bh-badge">Very Limited Range / Subordination Rare</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 64 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph <span class="hl-gra-simple">shows the percentage</span> of <span class="hl-gra-error">house</span> with internet in Country A, B and C.
+In 2000, Country A <span class="hl-gra-simple">was 40%</span> and Country B <span class="hl-gra-simple">was 15%</span>. In 2020, Country A <span class="hl-gra-simple">went up to 85%</span> and Country C <span class="hl-gra-simple">was 35%</span>. Country B <span class="hl-gra-simple">became 75%</span>. <span class="hl-gra-error">People loves internet now.</span> In conclusion, Country C must <span class="hl-gra-error">to buy</span> more computers to catch Country A.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 4)</div>
+                    <span class="ea-score-tag" style="background:#ea580c;">GRA Band Score: 4</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Structural Range:</div>
+                        Severely restricted to elementary SVO clauses. Zero subordinate, relative, or passive structures are attempted.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Grammar Distortions:</div>
+                        Modal error ('must to buy' instead of bare infinitive 'must buy') and agreement error ('People loves').
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Clear Pedagogical Explanation:</strong><br>
+                    "The candidate relies only on basic simple sentences strung together by 'and'. Complex grammar like relative clauses or passives is completely missing. Mistakes like 'must to buy' and 'People loves' are characteristic of Band 4."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 5 ================= -->
+        <div class="a4-page" id="page-band-5" style="display: none;">
+            <div class="watermark">BAND 5 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #d97706;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 5</div>
+                <div class="bh-badge">Limited Range / Repetitive Simple Syntax</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 112 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph gives information about the percentage of households with internet access in three countries from 2000 to 2020.
+<span class="hl-gra-simple">In 2000, Country A was 40%, Country B was 15%, and Country C was 5%.</span> <span class="hl-gra-simple">In 2005, Country A was 55%, Country B was 30%, and Country C was 12%.</span> <span class="hl-gra-simple">In 2010, Country A had 70%, Country B had 48%, and Country C had 20%.</span> In 2015, <span class="hl-gra-simple">Country A increased to 78%</span>, <span class="hl-gra-simple">Country B increased to 63%</span>, and <span class="hl-gra-simple">Country C was 28%</span>. In 2020, <span class="hl-gra-simple">Country A reached 85%</span>, <span class="hl-gra-simple">Country B reached 75%</span>, and <span class="hl-gra-simple">Country C was 35%</span>. Overall, <span class="hl-gra-simple">all countries went up</span>.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 5)</div>
+                    <span class="ea-score-tag" style="background:#d97706;">GRA Band Score: 5</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Syntactic Monotony:</div>
+                        Extremely rigid, repetitive syntax. Every single clause follows the identical formula: [Time Phrase] + [Subject] + [was/had/reached] + [Percentage].
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Absence of Subordination:</div>
+                        Zero complex sentence structures. The candidate does not attempt participle clauses, adverbial clauses of concession, or relative clauses.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Intermediate Analytical Explanation:</strong><br>
+                    "While simple sentences are mostly accurate, the candidate demonstrates an extremely limited grammatical range. There is no variety in sentence construction; every sentence is an identical, formulaic simple clause. This lack of structural ambition caps the score at Band 5."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 6 ================= -->
+        <div class="a4-page" id="page-band-6" style="display: none;">
+            <div class="watermark">BAND 6 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #2563eb;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 6</div>
+                <div class="bh-badge">Mix of Simple &amp; Complex Forms / Generally Accurate</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 154 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph illustrates the percentage of households <span class="hl-gra-complex">that had access to the internet</span> in Country A, Country B, and Country C between 2000 and 2020.
+Overall, <span class="hl-gra-complex">it is clear that internet access rose in all three countries</span> over the twenty-year period. Country A consistently had the highest proportion of households with internet, <span class="hl-gra-complex">whereas Country C remained the lowest</span>.
+In 2000, Country A began with 40% of households <span class="hl-gra-complex">connected to the internet</span>. This figure experienced a continuous increase, <span class="hl-gra-complex">reaching 70% in 2010</span> and finally <span class="hl-gra-complex">finishing at approximately 85% by 2020</span>.
+Looking at the other two nations, Country B started at around 15% in 2000 and grew to roughly 48% in 2010, <span class="hl-gra-complex">before climbing further to 75% in 2020</span>. Similarly, Country C showed an upward trend, <span class="hl-gra-complex">beginning at 5% in 2000</span> and gradually increasing to 35% in 2020.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 6)</div>
+                    <span class="ea-score-tag" style="background:#2563eb;">GRA Band Score: 6</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Complex Structures Present:</div>
+                        Relative clauses ('that had access'), contrastive clauses ('whereas...'), and participle phrases ('reaching 70%', 'before climbing').
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Why Not Band 7?</div>
+                        Sentences are accurate but follow predictable templates. Complex structures lack full flexibility, relying mostly on basic participial extensions.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Upper-Intermediate Evaluation:</strong><br>
+                    "The candidate produces a competent mix of simple and complex sentences. Participle clauses ('reaching', 'beginning') and subordinating clauses are deployed with good control and few errors. However, structural range is not yet varied or flexible enough for Band 7."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 7 ================= -->
+        <div class="a4-page" id="page-band-7" style="display: none;">
+            <div class="watermark">BAND 7 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0284c7;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 7</div>
+                <div class="bh-badge">Variety of Complex Structures / Frequent Error-Free Sentences</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 178 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph illustrates the proportion of households with internet connectivity across three nations—Country A, Country B, and Country C—over a twenty-year period from 2000 to 2020.
+Overall, all three countries witnessed substantial growth in domestic internet accessibility throughout the surveyed period. <span class="hl-gra-complex">While Country A consistently maintained the highest penetration rate</span>, Country B exhibited the most dramatic increase, <span class="hl-gra-complex">significantly narrowing the gap with the leader</span>. Country C, <span class="hl-gra-complex">despite steady progress</span>, consistently recorded the lowest figures.
+In 2000, Country A held the lead with 40% of homes connected, <span class="hl-gra-complex">which was over double the proportion in Country B (15%) and eight times that of Country C (5%)</span>. Over the subsequent decade, the former's figure rose steadily to 70% in 2010, <span class="hl-gra-complex">before culminating at approximately 85% in 2020</span>.
+Meanwhile, Country B demonstrated the fastest trajectory, <span class="hl-gra-complex">accelerating from 30% in 2005 to 48% in 2010</span>, and ultimately concluding at 75%, just 10 percentage points behind Country A. By contrast, <span class="hl-gra-complex">although internet access in Country C climbed sevenfold to finish at 35%</span>, its final figure remained lower than Country A's initial level in 2000.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 7)</div>
+                    <span class="ea-score-tag" style="background:#0284c7;">GRA Band Score: 7</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Syntactic Variety:</div>
+                        Concessive clauses ('While...', 'although...'), non-defining relative clauses ('which was over double...'), and complex prepositional/participle phrases.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Punctuation &amp; Mechanics:</div>
+                        Sophisticated punctuation control: em-dashes for parenthetical lists, commas setting off introductory adverbials and non-finite clauses.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Advanced Academic Appraisal:</strong><br>
+                    "A solid Band 7 performance. The writer demonstrates good control of complex syntax, producing frequent error-free sentences. Varied subordinate structures ('While', 'although', 'which was') are embedded smoothly without syntactic breakdown."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 8 ================= -->
+        <div class="a4-page" id="page-band-8" style="display: none;">
+            <div class="watermark">BAND 8 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0d9488;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 8</div>
+                <div class="bh-badge">Wide Range of Structures / Majority Error-Free</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 189 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph provides a comparative analysis of the percentage of households <span class="hl-gra-complex">equipped with internet access</span> in three distinct countries from 2000 to 2020.
+Overall, internet penetration expanded markedly across all three surveyed jurisdictions over the two-decade timeline. <span class="hl-gra-complex">While Country A consistently retained its dominance throughout</span>, Country B recorded the most formidable rate of expansion, <span class="hl-gra-complex">progressively closing the disparity with the frontrunner</span>. Conversely, Country C persistently trailed as the least connected nation <span class="hl-gra-complex">despite experiencing unceasing growth</span>.
+<span class="hl-gra-complex">At the commencement of the period in 2000</span>, internet connectivity was predominantly concentrated in Country A at 40%, <span class="hl-gra-complex">vastly outpacing Country B (15%) and Country C (5%)</span>. Over the following ten years, this metric climbed smoothly to 70%, <span class="hl-gra-complex">eventually cresting at around 85% in 2020</span>.
+Most remarkably, Country B registered an exceptional fivefold surge; <span class="hl-gra-complex">after moderate initial increases up to 2005 (30%)</span>, its adoption accelerated substantially, <span class="hl-gra-complex">reaching 48% in 2010 and ultimately reaching 75% in 2020</span>—<span class="hl-gra-complex">trailing Country A by a mere 10%</span>. Meanwhile, Country C exhibited a consistent linear ascent from 5% to 35%, <span class="hl-gra-complex">though its concluding proportion was still eclipsed by Country A's starting baseline twenty years earlier</span>.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 8)</div>
+                    <span class="ea-score-tag" style="background:#0d9488;">GRA Band Score: 8</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Structural Range &amp; Flexibility:</div>
+                        Uses reduced relative clauses ('households equipped with...'), passive constructions ('was still eclipsed by...'), and semicolons joining related compound sentences.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Accuracy Rate:</div>
+                        Over 95% of sentences are completely error-free. Demonstrates flawless control of subject-verb agreement and tense sequences across complex syntactic periods.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Sophisticated Examiner Review:</strong><br>
+                    "A wide range of grammatical structures is deployed with high flexibility and accuracy. The candidate uses sophisticated participial extensions ('progressively closing', 'vastly outpacing') and passive constructions seamlessly. Punctuation (semicolons, dashes) is controlled with academic precision."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 9 ================= -->
+        <div class="a4-page" id="page-band-9" style="display: none;">
+            <div class="watermark">BAND 9 SIMULATION<br>UNOFFICIAL MASTER SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../../Assets/BritCounsil.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../../Assets/IdpEdu.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../../Assets/CambridgeEsol.jpeg" onerror="this.onerror=null; this.src='../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #047857;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 9</div>
+                <div class="bh-badge">Full Flexibility &amp; Absolute Precision / Master Grammar</div>
+            </div>
+
+            <div class="highlight-legend">
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-green-text);"></span> Complex Syntactic Clause</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-amber-text);"></span> Simple / Repetitive Structure</div>
+                <div class="legend-item"><span class="legend-dot" style="background:var(--hl-red-text);"></span> Grammatical / Punctuation Error</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 209 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph delineates the trajectory of domestic internet accessibility across three nations—<span class="hl-gra-complex">designated Country A, Country B, and Country C</span>—over a twenty-year epoch spanning from 2000 to 2020.
+Overall, household internet penetration underwent substantial, unbroken expansion across all three examined territories. Country A asserted an uninterrupted hegemony throughout the timeframe, yet the standout feature was the rapid acceleration of Country B, <span class="hl-gra-complex">which drastically curtailed the initial disparity with the market leader</span>. In stark contrast, Country C remained systematically entrenched at the bottom of the spectrum.
+In 2000, connectivity <span class="hl-gra-complex">was heavily skewed toward Country A at 40%</span>, <span class="hl-gra-complex">outstripping Country B (15%) nearly threefold and Country C (5%) eightfold</span>. Over the ensuing two decades, the primary nation documented a measured, near-linear appreciation of approximately 45 percentage points, <span class="hl-gra-complex">culminating in an authoritative peak of 85.5% by 2020</span>.
+Conversely, Country B exhibited the most pronounced dynamism. <span class="hl-gra-complex">Following a moderate start</span>, its rate of connectivity surged past the midpoint in 2011 to attain 75.5% in 2020, <span class="hl-gra-complex">effectively reducing its deficit against Country A from 25 to just 10 percentage points</span>. Meanwhile, Country C displayed a modest yet steady upward gradient, <span class="hl-gra-complex">rising sevenfold to conclude at 35.5%</span>; nevertheless, this final figure failed even <span class="hl-gra-complex">to rival the introductory benchmark established by Country A two decades prior</span>.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (GRAMMAR: BAND 9)</div>
+                    <span class="ea-score-tag" style="background:#047857;">GRA Band Score: 9</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Complete Flexibility:</div>
+                        Effortless syntactic balance: reduced participle phrases ('designated Country A...'), infinitive complementation, embedded relative clauses, and passive voice.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Flawless Accuracy:</div>
+                        100% error-free execution. Punctuation (em-dashes, semicolons, parenthetical commas) operates with native-level stylistic authority.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Mastery-Level Examiner Appraisal:</strong><br>
+                    "Exemplifies complete grammatical mastery. The candidate demonstrates consummate control of both simple and intricate sentence structures with full flexibility. Syntactic subordination, participial phrases, and punctuation function harmoniously, producing flawless academic prose."
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End Pages Container -->
+
+    <!-- ================= SCRIPT LOGIC ================= -->
+    <script>
+        let isShowAllMode = false;
+
+        function showBand(band) {
+            isShowAllMode = false;
+            document.getElementById('btn-toggle-view').innerText = "Show All Pages (Print Mode)";
+            
+            // Hide all pages
+            const allPages = document.querySelectorAll('.a4-page');
+            allPages.forEach(page => page.style.display = 'none');
+
+            // Deactivate all pills
+            const allPills = document.querySelectorAll('.nav-pill');
+            allPills.forEach(pill => pill.classList.remove('active'));
+
+            // Show selected page
+            const targetId = (band === 'prompt') ? 'page-prompt' : `page-band-${band}`;
+            const targetPage = document.getElementById(targetId);
+            if (targetPage) {
+                targetPage.style.display = 'flex';
+            }
+
+            // Activate corresponding button
+            allPills.forEach(pill => {
+                if (band === 'prompt' && pill.innerText.includes('Prompt')) {
+                    pill.classList.add('active');
+                } else if (pill.innerText.includes(`Band ${band}`)) {
+                    pill.classList.add('active');
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleViewMode() {
+            isShowAllMode = !isShowAllMode;
+            const btn = document.getElementById('btn-toggle-view');
+            const allPages = document.querySelectorAll('.a4-page');
+            const allPills = document.querySelectorAll('.nav-pill');
+
+            if (isShowAllMode) {
+                btn.innerText = "Single Page Focus Mode";
+                allPages.forEach(page => page.style.display = 'flex');
+                allPills.forEach(pill => pill.classList.remove('active'));
+            } else {
+                btn.innerText = "Show All Pages (Print Mode)";
+                showBand('prompt');
+            }
+        }
+
+        // Default initial load: show prompt first
+        window.onload = () => {
+            showBand('prompt');
+        };
+    </script>
+</body>
+</html>
