@@ -41,7 +41,7 @@
         }
         .btn-start:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
-        /* --- SECTION COMPARISON BUTTONS --- */
+        /* --- SECTION CRITERIA & COMPARISON --- */
         .comparison-wrapper {
             width: 100%;
             margin-top: 18px;
@@ -49,11 +49,37 @@
             border-top: 1px dashed var(--border);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
+        }
+
+        /* Banner Link to Criteria Explanation */
+        .btn-criteria-guide {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .btn-criteria-guide:hover {
+            background: #dcfce7;
+            border-color: #86efac;
+            transform: translateY(-1px);
+        }
+        .guide-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .comparison-label {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
@@ -62,6 +88,7 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            margin-top: 2px;
         }
 
         .comparison-grid {
@@ -120,12 +147,23 @@
             <!-- Tombol Utama Start Task 1 -->
             <a href="./task1/index.html" class="btn-start">Start Task 1</a>
 
-            <!-- Tombol See Comparison (TA, CC, LR, GRA) -->
+            <!-- Section Hub Criteria & Comparisons -->
             <div class="comparison-wrapper">
+                
+                <!-- Link to Criteria Page -->
+                <a href="./task1/criteria/index.html" class="btn-criteria-guide">
+                    <span class="guide-left">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Task 1 Assessment Criteria Explained
+                    </span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </a>
+
                 <div class="comparison-label">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
                     See Band 1–9 Comparison:
                 </div>
+
                 <div class="comparison-grid">
                     <!-- Task Achievement -->
                     <a href="../../print/writing/task1/comparison/taskAchievement/index.html" class="btn-comp" target="_blank" title="Task Achievement Comparison">
