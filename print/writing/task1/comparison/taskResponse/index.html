@@ -1,1 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=850, user-scalable=yes">
+    <title>IELTS Writing Task 1 - Task Achievement Comparative Benchmark (Band 1 to 9)</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --text-dark: #1e293b;
+            --box-border: #000000;
+            --grey-bg: #e2e8f0;
+            --light-grey: #f8fafc;
+            --line-color: #94a3b8;
+            --accent-b1: #ef4444;
+            --accent-b5: #f59e0b;
+            --accent-b7: #0284c7;
+            --accent-b9: #10b981;
+        }
 
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background-color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+        }
+
+        /* --- STICKY NAVIGATOR TOOLBAR (No Print) --- */
+        .no-print-toolbar {
+            position: sticky;
+            top: 10px;
+            z-index: 10000;
+            width: 210mm;
+            background: #ffffff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toolbar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-print { background-color: var(--primary); color: white; }
+        .btn-print:hover { background-color: var(--primary-hover); }
+        .btn-back { background-color: #64748b; color: white; }
+        .btn-back:hover { background-color: #475569; }
+        .btn-mode { background-color: #0f172a; color: white; }
+
+        /* Nav Pills */
+        .band-navigator {
+            display: flex;
+            gap: 5px;
+            justify-content: space-between;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            flex: 1;
+            min-width: 60px;
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #334155;
+            transition: 0.15s ease-in-out;
+        }
+
+        .nav-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+        }
+
+        /* --- A4 Page Container --- */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            height: 297mm;
+            background: white;
+            padding: 13mm 15mm;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 25px;
+            page-break-after: always;
+            break-after: page;
+        }
+
+        /* --- Watermark --- */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 52px;
+            font-weight: 800;
+            color: #000000;
+            opacity: 0.08;
+            z-index: 999;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+
+        /* --- Header Logos (Identik Task 1) --- */
+        .header-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 8px;
+            padding: 0 10px;
+            width: 100%;
+        }
+        .header-logos img { height: 38px; object-fit: contain; }
+
+        /* --- Question Preview Card on Page 0 --- */
+        .prompt-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid var(--primary);
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+        .prompt-title { font-weight: bold; font-size: 14px; color: var(--primary); margin-bottom: 4px; }
+
+        .graph-preview {
+            width: 100%;
+            max-height: 480px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .graph-preview img {
+            max-width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+        }
+
+        /* --- Band Header Banner --- */
+        .band-header-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            color: white;
+            padding: 6px 14px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .bh-left { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; }
+        .bh-badge {
+            background: #ffffff;
+            color: #0f172a;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* --- Answer Sheet Box with Lines --- */
+        .answer-sample-card {
+            border: 1px solid var(--box-border);
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            background: #ffffff;
+            position: relative;
+        }
+        .sample-label {
+            font-size: 11px;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .writing-lines-sample {
+            background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, var(--line-color) 29px, var(--line-color) 30px);
+            background-size: 100% 30px;
+            line-height: 30px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13.5px;
+            color: #000;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 240px;
+            padding-bottom: 4px;
+        }
+
+        /* --- Examiner Commentary Section --- */
+        .examiner-analysis {
+            background: #fdfefe;
+            border: 1px solid #0f172a;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: auto;
+            border-radius: 4px;
+        }
+
+        .ea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+
+        .ea-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+
+        .ea-score-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            background: #334155;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 11px;
+            line-height: 1.45;
+            color: #334155;
+            margin-top: 4px;
+        }
+
+        .analysis-block {
+            background: #f8fafc;
+            padding: 6px 8px;
+            border-left: 3px solid #64748b;
+            border-radius: 2px;
+        }
+        .ab-label { font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+
+        .examiner-quote {
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: #1e293b;
+            font-style: italic;
+            background: #f1f5f9;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary);
+            margin-top: 4px;
+        }
+
+        /* --- Print Stylesheet --- */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .no-print-toolbar {
+                display: none !important;
+            }
+            .a4-page {
+                box-shadow: none;
+                margin: 0;
+                display: flex !important; /* Force all pages visible when printing */
+                height: 297mm;
+                page-break-after: always;
+                break-after: page;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= STICKY TOOLBAR (NO-PRINT) ================= -->
+    <div class="no-print-toolbar">
+        <div class="toolbar-top">
+            <div class="toolbar-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                Task 1 Benchmark: Task Achievement (Band 1 - Band 9)
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn btn-back" onclick="window.history.back()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    Back
+                </button>
+                <button class="btn btn-mode" id="btn-toggle-view" onclick="toggleViewMode()">
+                    Show All Pages (Print Mode)
+                </button>
+                <button class="btn btn-print" onclick="window.print()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print
+                </button>
+            </div>
+        </div>
+
+        <!-- 10 Fast Switch Pills -->
+        <div class="band-navigator">
+            <button class="nav-pill active" onclick="showBand('prompt')">Graph Prompt</button>
+            <button class="nav-pill" onclick="showBand(1)">See Band 1</button>
+            <button class="nav-pill" onclick="showBand(2)">See Band 2</button>
+            <button class="nav-pill" onclick="showBand(3)">See Band 3</button>
+            <button class="nav-pill" onclick="showBand(4)">See Band 4</button>
+            <button class="nav-pill" onclick="showBand(5)">See Band 5</button>
+            <button class="nav-pill" onclick="showBand(6)">See Band 6</button>
+            <button class="nav-pill" onclick="showBand(7)">See Band 7</button>
+            <button class="nav-pill" onclick="showBand(8)">See Band 8</button>
+            <button class="nav-pill" onclick="showBand(9)">See Band 9</button>
+        </div>
+    </div>
+
+    <!-- ================= PAGES CONTAINER ================= -->
+    <div id="pages-container">
+
+        <!-- ================= PAGE 0: PROMPT & GRAPH ================= -->
+        <div class="a4-page" id="page-prompt">
+            <div class="watermark">REFERENCE QUESTION<br>IELTS TASK 1</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background:#1e293b;">
+                <div class="bh-left">OFFICIAL STIMULUS: TASK 1 ACADEMIC GRAPH</div>
+                <div class="bh-badge">Standard Dataset</div>
+            </div>
+
+            <div class="prompt-box">
+                <div class="prompt-title">Writing Task 1 Question Prompt:</div>
+                You should spend about 20 minutes on this task.<br>
+                <strong>The line graph below shows the percentage of households with internet access in three countries (Country A, Country B, and Country C) between 2000 and 2020.</strong><br>
+                <em>Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.</em>
+            </div>
+
+            <div class="graph-preview">
+                <img src="../../../../Assets/Comparison/img1.jpg" onerror="this.src='../../../../../Assets/Comparison/img1.jpg'; if(!this.complete) this.src='../../../../Assets/Comparison/img1.jpg';" alt="Percentage of Households with Internet Access (2000-2020)">
+            </div>
+
+            <div class="examiner-analysis" style="margin-top: 10px;">
+                <div class="ea-header">
+                    <div class="ea-title">KEY STATISTICAL REALITIES OF THIS GRAPH (FOR EXAMINER BENCHMARKING)</div>
+                    <span class="ea-score-tag" style="background:var(--primary);">Assessment Core</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Country A (Blue Square):</div>
+                        Starts highest at 40% (2000), rises in an unbroken near-linear trajectory through 70% (2010), peaking at 85.5% (2020). Consistently leads throughout.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Country B (Red Circle):</div>
+                        Starts at 15.5% (2000), demonstrates the sharpest surge (especially post-2005), jumping from 48% (2010) to 75.5% (2020), nearly closing the gap with Country A.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Country C (Green Triangle):</div>
+                        Starts lowest at 5% (2000), climbs steadily to 20% (2010) and finishes at 35.5% (2020). Despite a sevenfold rise, it stays consistently lowest.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Crucial Global Overview Requirement:</div>
+                        Must observe: (1) All 3 countries grew, (2) Country A always highest vs Country C always lowest, (3) Country B saw the fastest acceleration.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 1 ================= -->
+        <div class="a4-page" id="page-band-1" style="display: none;">
+            <div class="watermark">BAND 1 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #991b1b;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 1</div>
+                <div class="bh-badge">Completely Unrelated / No Message</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 13 words</span>
+                </div>
+                <div class="writing-lines-sample">computer internet year 2000 2020 country good house line screen blue red green percent.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 1 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#991b1b;">Task Achievement: Band 1</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Data & Facts Present:</div>
+                        None. There are zero sentences, zero facts, and zero numbers representing the dataset.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Overview Evaluation:</div>
+                        No overview. The candidate cannot formulate grammatical sentences or communicate an idea.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The taker cannot write English sentences. They only write random, isolated words copied from the chart like 'computer' and 'percent'. Because there is no message and no information from the graph, this response receives Band 1."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 2 ================= -->
+        <div class="a4-page" id="page-band-2" style="display: none;">
+            <div class="watermark">BAND 2 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #b91c1c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 2</div>
+                <div class="bh-badge">Barely Related / Fragmentary Data</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 26 words</span>
+                </div>
+                <div class="writing-lines-sample">Country A internet 40% in 2000. Then 85% in 2020. Country B 15% and Country C 5%. Internet going up for house country. Line high.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 2 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#b91c1c;">Task Achievement: Band 2</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Task Fulfillment:</div>
+                        Barely answers the question. The candidate writes a few numbers (40%, 85%, 15%, 5%), but they are disconnected fragments.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Key Features & Trends:</div>
+                        No comparison exists. The sentence 'Internet going up' is too broken to serve as a meaningful overview.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The writer attempts to write some numbers from the prompt, but there are no proper sentences. You cannot understand the relationships between Country A, B, and C. It is essentially isolated words with raw numbers, which fits the Band 2 criteria."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 3 ================= -->
+        <div class="a4-page" id="page-band-3" style="display: none;">
+            <div class="watermark">BAND 3 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #c2410c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 3</div>
+                <div class="bh-badge">Fails Task Adequately / Off-Topic Personal Views</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 68 words</span>
+                </div>
+                <div class="writing-lines-sample">This picture is about internet. I like the internet very much because students can study English and play computer games at home. In Country A, people have a lot of money and good jobs, so 40% had internet in 2000 and 85% in 2020. But Country C is poor so only 5% had internet. The government should build free Wi-Fi for everyone in Country C.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 3 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#c2410c;">Task Achievement: Band 3</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Task Fulfillment:</div>
+                        Fails to address the core requirements. The text treats Task 1 like an essay (Task 2) by expressing personal opinions and giving advice.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Major Flaw:</div>
+                        Fabricates external reasons not in the graphic ('people have a lot of money', 'Country C is poor', 'government should build free Wi-Fi').
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Simple English Explanation:</strong><br>
+                    "The taker does not know the basic rule of Academic Task 1: never write personal opinions or external speculations. Most of the data from 2000 to 2020 is missed, and the writing is mostly off-topic speculation, resulting in a Band 3 score."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 4 ================= -->
+        <div class="a4-page" id="page-band-4" style="display: none;">
+            <div class="watermark">BAND 4 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #ea580c;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 4</div>
+                <div class="bh-badge">Responds in Minimal Way / No Overview</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 64 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph shows the percentage of house with internet in Country A, B and C.
+In 2000, Country A was 40% and Country B was 15%. In 2020, Country A went up to 85% and Country C was 35%. Country B became 75%. People love internet now. In conclusion, Country C must buy more computers to catch Country A.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 4 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#ea580c;">Task Achievement: Band 4</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Overview Present?</div>
+                        No clear overview. The writer finishes with an invalid personal recommendation ('must buy more computers') instead of an overarching trend.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Data Coverage:</div>
+                        Severely minimal. Only beginning and end figures are stated with zero timeline progression (2005, 2010, 2015 omitted). Far below 150 words.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Clear Pedagogical Explanation:</strong><br>
+                    "The candidate attempts the task, but misses key requirements. An overview is completely absent, major chronological checkpoints are ignored, and inappropriate subjective commentary is included. The response satisfies only the most basic criteria of Band 4."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 5 ================= -->
+        <div class="a4-page" id="page-band-5" style="display: none;">
+            <div class="watermark">BAND 5 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #d97706;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 5</div>
+                <div class="bh-badge">Mechanical Listing / Inadequate Overview</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 112 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph gives information about the percentage of households with internet access in three countries from 2000 to 2020.
+In 2000, Country A was 40%, Country B was 15%, and Country C was 5%. In 2005, Country A was 55%, Country B was 30%, and Country C was 12%. In 2010, Country A had 70%, Country B had 48%, and Country C had 20%. In 2015, Country A increased to 78%, Country B increased to 63%, and Country C was 28%. In 2020, Country A reached 85%, Country B reached 75%, and Country C was 35%. Overall, all countries went up.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 5 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#d97706;">Task Achievement: Band 5</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Mechanical Listing Flaw:</div>
+                        The text is a 'laundry list' of numbers. The writer mechanically reads every number year by year without synthesizing what the numbers actually mean.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Overview Quality:</div>
+                        Extremely superficial ('Overall, all countries went up'). It fails to mention which country was highest, lowest, or grew the fastest.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Intermediate Analytical Explanation:</strong><br>
+                    "The candidate provides a mechanical recount of data rather than an analytical report. There is no genuine comparison between categories, and the overview lacks development. Listing every date and percentage point without grouping constitutes textbook Band 5 Task Achievement."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 6 ================= -->
+        <div class="a4-page" id="page-band-6" style="display: none;">
+            <div class="watermark">BAND 6 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #2563eb;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 6</div>
+                <div class="bh-badge">Adequate Overview / Limited Synthesis</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 154 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph illustrates the percentage of households that had access to the internet in Country A, Country B, and Country C between 2000 and 2020.
+Overall, it is clear that internet access rose in all three countries over the twenty-year period. Country A consistently had the highest proportion of households with internet, whereas Country C remained the lowest throughout.
+In 2000, Country A began with 40% of households connected to the internet. This figure experienced a continuous increase, reaching 70% in 2010 and finally finishing at approximately 85% by 2020.
+Looking at the other two nations, Country B started at around 15% in 2000 and grew to roughly 48% in 2010, before climbing further to 75% in 2020. Similarly, Country C showed an upward trend, beginning at 5% in 2000 and gradually increasing to 35% in 2020.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 6 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#2563eb;">Task Achievement: Band 6</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Overview Quality:</div>
+                        Presents an identifiable overview (growth across all three, A highest, C lowest). This satisfies the threshold requirement for Band 6.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Why Not Band 7?</div>
+                        The data is reported in silos (country-by-country paragraphs). The writer does not explicitly contrast Country B's rapid rise against Country A's lead.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Upper-Intermediate Evaluation:</strong><br>
+                    "The response addresses all parts of the prompt and exceeds 150 words. An overview is explicitly formulated. However, key comparisons remain under-developed: Country B's remarkable acceleration and its narrowing gap with Country A are left unstated. Hence, it remains capped at Band 6."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 7 ================= -->
+        <div class="a4-page" id="page-band-7" style="display: none;">
+            <div class="watermark">BAND 7 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0284c7;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 7</div>
+                <div class="bh-badge">Clear Overview + Well-Supported Key Features</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 178 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph illustrates the proportion of households with internet connectivity across three nations—Country A, Country B, and Country C—over a twenty-year period from 2000 to 2020.
+Overall, all three countries witnessed substantial growth in domestic internet accessibility throughout the surveyed period. Country A consistently maintained the highest penetration rate, while Country B exhibited the most dramatic increase, significantly narrowing the gap with the leader. Country C, despite steady progress, consistently recorded the lowest figures.
+In 2000, Country A held the lead with 40% of homes connected, which was over double the proportion in Country B (15%) and eight times that of Country C (5%). Over the subsequent decade, Country A's figure rose steadily to 70% in 2010, before culminating at approximately 85% in 2020.
+Meanwhile, Country B demonstrated the fastest trajectory, accelerating from 30% in 2005 to 48% in 2010, and ultimately concluding at 75%, just 10 percentage points behind Country A. By contrast, although internet access in Country C climbed sevenfold to finish at 35%, its final figure remained lower than Country A's initial level in 2000.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 7 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#0284c7;">Task Achievement: Band 7</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Overview Precision:</div>
+                        Comprehensive overview capturing general growth, persistent leader/laggard status, and Country B's standout rate of acceleration.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Data Integration:</div>
+                        Employs comparative ratios ('over double', 'eight times', 'just 10 percentage points behind') rather than relying solely on raw numbers.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Advanced Academic Appraisal:</strong><br>
+                    "A fully competent Band 7 performance. The candidate successfully identifies the defining narrative of the graphic—namely Country B converging upon Country A. Numerical evidence is selected judiciously to corroborate comparisons rather than smothering the prose in raw data points."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 8 ================= -->
+        <div class="a4-page" id="page-band-8" style="display: none;">
+            <div class="watermark">BAND 8 SIMULATION<br>UNOFFICIAL SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #0d9488;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 8</div>
+                <div class="bh-badge">Sufficient Coverage + Skillful Highlights</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 189 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph provides a comparative analysis of the percentage of households equipped with internet access in three distinct countries from 2000 to 2020.
+Overall, internet penetration expanded markedly across all three surveyed jurisdictions over the two-decade timeline. While Country A consistently retained its dominance throughout, Country B recorded the most formidable rate of expansion, progressively closing the disparity with the frontrunner. Conversely, Country C persistently trailed as the least connected nation despite experiencing unceasing growth.
+At the commencement of the period in 2000, internet connectivity was predominantly concentrated in Country A at 40%, vastly outpacing Country B (15%) and Country C (5%). Over the following ten years, Country A climbed smoothly to 70%, eventually cresting at around 85% in 2020.
+Most remarkably, Country B registered an exceptional fivefold surge; after moderate initial increases up to 2005 (30%), its adoption accelerated substantially, reaching 48% in 2010 and ultimately reaching 75% in 2020—trailing Country A by a mere 10%. Meanwhile, Country C exhibited a consistent linear ascent from 5% to 35%, though its concluding proportion was still eclipsed by Country A's starting baseline twenty years earlier.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 8 DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#0d9488;">Task Achievement: Band 8</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Key Features Treatment:</div>
+                        Clearly illustrates key trends and highlights pivotal inflection points (e.g., Country B's post-2005 acceleration and its concluding 10% deficit).
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Relational Metrics:</div>
+                        Synthesizes cross-temporal insights (e.g., Country C's 2020 total being eclipsed by Country A's 2000 starting position).
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Sophisticated Examiner Review:</strong><br>
+                    "All requirements of the task are addressed with fluent analytical precision. The writer demonstrates exceptional command of comparative framing ('fivefold surge', 'closing the disparity', 'linear ascent'). Every sentence advances the macro-level interpretation of the data."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE BAND 9 ================= -->
+        <div class="a4-page" id="page-band-9" style="display: none;">
+            <div class="watermark">BAND 9 SIMULATION<br>UNOFFICIAL MASTER SAMPLE</div>
+
+            <div class="header-logos">
+                <img src="../../../../Assets/BritCounsil.jpeg" onerror="this.src='../../../../../Assets/BritCounsil.jpeg'" alt="British Council">
+                <img src="../../../../Assets/IdpEdu.jpeg" onerror="this.src='../../../../../Assets/IdpEdu.jpeg'" alt="IDP Education">
+                <img src="../../../../Assets/CambridgeEsol.jpeg" onerror="this.src='../../../../../Assets/CambridgeEsol.jpeg'" alt="Cambridge ESOL">
+            </div>
+
+            <div class="band-header-banner" style="background: #047857;">
+                <div class="bh-left">CANDIDATE SUBMISSION — BAND 9</div>
+                <div class="bh-badge">Fully Satisfies All Requirements / Flawless Synthesis</div>
+            </div>
+
+            <div class="answer-sample-card">
+                <div class="sample-label">
+                    <span>Written Response on Answer Sheet</span>
+                    <span>Length: 209 words</span>
+                </div>
+                <div class="writing-lines-sample">The line graph delineates the trajectory of domestic internet accessibility across three nations—designated Country A, Country B, and Country C—over a twenty-year epoch spanning from 2000 to 2020.
+Overall, household internet penetration underwent substantial, unbroken expansion across all three examined territories. Country A asserted an uninterrupted hegemony throughout the timeframe, yet the standout feature was the rapid acceleration of Country B, which drastically curtailed the initial disparity with the market leader. In stark contrast, Country C remained systematically entrenched at the bottom of the spectrum.
+In 2000, connectivity was heavily skewed toward Country A at 40%, outstripping Country B (15%) nearly threefold and Country C (5%) eightfold. Over the ensuing two decades, Country A documented a measured, near-linear appreciation of approximately 45 percentage points, culminating in an authoritative peak of 85.5% by 2020.
+Conversely, Country B exhibited the most pronounced dynamism. Following a moderate start, its rate of connectivity surged past the midpoint in 2011 to attain 75.5% in 2020, effectively reducing its deficit against Country A from 25 to just 10 percentage points. Meanwhile, Country C displayed a modest yet steady upward gradient, rising sevenfold to conclude at 35.5%; nevertheless, this final figure failed even to rival the introductory benchmark established by Country A two decades prior.</div>
+            </div>
+
+            <div class="examiner-analysis">
+                <div class="ea-header">
+                    <div class="ea-title">EXAMINER EVALUATION (BAND 9 MASTER DESCRIPTOR LEVEL)</div>
+                    <span class="ea-score-tag" style="background:#047857;">Task Achievement: Band 9</span>
+                </div>
+                <div class="analysis-grid">
+                    <div class="analysis-block">
+                        <div class="ab-label">Definitive Benchmark Fulfillment:</div>
+                        Fully satisfies all requirements with consummate academic maturity. Transforms numerical statistics into a lucid, authoritative narrative of technological convergence.
+                    </div>
+                    <div class="analysis-block">
+                        <div class="ab-label">Macro-Micro Synthesis:</div>
+                        Integrates absolute figures, relative multipliers ('threefold', 'eightfold'), net percentage-point shifts (+45 pts), and cross-categorical baseline comparisons.
+                    </div>
+                </div>
+                <div class="examiner-quote">
+                    <strong>Mastery-Level Examiner Appraisal:</strong><br>
+                    "An exemplary Band 9 response that exemplifies the absolute ceiling of Task Achievement. The candidate avoids the common pitfall of data clutter, presenting instead an elegant synthesis where every reported figure serves as empirical scaffolding for high-level comparative deductions."
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End Pages Container -->
+
+    <!-- ================= SCRIPT LOGIC ================= -->
+    <script>
+        let isShowAllMode = false;
+
+        function showBand(band) {
+            isShowAllMode = false;
+            document.getElementById('btn-toggle-view').innerText = "Show All Pages (Print Mode)";
+            
+            // Hide all pages
+            const allPages = document.querySelectorAll('.a4-page');
+            allPages.forEach(page => page.style.display = 'none');
+
+            // Deactivate all pills
+            const allPills = document.querySelectorAll('.nav-pill');
+            allPills.forEach(pill => pill.classList.remove('active'));
+
+            // Show selected page
+            const targetId = (band === 'prompt') ? 'page-prompt' : `page-band-${band}`;
+            const targetPage = document.getElementById(targetId);
+            if (targetPage) {
+                targetPage.style.display = 'flex';
+            }
+
+            // Activate corresponding button
+            allPills.forEach(pill => {
+                if (band === 'prompt' && pill.innerText.includes('Prompt')) {
+                    pill.classList.add('active');
+                } else if (pill.innerText.includes(`Band ${band}`)) {
+                    pill.classList.add('active');
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleViewMode() {
+            isShowAllMode = !isShowAllMode;
+            const btn = document.getElementById('btn-toggle-view');
+            const allPages = document.querySelectorAll('.a4-page');
+            const allPills = document.querySelectorAll('.nav-pill');
+
+            if (isShowAllMode) {
+                btn.innerText = "Single Page Focus Mode";
+                allPages.forEach(page => page.style.display = 'flex');
+                allPills.forEach(pill => pill.classList.remove('active'));
+            } else {
+                btn.innerText = "Show All Pages (Print Mode)";
+                showBand('prompt');
+            }
+        }
+
+        // Default initial load: show prompt & chart first
+        window.onload = () => {
+            showBand('prompt');
+        };
+    </script>
+</body>
+</html>
