@@ -6,6 +6,7 @@
     <title>Handwritten Retype Practice - Band 9</title>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@300;400;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --paper-bg: #fefcf3;
@@ -33,17 +34,18 @@
             color: #1e293b;
             padding-bottom: 20px;
             user-select: none;
+            transition: padding 0.25s ease;
         }
 
         body.has-osk {
-            padding-bottom: 270px;
+            padding-bottom: 300px;
         }
 
-        /* Top Bar */
+        /* Top Bar & Collapsible Toolbar */
         .top-nav {
             background: #ffffff;
             border-bottom: 2px dashed #d1c7b7;
-            padding: 10px 16px;
+            padding: 12px 24px 12px 64px; /* Space for float toggle button */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -51,24 +53,32 @@
             z-index: 100;
             position: sticky;
             top: 0;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
         }
+
+        .top-nav.hidden-toolbar {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
         .top-nav .title-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 15px;
             color: #4338ca;
         }
         .btn-action {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
+            padding: 7px 14px;
             border-radius: 8px;
-            font-size: 12.5px;
+            font-size: 13px;
             font-weight: 600;
             border: 1px solid #cbd5e1;
             background: #fff;
@@ -84,6 +94,41 @@
             color: #854d0e;
         }
         .btn-peek:hover { background: #fde047; }
+        .btn-exit {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+        .btn-exit:hover { background: #fecaca; }
+
+        .btn-save-progress {
+            background: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #065f46;
+        }
+        .btn-save-progress:hover { background: #d1fae5; }
+
+        /* Floating Toggle for Toolbar Menu */
+        .fab-toggle-toolbar {
+            position: fixed;
+            top: 10px;
+            left: 12px;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.2s;
+        }
+        .fab-toggle-toolbar:hover { background: #f8fafc; color: #4f46e5; border-color: #818cf8; }
+        .fab-toggle-toolbar svg { width: 20px; height: 20px; stroke: currentColor; fill: none; }
 
         /* Keyboard & Sound Toggle Pill */
         .btn-toggle-kb, .btn-toggle-sound {
@@ -99,9 +144,9 @@
 
         /* Sound Select Dropdown */
         .sound-select-styled {
-            padding: 5px 8px;
+            padding: 6px 10px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 600;
             border: 1px solid #cbd5e1;
             background: #ffffff;
@@ -124,13 +169,13 @@
             background: #fffbeb;
             border: 1px solid #fde68a;
             color: #b45309;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 12.5px;
+            font-size: 13px;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         /* Handwritten Desk Layout */
@@ -138,17 +183,21 @@
             flex: 1;
             display: flex;
             justify-content: center;
-            padding: 16px 12px;
+            padding: 24px 20px;
+            transition: padding-top 0.3s ease;
+        }
+        body.toolbar-closed .desk-workspace {
+            padding-top: 55px;
         }
 
         /* Notebook Paper Style */
         .notebook-paper {
             width: 100%;
-            max-width: 860px;
+            max-width: 980px;
             background: var(--paper-bg);
-            border-radius: 6px;
-            box-shadow: 2px 3px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px #e2dac9;
-            padding: 30px 24px 50px 54px;
+            border-radius: 8px;
+            box-shadow: 2px 4px 24px rgba(0, 0, 0, 0.09), 0 0 0 1px #e2dac9;
+            padding: 40px 36px 60px 70px;
             position: relative;
             background-image: repeating-linear-gradient(var(--paper-bg) 0px, var(--paper-bg) 31px, var(--line-color) 32px);
             line-height: 32px;
@@ -160,7 +209,7 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            left: 40px;
+            left: 50px;
             width: 2px;
             background-color: var(--margin-line);
         }
@@ -170,24 +219,24 @@
             display: flex;
             justify-content: space-between;
             font-family: 'Inter', sans-serif;
-            font-size: 12.5px;
+            font-size: 13.5px;
             color: #64748b;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             border-bottom: 1px solid #e2dac9;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
         }
 
         /* Typing Area Engine */
         .typing-container {
             position: relative;
-            min-height: 280px;
+            min-height: 300px;
             cursor: text;
         }
 
         /* Ghost & Typed Layer */
         .display-stream {
             font-family: 'Caveat', cursive;
-            font-size: 26px;
+            font-size: 27px;
             letter-spacing: 0.5px;
             white-space: pre-wrap;
             word-break: break-word;
@@ -216,7 +265,7 @@
             margin-left: -1px;
             margin-right: -1px;
             display: inline-block;
-            height: 24px;
+            height: 25px;
             vertical-align: middle;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -235,33 +284,33 @@
         .peek-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.65);
+            background: rgba(15, 23, 42, 0.7);
             backdrop-filter: blur(4px);
             z-index: 2500;
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 20px;
         }
         .peek-modal {
             background: #fff;
-            padding: 14px;
+            padding: 16px;
             border-radius: 12px;
-            max-width: 92vw;
-            max-height: 85vh;
+            max-width: 90vw;
+            max-height: 88vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.3);
         }
         .peek-modal img {
             max-width: 100%;
-            max-height: 70vh;
+            max-height: 75vh;
             object-fit: contain;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
         }
         .peek-footer {
-            margin-top: 10px;
+            margin-top: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -272,15 +321,15 @@
         /* Floating Peek Image Button */
         .fab-peek {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
+            bottom: 24px;
+            right: 24px;
+            width: 54px;
+            height: 54px;
             background: #fbbf24;
             color: #78350f;
             border-radius: 50%;
             border: none;
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.45);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -289,26 +338,26 @@
             transition: all 0.2s;
         }
         .fab-peek:hover { transform: scale(1.08); background: #f59e0b; color: #fff; }
-        .fab-peek svg { width: 24px; height: 24px; stroke: currentColor; fill: none; }
+        .fab-peek svg { width: 26px; height: 26px; stroke: currentColor; fill: none; }
 
-        /* ON-SCREEN QWERTY KEYBOARD (FULL) */
+        /* ON-SCREEN QWERTY KEYBOARD (FULL WIDTH & LEGA) */
         .osk-container {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: #cbd5e1;
-            padding: 8px 6px 12px 6px;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+            padding: 10px 10px 16px 10px;
+            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
             display: none;
             flex-direction: column;
-            gap: 6px;
+            gap: 7px;
             z-index: 1500;
             font-family: 'Inter', system-ui, sans-serif;
             border-top: 1px solid #94a3b8;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
-            border-radius: 12px 12px 0 0;
+            border-radius: 14px 14px 0 0;
         }
         .osk-container.visible {
             display: flex;
@@ -317,25 +366,25 @@
         .osk-row {
             display: flex;
             justify-content: center;
-            gap: 4px;
+            gap: 6px;
             width: 100%;
         }
 
         .osk-key {
             flex: 1;
-            max-width: 54px;
-            height: 42px;
+            max-width: 68px;
+            height: 48px;
             background: #ffffff;
             border: 1px solid #94a3b8;
-            border-radius: 6px;
-            font-size: 15px;
+            border-radius: 7px;
+            font-size: 16px;
             font-weight: 600;
             color: #1e293b;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 2px 0 #94a3b8;
+            box-shadow: 0 2.5px 0 #94a3b8;
             touch-action: manipulation;
             user-select: none;
             transition: all 0.08s ease;
@@ -349,9 +398,9 @@
         .osk-key.special {
             background: #94a3b8;
             color: #ffffff;
-            font-size: 12.5px;
+            font-size: 13.5px;
             font-weight: 700;
-            max-width: 76px;
+            max-width: 88px;
         }
         .osk-key.special.active {
             background: #4f46e5;
@@ -359,16 +408,16 @@
             border-color: #3730a3;
         }
         .osk-key.space {
-            flex: 4;
-            max-width: 260px;
+            flex: 5;
+            max-width: 380px;
         }
         .osk-key.enter {
-            flex: 1.5;
-            max-width: 80px;
+            flex: 1.8;
+            max-width: 96px;
             background: #10b981;
             color: white;
             border-color: #059669;
-            box-shadow: 0 2px 0 #059669;
+            box-shadow: 0 2.5px 0 #059669;
         }
         .osk-key.enter:active {
             box-shadow: 0 0 0 #059669;
@@ -388,9 +437,9 @@
         .reward-card {
             background: #ffffff;
             border-radius: 16px;
-            padding: 30px;
+            padding: 32px;
             text-align: center;
-            max-width: 400px;
+            max-width: 420px;
             width: 100%;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             font-family: 'Inter', sans-serif;
@@ -406,24 +455,34 @@
 
         /* Mobile adjustments */
         @media (max-width: 640px) {
-            .notebook-paper { padding: 24px 12px 40px 36px; }
+            .top-nav { padding: 10px 14px 10px 56px; }
+            .notebook-paper { padding: 24px 14px 40px 38px; }
             .notebook-paper::before { left: 24px; }
-            .display-stream { font-size: 21px; line-height: 32px; }
-            .osk-key { height: 38px; font-size: 13.5px; }
-            .fab-peek { bottom: 15px; right: 15px; }
-            body.has-osk { padding-bottom: 240px; }
+            .display-stream { font-size: 22px; line-height: 32px; }
+            .osk-key { height: 42px; font-size: 14px; max-width: 54px; }
+            .fab-peek { bottom: 16px; right: 16px; }
+            body.has-osk { padding-bottom: 260px; }
         }
     </style>
 </head>
 <body onclick="handleDeskClick()">
 
-    <!-- Top Navigation -->
-    <div class="top-nav">
+    <!-- Floating Toggle Button for Toolbar Menu -->
+    <button class="fab-toggle-toolbar" id="btn-toggle-toolbar" onclick="toggleToolbarMenu(event)" title="Show / Hide Toolbar Menu">
+        <svg id="icon-toolbar-state" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <!-- Top Navigation (Toolbar Menu) -->
+    <div class="top-nav" id="top-nav-bar">
         <div class="title-group">
-            <a href="../index.html" class="btn-action" title="Back to Hints">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                Hint
-            </a>
+            <button class="btn-action btn-exit" onclick="closeGame()" title="Close and return to task 1 workspace">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                Exit Game
+            </button>
             <span>✍️ Handwritten Retype</span>
         </div>
 
@@ -432,6 +491,18 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 1 0-5H12"></path></svg>
                 <span id="user-coins">0</span>
             </div>
+
+            <!-- Manual Save Progress Button -->
+            <button class="btn-action btn-save-progress" onclick="saveProgressNotification(event)" title="Save current progress">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                Save
+            </button>
+
+            <!-- Reset Progress Button -->
+            <button class="btn-action" onclick="confirmResetProgress(event)" title="Reset typing progress">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                Reset
+            </button>
 
             <!-- Sound Toggle Button -->
             <button id="toggle-sound-btn" class="btn-action btn-toggle-sound active" onclick="toggleSound(event)" title="Toggle Typing Sound">
@@ -589,7 +660,7 @@
             </div>
             <div style="display: flex; gap: 8px;">
                 <button class="btn-action" style="flex:1;" onclick="restartRetype()">Retype Again</button>
-                <a href="../index.html" class="btn-action btn-peek" style="flex:1; justify-content:center;">Back to Hint</a>
+                <button class="btn-action btn-peek" style="flex:1; justify-content:center;" onclick="closeGame()">Finish & Exit</button>
             </div>
         </div>
     </div>
@@ -601,6 +672,8 @@
         const STORAGE_OSK_KEY = 'ielts_retype_osk_enabled';
         const STORAGE_SOUND_ENABLED_KEY = 'ielts_retype_sound_enabled';
         const STORAGE_SOUND_TYPE_KEY = 'ielts_retype_sound_type';
+        const STORAGE_PROGRESS_KEY = 'ielts_retype_typing_progress';
+        const STORAGE_TOOLBAR_KEY = 'ielts_retype_toolbar_visible';
 
         let targetText = "";
         let currentIndex = 0;
@@ -610,6 +683,7 @@
 
         let isShiftActive = false;
         let isOSKVisible = false;
+        let isToolbarVisible = true;
 
         // Sound System (Web Audio API)
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -617,6 +691,143 @@
         let isSoundEnabled = true;
         let selectedSound = 'typewriter';
 
+        // SweetAlert Toast Notification Helper
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1600,
+            timerProgressBar: true
+        });
+
+        function closeGame() {
+            saveProgress(false);
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage('CLOSE_TYPE_GAME', '*');
+            } else {
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Toolbar Menu Hide / Show Toggle
+        function toggleToolbarMenu(e) {
+            if (e) e.stopPropagation();
+            setToolbarState(!isToolbarVisible);
+        }
+
+        function setToolbarState(visible) {
+            isToolbarVisible = visible;
+            localStorage.setItem(STORAGE_TOOLBAR_KEY, visible ? 'true' : 'false');
+
+            const nav = document.getElementById('top-nav-bar');
+            const icon = document.getElementById('icon-toolbar-state');
+
+            if (visible) {
+                nav.classList.remove('hidden-toolbar');
+                document.body.classList.remove('toolbar-closed');
+                icon.innerHTML = '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+            } else {
+                nav.classList.add('hidden-toolbar');
+                document.body.classList.add('toolbar-closed');
+                // Eye/Expand icon
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                Toast.fire({ icon: 'info', title: 'Toolbar hidden (Zen Mode)' });
+            }
+            focusInput();
+        }
+
+        function loadToolbarPreference() {
+            const saved = localStorage.getItem(STORAGE_TOOLBAR_KEY);
+            if (saved === 'false') {
+                setToolbarState(false);
+            } else {
+                setToolbarState(true);
+            }
+        }
+
+        // User Typing Progress Saving & Resuming
+        function saveProgress(showToast = false) {
+            const progressData = {
+                currentIndex: currentIndex,
+                errorsCount: errorsCount,
+                totalTypedCount: totalTypedCount,
+                textSignature: targetText.slice(0, 40),
+                timestamp: Date.now()
+            };
+            localStorage.setItem(STORAGE_PROGRESS_KEY, JSON.stringify(progressData));
+
+            if (showToast) {
+                Toast.fire({ icon: 'success', title: 'Progress Saved!' });
+            }
+        }
+
+        function saveProgressNotification(e) {
+            if (e) e.stopPropagation();
+            saveProgress(true);
+            focusInput();
+        }
+
+        function checkAndResumeProgress() {
+            const raw = localStorage.getItem(STORAGE_PROGRESS_KEY);
+            if (!raw) return;
+
+            try {
+                const data = JSON.parse(raw);
+                if (data.currentIndex > 0 && data.currentIndex < targetText.length && data.textSignature === targetText.slice(0, 40)) {
+                    const percent = Math.round((data.currentIndex / targetText.length) * 100);
+                    
+                    Swal.fire({
+                        title: 'Resume Progress?',
+                        text: `You were at ${percent}% progress (${data.currentIndex} characters). Do you want to continue where you left off?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4f46e5',
+                        cancelButtonColor: '#94a3b8',
+                        confirmButtonText: 'Yes, Resume!',
+                        cancelButtonText: 'Start Over'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            currentIndex = data.currentIndex;
+                            errorsCount = data.errorsCount || 0;
+                            totalTypedCount = data.totalTypedCount || data.currentIndex;
+                            renderDisplay();
+                            updateStats();
+                            Toast.fire({ icon: 'success', title: 'Resumed successfully!' });
+                        } else {
+                            localStorage.removeItem(STORAGE_PROGRESS_KEY);
+                            currentIndex = 0;
+                            errorsCount = 0;
+                            totalTypedCount = 0;
+                            renderDisplay();
+                            updateStats();
+                        }
+                        focusInput();
+                    });
+                }
+            } catch(e) {}
+        }
+
+        function confirmResetProgress(e) {
+            if (e) e.stopPropagation();
+            Swal.fire({
+                title: 'Reset Progress?',
+                text: 'Your current typing position will start back from the beginning.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Yes, Reset'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    restartRetype();
+                    localStorage.removeItem(STORAGE_PROGRESS_KEY);
+                    Toast.fire({ icon: 'success', title: 'Reset to start!' });
+                }
+                focusInput();
+            });
+        }
+
+        // Web Audio API Generation
         function createNoiseBuffer(durationSec) {
             const bufferSize = audioCtx.sampleRate * durationSec;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -835,6 +1046,11 @@
                 ? Math.max(0, Math.round(((totalTypedCount - errorsCount) / totalTypedCount) * 100))
                 : 100;
             document.getElementById('accuracy-stat').innerText = `${accuracy}%`;
+
+            // Auto-save silently every 5 characters typed
+            if (currentIndex % 5 === 0 && currentIndex > 0) {
+                saveProgress(false);
+            }
         }
 
         // Shared Typing Processor (Untuk Hardware & On-Screen Keyboard)
@@ -875,7 +1091,7 @@
             const paper = document.querySelector('.notebook-paper');
             paper.style.boxShadow = "0 0 0 3px #ef4444";
             setTimeout(() => {
-                paper.style.boxShadow = "2px 3px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px #e2dac9";
+                paper.style.boxShadow = "2px 4px 24px rgba(0, 0, 0, 0.09), 0 0 0 1px #e2dac9";
             }, 180);
         }
 
@@ -883,9 +1099,10 @@
             isCompleted = true;
             renderDisplay();
             addCoins(100);
+            localStorage.removeItem(STORAGE_PROGRESS_KEY); // Clear progress when completed
 
             try {
-                confetti({ particleCount: 130, spread: 85, origin: { y: 0.6 } });
+                confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
             } catch(e) {}
 
             document.getElementById('reward-overlay').style.display = 'flex';
@@ -968,13 +1185,12 @@
                 if (char) {
                     if (isShiftActive && /^[a-z]$/i.test(char)) {
                         char = char.toUpperCase();
-                        toggleShift(false); // Reset shift after single char
+                        toggleShift(false);
                     }
                     processInputChar(char);
                 }
             });
 
-            // Load saved preference
             const savedState = localStorage.getItem(STORAGE_OSK_KEY);
             if (savedState === 'true') {
                 setOSKState(true);
@@ -1015,7 +1231,6 @@
             const shiftBtn = document.getElementById('osk-shift-btn');
             shiftBtn.classList.toggle('active', isShiftActive);
 
-            // Update on-screen letters display (Caps/Lower)
             const letterKeys = document.querySelectorAll('.osk-key[data-key]');
             letterKeys.forEach(k => {
                 const raw = k.getAttribute('data-key');
@@ -1043,7 +1258,11 @@
                 imgEl.style.display = 'block';
             } else {
                 imgEl.style.display = 'none';
-                alert("No image uploaded yet in Writing Workspace!");
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Image Found',
+                    text: 'Please upload a graph/diagram in the main task workspace first!'
+                });
                 return;
             }
             document.getElementById('peek-overlay').style.display = 'flex';
@@ -1059,7 +1278,9 @@
             loadCoins();
             loadModelAnswer();
             loadSoundPreferences();
+            loadToolbarPreference();
             initOSK();
+            checkAndResumeProgress();
             focusInput();
         };
     </script>
