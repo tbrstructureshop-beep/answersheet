@@ -224,15 +224,34 @@
             </div>
         </div>
 
-        <!-- 1. Model Answer -->
+        <!-- 1. Model Answer with Retype Typing Game Button -->
         <div class="card" id="card-full">
-            <div class="card-header" onclick="toggleCard('card-full')">
-                <div class="card-header-left">
+            <div class="card-header">
+                <div class="card-header-left" onclick="toggleCard('card-full')" style="flex:1;">
                     <span>1. Model Answer (Band 9)</span>
                 </div>
                 <div class="card-header-right">
-                    <span id="full-wc" style="font-size: 11px; color: var(--text-muted);">0 words</span>
-                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Tombol SVG Typing Game -->
+                    <a href="typingGame/index.html" title="Practice Retyping this Model Answer" style="text-decoration:none;">
+                        <button type="button" style="background:#ede9fe; color:#6366f1; border-color:#ddd6fe; padding:4px 9px; font-size:11px;" onclick="event.stopPropagation()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px; height:14px;">
+                                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                <line x1="6" y1="8" x2="6" y2="8"></line>
+                                <line x1="10" y1="8" x2="10" y2="8"></line>
+                                <line x1="14" y1="8" x2="14" y2="8"></line>
+                                <line x1="18" y1="8" x2="18" y2="8"></line>
+                                <line x1="6" y1="12" x2="6" y2="12"></line>
+                                <line x1="10" y1="12" x2="10" y2="12"></line>
+                                <line x1="14" y1="12" x2="14" y2="12"></line>
+                                <line x1="18" y1="12" x2="18" y2="12"></line>
+                                <line x1="7" y1="16" x2="17" y2="16"></line>
+                            </svg>
+                            Type Game
+                        </button>
+                    </a>
+
+                    <span id="full-wc" style="font-size: 11px; color: var(--text-muted);" onclick="toggleCard('card-full')">0 words</span>
+                    <svg class="toggle-icon" onclick="toggleCard('card-full')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
