@@ -20,6 +20,7 @@
             --key-bg: #ffffff;
             --key-active: #cbd5e1;
             --key-text: #1e293b;
+            --line-height-val: 36px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -86,6 +87,7 @@
             transition: all 0.15s ease;
             text-decoration: none;
             color: #334155;
+            height: 36px;
         }
         .btn-action:hover { background: #f8fafc; border-color: #94a3b8; }
         .btn-peek {
@@ -112,7 +114,7 @@
         .fab-toggle-toolbar {
             position: fixed;
             top: 10px;
-            left: 12px;
+            left: 14px;
             width: 38px;
             height: 38px;
             border-radius: 8px;
@@ -144,7 +146,8 @@
 
         /* Sound Select Dropdown */
         .sound-select-styled {
-            padding: 6px 10px;
+            height: 36px;
+            padding: 0 10px;
             border-radius: 8px;
             font-size: 12.5px;
             font-weight: 600;
@@ -169,7 +172,8 @@
             background: #fffbeb;
             border: 1px solid #fde68a;
             color: #b45309;
-            padding: 6px 14px;
+            padding: 0 14px;
+            height: 36px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 700;
@@ -190,26 +194,33 @@
             padding-top: 55px;
         }
 
-        /* Notebook Paper Style */
+        /* Notebook Paper Style with Aligned Ruled Lines */
         .notebook-paper {
             width: 100%;
             max-width: 980px;
-            background: var(--paper-bg);
+            background-color: var(--paper-bg);
             border-radius: 8px;
             box-shadow: 2px 4px 24px rgba(0, 0, 0, 0.09), 0 0 0 1px #e2dac9;
-            padding: 40px 36px 60px 70px;
+            padding: 30px 32px 60px 68px; /* Aligned with red margin line */
             position: relative;
-            background-image: repeating-linear-gradient(var(--paper-bg) 0px, var(--paper-bg) 31px, var(--line-color) 32px);
-            line-height: 32px;
+            /* Perfectly synced ruled lines */
+            background-image: repeating-linear-gradient(
+                transparent 0px,
+                transparent calc(var(--line-height-val) - 1px),
+                var(--line-color) calc(var(--line-height-val) - 1px),
+                var(--line-color) var(--line-height-val)
+            );
+            background-size: 100% var(--line-height-val);
+            line-height: var(--line-height-val);
         }
 
-        /* Red margin line */
+        /* Red margin line - precisely aligned */
         .notebook-paper::before {
             content: '';
             position: absolute;
             top: 0;
             bottom: 0;
-            left: 50px;
+            left: 48px;
             width: 2px;
             background-color: var(--margin-line);
         }
@@ -221,28 +232,30 @@
             font-family: 'Inter', sans-serif;
             font-size: 13.5px;
             color: #64748b;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             border-bottom: 1px solid #e2dac9;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            line-height: normal;
         }
 
         /* Typing Area Engine */
         .typing-container {
             position: relative;
-            min-height: 300px;
+            min-height: 320px;
             cursor: text;
         }
 
-        /* Ghost & Typed Layer */
+        /* Ghost & Typed Layer - Perfectly baseline aligned */
         .display-stream {
             font-family: 'Caveat', cursive;
-            font-size: 27px;
+            font-size: 26px;
             letter-spacing: 0.5px;
             white-space: pre-wrap;
             word-break: break-word;
-            line-height: 32px;
+            line-height: var(--line-height-val);
             user-select: none;
             pointer-events: none;
+            display: inline;
         }
 
         .char-typed {
@@ -259,14 +272,16 @@
             border-radius: 2px;
             text-decoration: underline wavy #ef4444;
         }
+
+        /* Caret precisely positioned at baseline */
         .caret {
-            border-left: 3px solid #ef4444;
+            border-left: 2.5px solid #ef4444;
             animation: blink 0.9s infinite;
-            margin-left: -1px;
-            margin-right: -1px;
+            margin-left: 0px;
+            margin-right: 1px;
             display: inline-block;
-            height: 25px;
-            vertical-align: middle;
+            height: 26px;
+            vertical-align: -3px;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
@@ -340,14 +355,14 @@
         .fab-peek:hover { transform: scale(1.08); background: #f59e0b; color: #fff; }
         .fab-peek svg { width: 26px; height: 26px; stroke: currentColor; fill: none; }
 
-        /* ON-SCREEN QWERTY KEYBOARD (ANDROID STYLE) */
+        /* ON-SCREEN QWERTY KEYBOARD (ALIGNED ANDROID GBOARD STYLE) */
         .osk-container {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: #cbd5e1;
-            padding: 8px 8px 14px 8px;
+            padding: 8px 10px 14px 10px;
             box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
             display: none;
             flex-direction: column;
@@ -376,13 +391,14 @@
         .osk-row {
             display: flex;
             justify-content: center;
+            align-items: center;
             gap: 5px;
             width: 100%;
         }
 
         .osk-key {
             flex: 1;
-            max-width: 74px;
+            max-width: 76px;
             height: 48px;
             background: #ffffff;
             border: 1px solid #94a3b8;
@@ -454,6 +470,7 @@
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             font-family: 'Inter', sans-serif;
             animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            line-height: normal;
         }
         @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .coin-icon-huge {
@@ -466,9 +483,11 @@
         /* Mobile adjustments */
         @media (max-width: 640px) {
             .top-nav { padding: 10px 14px 10px 56px; }
-            .notebook-paper { padding: 24px 14px 40px 38px; }
+            .notebook-paper { padding: 20px 14px 36px 36px; }
             .notebook-paper::before { left: 24px; }
-            .display-stream { font-size: 22px; line-height: 32px; }
+            :root { --line-height-val: 32px; }
+            .display-stream { font-size: 21px; }
+            .caret { height: 22px; }
             .osk-key { height: 44px; font-size: 14.5px; }
             .fab-peek { bottom: 16px; right: 16px; }
             body.has-osk { padding-bottom: 270px; }
@@ -1108,16 +1127,13 @@
             const typedPart = targetText.slice(0, currentIndex);
             const remainingPart = targetText.slice(currentIndex);
 
-            // Tinta biru tulisan tangan
             const typedSpan = document.createElement('span');
             typedSpan.className = 'char-typed';
             typedSpan.textContent = typedPart;
 
-            // Caret kedip
             const caret = document.createElement('span');
             caret.className = 'caret';
 
-            // Ghost text 25% opacity
             const ghostSpan = document.createElement('span');
             ghostSpan.className = 'char-ghost';
             ghostSpan.textContent = remainingPart;
@@ -1126,7 +1142,6 @@
             if (!isCompleted) container.appendChild(caret);
             container.appendChild(ghostSpan);
 
-            // Auto-scroll follow caret
             caret.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
@@ -1146,14 +1161,12 @@
             }
         }
 
-        // Normalisasi Dash/Kutipan agar sesuai antara teks & tombol keyboard
         function normalizeChar(c) {
             if (c === '’' || c === '‘') return "'";
             if (c === '“' || c === '”') return '"';
             return c;
         }
 
-        // Shared Typing Processor (Untuk Hardware & On-Screen Keyboard)
         function processInputChar(char) {
             if (isCompleted) return;
 
@@ -1164,7 +1177,6 @@
             const expectedChar = normalizeChar(rawExpected);
             const inputChar = normalizeChar(char);
 
-            // Cocokkan langsung atau alternatif dash (en-dash '–', em-dash '—', hyphen '-')
             const isMatch = (inputChar === expectedChar) || 
                             (['-', '–', '—'].includes(inputChar) && ['-', '–', '—'].includes(rawExpected));
 
@@ -1235,7 +1247,6 @@
             focusInput();
         }
 
-        // Hardware Keyboard Listener
         window.addEventListener('keydown', (e) => {
             if (isCompleted) return;
 
@@ -1261,7 +1272,6 @@
             }
         });
 
-        // ON-SCREEN KEYBOARD LOGIC (ANDROID / GBOARD REPLICA)
         function initOSK() {
             const osk = document.getElementById('osk-keyboard');
             
@@ -1288,7 +1298,6 @@
                     return;
                 }
 
-                // Layout Switcher (Persis Android)
                 if (action === 'to-sym1') {
                     switchLayout('layout-sym1');
                     return;
@@ -1305,7 +1314,7 @@
                 if (char) {
                     if (isShiftActive && /^[a-z]$/i.test(char)) {
                         char = char.toUpperCase();
-                        toggleShift(false); // Reset shift after character
+                        toggleShift(false);
                     }
                     processInputChar(char);
                 }
@@ -1366,7 +1375,6 @@
             });
         }
 
-        // Peek Modal Handler
         function openPeekModal(e) {
             if (e) e.stopPropagation();
             const rawWorkspace = localStorage.getItem(STORAGE_WORKSPACE_KEY);
