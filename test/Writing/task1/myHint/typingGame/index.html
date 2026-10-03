@@ -1,1 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Retype Practice - Band 9</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@300;400;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --paper-bg: #fefcf3;
+            --line-color: #e5dfd3;
+            --margin-line: #fca5a5;
+            --ink-blue: #1e3a8a;
+            --ink-ghost: rgba(30, 58, 138, 0.25);
+            --ink-error: #ef4444;
+            --primary: #4f46e5;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background: #ede8dc;
+            font-family: 'Kalam', cursive;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            color: #1e293b;
+        }
+
+        /* Top Bar */
+        .top-nav {
+            background: #ffffff;
+            border-bottom: 2px dashed #d1c7b7;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            z-index: 100;
+        }
+        .top-nav .title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #4338ca;
+        }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            color: #334155;
+        }
+        .btn-action:hover { background: #f8fafc; border-color: #94a3b8; }
+        .btn-peek {
+            background: #fef08a;
+            border-color: #facc15;
+            color: #854d0e;
+        }
+        .btn-peek:hover { background: #fde047; }
+
+        .coin-pill {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #b45309;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Handwritten Desk Layout */
+        .desk-workspace {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        /* Notebook Paper Style */
+        .notebook-paper {
+            width: 100%;
+            max-width: 860px;
+            background: var(--paper-bg);
+            border-radius: 4px;
+            box-shadow: 2px 3px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px #e2dac9;
+            padding: 40px 40px 60px 70px;
+            position: relative;
+            background-image: repeating-linear-gradient(var(--paper-bg) 0px, var(--paper-bg) 31px, var(--line-color) 32px);
+            line-height: 32px;
+        }
+
+        /* Red margin line */
+        .notebook-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50px;
+            width: 2px;
+            background-color: var(--margin-line);
+        }
+
+        /* Stats Sub-bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e2dac9;
+            padding-bottom: 8px;
+        }
+
+        /* Typing Area Engine */
+        .typing-container {
+            position: relative;
+            min-height: 380px;
+            cursor: text;
+        }
+
+        /* Ghost & Typed Layer */
+        .display-stream {
+            font-family: 'Caveat', cursive;
+            font-size: 26px;
+            letter-spacing: 0.5px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 32px;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .char-typed {
+            color: var(--ink-blue);
+            font-weight: 700;
+        }
+        .char-ghost {
+            color: var(--ink-ghost);
+            font-weight: 600;
+        }
+        .char-error {
+            color: var(--ink-error);
+            background: #fee2e2;
+            border-radius: 2px;
+            text-decoration: underline wavy #ef4444;
+        }
+        .caret {
+            border-left: 2px solid #ef4444;
+            animation: blink 0.9s infinite;
+            margin-left: -1px;
+            margin-right: -1px;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Hidden functional input */
+        #hidden-input {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+        }
+
+        /* Peek Modal for Graph Diagram */
+        .peek-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .peek-modal {
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
+            max-width: 90vw;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+        .peek-modal img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .peek-footer {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+        }
+
+        /* Floating Peek Image Button */
+        .fab-peek {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 54px;
+            height: 54px;
+            background: #fbbf24;
+            color: #78350f;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 500;
+            transition: all 0.2s;
+        }
+        .fab-peek:hover { transform: scale(1.1); background: #f59e0b; color: #fff; }
+        .fab-peek svg { width: 26px; height: 26px; stroke: currentColor; fill: none; }
+
+        /* Reward Modal */
+        .reward-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .reward-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            font-family: 'Inter', sans-serif;
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .coin-icon-huge {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            filter: drop-shadow(0 4px 6px rgba(245, 158, 11, 0.3));
+        }
+
+        /* Mobile adaptation */
+        @media (max-width: 640px) {
+            .notebook-paper { padding: 30px 15px 40px 35px; }
+            .notebook-paper::before { left: 25px; }
+            .display-stream { font-size: 21px; line-height: 32px; }
+        }
+    </style>
+</head>
+<body onclick="focusInput()">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <div class="title-group">
+            <a href="../index.html" class="btn-action" title="Back to Hints">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Hint
+            </a>
+            <span>✍️ Handwritten Retype Mode</span>
+        </div>
+
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <div class="coin-pill">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 1 0-5H12"></path></svg>
+                <span id="user-coins">0</span>
+            </div>
+            <button class="btn-action btn-peek" onclick="openPeekModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                Peek Graph
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Desk -->
+    <div class="desk-workspace">
+        <div class="notebook-paper">
+            <div class="stats-bar">
+                <span>Progress: <b id="progress-percent">0%</b></span>
+                <span>Accuracy: <b id="accuracy-stat">100%</b></span>
+                <span>Remaining: <b id="chars-remaining">0 chars</b></span>
+            </div>
+
+            <!-- The Typing Canvas Layer -->
+            <div class="typing-container">
+                <div id="text-display" class="display-stream">Loading model answer...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden input to capture physical/mobile keyboard -->
+    <input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+
+    <!-- Floating Quick-Peek Button -->
+    <button class="fab-peek" onclick="openPeekModal()" title="Peek Graph / Diagram">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+    </button>
+
+    <!-- Peek Image Modal -->
+    <div class="peek-overlay" id="peek-overlay" onclick="closePeekModal(event)">
+        <div class="peek-modal" onclick="event.stopPropagation()">
+            <img id="peek-img" src="" alt="Graph Diagram">
+            <div class="peek-footer">
+                <span style="color: #64748b;">Click outside or Esc to close & continue typing</span>
+                <button class="btn-action" onclick="closePeekModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory 100 Gold Coins Modal -->
+    <div class="reward-overlay" id="reward-overlay">
+        <div class="reward-card">
+            <svg class="coin-icon-huge" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 1 0-5H12"></path>
+            </svg>
+            <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Magnificent! 🏆</h2>
+            <p style="font-size: 14px; color: #475569; margin-bottom: 18px;">
+                You successfully retyped the whole Band 9 Model Answer with high muscle memory!
+            </p>
+            <div style="background: #fef3c7; border: 1px dashed #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
+                <span style="font-size: 13px; color: #92400e; font-weight: 600;">Reward Claimed:</span>
+                <div style="font-size: 26px; font-weight: 800; color: #b45309;">+100 Gold Coins</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-action" style="flex:1;" onclick="restartRetype()">Retype Again</button>
+                <a href="../index.html" class="btn-action btn-peek" style="flex:1; justify-content:center;">Back to Hint</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_HINT_KEY = 'ielts_writing_task1_ai_hint';
+        const STORAGE_WORKSPACE_KEY = 'ielts_writing_task1_workspace';
+        const STORAGE_COIN_KEY = 'ielts_user_gold_coins';
+
+        let targetText = "";
+        let currentIndex = 0;
+        let errorsCount = 0;
+        let totalTypedCount = 0;
+        let isCompleted = false;
+
+        function loadCoins() {
+            const coins = parseInt(localStorage.getItem(STORAGE_COIN_KEY) || "0", 10);
+            document.getElementById('user-coins').innerText = coins;
+        }
+
+        function addCoins(amount) {
+            let coins = parseInt(localStorage.getItem(STORAGE_COIN_KEY) || "0", 10);
+            coins += amount;
+            localStorage.setItem(STORAGE_COIN_KEY, coins);
+            document.getElementById('user-coins').innerText = coins;
+        }
+
+        function loadModelAnswer() {
+            const rawHint = localStorage.getItem(STORAGE_HINT_KEY);
+            if (rawHint) {
+                try {
+                    const parsed = JSON.parse(rawHint);
+                    targetText = (parsed.full || "").trim();
+                } catch(e) {}
+            }
+
+            // Fallback jika belum ada yang di-paste di hint
+            if (!targetText) {
+                targetText = "Please go back to AI Hint and paste a Band 9 Model Answer first!";
+            }
+
+            renderDisplay();
+            updateStats();
+        }
+
+        function renderDisplay() {
+            const container = document.getElementById('text-display');
+            container.innerHTML = "";
+
+            const typedPart = targetText.slice(0, currentIndex);
+            const remainingPart = targetText.slice(currentIndex);
+
+            // Lapisan huruf yang sudah diketik (Tinta biru tebal)
+            const typedSpan = document.createElement('span');
+            typedSpan.className = 'char-typed';
+            typedSpan.textContent = typedPart;
+
+            // Caret kedip
+            const caret = document.createElement('span');
+            caret.className = 'caret';
+
+            // Lapisan bayangan tulisan berikutnya (Ghost text opacity 25%)
+            const ghostSpan = document.createElement('span');
+            ghostSpan.className = 'char-ghost';
+            ghostSpan.textContent = remainingPart;
+
+            container.appendChild(typedSpan);
+            if (!isCompleted) container.appendChild(caret);
+            container.appendChild(ghostSpan);
+        }
+
+        function updateStats() {
+            const total = targetText.length;
+            const progress = total > 0 ? Math.round((currentIndex / total) * 100) : 0;
+            document.getElementById('progress-percent').innerText = `${progress}%`;
+            document.getElementById('chars-remaining').innerText = `${total - currentIndex} chars`;
+
+            const accuracy = totalTypedCount > 0 
+                ? Math.max(0, Math.round(((totalTypedCount - errorsCount) / totalTypedCount) * 100))
+                : 100;
+            document.getElementById('accuracy-stat').innerText = `${accuracy}%`;
+        }
+
+        // Listener Keyboard
+        window.addEventListener('keydown', (e) => {
+            if (isCompleted) return;
+
+            // Abaikan tombol modifier
+            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+
+            if (e.key === 'Escape') {
+                closePeekModal();
+                return;
+            }
+
+            if (e.key === 'Backspace') {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    renderDisplay();
+                    updateStats();
+                }
+                e.preventDefault();
+                return;
+            }
+
+            // Normalisasi Enter key
+            let key = e.key;
+            if (key === 'Enter') key = '\n';
+
+            // Cek kesesuaian karakter target
+            if (key.length === 1 || key === '\n') {
+                totalTypedCount++;
+                const expectedChar = targetText[currentIndex];
+
+                if (key === expectedChar) {
+                    currentIndex++;
+                    renderDisplay();
+                    updateStats();
+
+                    // Cek jika sudah tamat
+                    if (currentIndex >= targetText.length) {
+                        finishGame();
+                    }
+                } else {
+                    errorsCount++;
+                    updateStats();
+                    flashError();
+                }
+                e.preventDefault();
+            }
+        });
+
+        function flashError() {
+            const paper = document.querySelector('.notebook-paper');
+            paper.style.boxShadow = "0 0 0 3px #ef4444";
+            setTimeout(() => {
+                paper.style.boxShadow = "2px 3px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px #e2dac9";
+            }, 180);
+        }
+
+        function finishGame() {
+            isCompleted = true;
+            renderDisplay();
+            addCoins(100);
+
+            // Confetti Cannon
+            try {
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+            } catch(e) {}
+
+            document.getElementById('reward-overlay').style.display = 'flex';
+        }
+
+        function restartRetype() {
+            currentIndex = 0;
+            errorsCount = 0;
+            totalTypedCount = 0;
+            isCompleted = false;
+            document.getElementById('reward-overlay').style.display = 'none';
+            renderDisplay();
+            updateStats();
+            focusInput();
+        }
+
+        function focusInput() {
+            document.getElementById('hidden-input').focus();
+        }
+
+        // Peek Modal Handler
+        function openPeekModal() {
+            const rawWorkspace = localStorage.getItem(STORAGE_WORKSPACE_KEY);
+            let imgSrc = "";
+            if (rawWorkspace) {
+                try {
+                    const parsed = JSON.parse(rawWorkspace);
+                    imgSrc = parsed.image || "";
+                } catch(e) {}
+            }
+
+            const imgEl = document.getElementById('peek-img');
+            if (imgSrc && imgSrc.length > 20) {
+                imgEl.src = imgSrc;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+                alert("No image uploaded yet in Writing Workspace!");
+                return;
+            }
+            document.getElementById('peek-overlay').style.display = 'flex';
+        }
+
+        function closePeekModal(e) {
+            document.getElementById('peek-overlay').style.display = 'none';
+            focusInput();
+        }
+
+        window.onload = () => {
+            loadCoins();
+            loadModelAnswer();
+            focusInput();
+        };
+    </script>
+</body>
+</html>
