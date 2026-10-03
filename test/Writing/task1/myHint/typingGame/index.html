@@ -16,7 +16,7 @@
             --ink-ghost: rgba(30, 58, 138, 0.25);
             --ink-error: #ef4444;
             --primary: #4f46e5;
-            --kb-bg: #e2e8f0;
+            --kb-bg: #cbd5e1;
             --key-bg: #ffffff;
             --key-active: #cbd5e1;
             --key-text: #1e293b;
@@ -45,7 +45,7 @@
         .top-nav {
             background: #ffffff;
             border-bottom: 2px dashed #d1c7b7;
-            padding: 12px 24px 12px 64px; /* Space for float toggle button */
+            padding: 12px 24px 12px 64px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -340,22 +340,22 @@
         .fab-peek:hover { transform: scale(1.08); background: #f59e0b; color: #fff; }
         .fab-peek svg { width: 26px; height: 26px; stroke: currentColor; fill: none; }
 
-        /* ON-SCREEN QWERTY KEYBOARD (FULL WIDTH & LEGA) */
+        /* ON-SCREEN QWERTY KEYBOARD (ANDROID STYLE) */
         .osk-container {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: #cbd5e1;
-            padding: 10px 10px 16px 10px;
+            padding: 8px 8px 14px 8px;
             box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
             display: none;
             flex-direction: column;
-            gap: 7px;
+            gap: 6px;
             z-index: 1500;
             font-family: 'Inter', system-ui, sans-serif;
             border-top: 1px solid #94a3b8;
-            max-width: 1000px;
+            max-width: 960px;
             margin: 0 auto;
             border-radius: 14px 14px 0 0;
         }
@@ -363,16 +363,26 @@
             display: flex;
         }
 
+        .osk-layout {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+        .osk-layout.active {
+            display: flex;
+        }
+
         .osk-row {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             width: 100%;
         }
 
         .osk-key {
             flex: 1;
-            max-width: 68px;
+            max-width: 74px;
             height: 48px;
             background: #ffffff;
             border: 1px solid #94a3b8;
@@ -384,7 +394,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 2.5px 0 #94a3b8;
+            box-shadow: 0 2px 0 #94a3b8;
             touch-action: manipulation;
             user-select: none;
             transition: all 0.08s ease;
@@ -400,7 +410,7 @@
             color: #ffffff;
             font-size: 13.5px;
             font-weight: 700;
-            max-width: 88px;
+            max-width: 90px;
         }
         .osk-key.special.active {
             background: #4f46e5;
@@ -408,16 +418,16 @@
             border-color: #3730a3;
         }
         .osk-key.space {
-            flex: 5;
+            flex: 4;
             max-width: 380px;
         }
         .osk-key.enter {
-            flex: 1.8;
-            max-width: 96px;
+            flex: 1.6;
+            max-width: 92px;
             background: #10b981;
             color: white;
             border-color: #059669;
-            box-shadow: 0 2.5px 0 #059669;
+            box-shadow: 0 2px 0 #059669;
         }
         .osk-key.enter:active {
             box-shadow: 0 0 0 #059669;
@@ -459,9 +469,9 @@
             .notebook-paper { padding: 24px 14px 40px 38px; }
             .notebook-paper::before { left: 24px; }
             .display-stream { font-size: 22px; line-height: 32px; }
-            .osk-key { height: 42px; font-size: 14px; max-width: 54px; }
+            .osk-key { height: 44px; font-size: 14.5px; }
             .fab-peek { bottom: 16px; right: 16px; }
-            body.has-osk { padding-bottom: 260px; }
+            body.has-osk { padding-bottom: 270px; }
         }
     </style>
 </head>
@@ -558,78 +568,163 @@
         </svg>
     </button>
 
-    <!-- ON-SCREEN FULL QWERTY KEYBOARD -->
+    <!-- ON-SCREEN ANDROID GBOARD STYLE KEYBOARD -->
     <div class="osk-container" id="osk-keyboard">
-        <!-- Row 1: Numbers & Symbols -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="1">1</button>
-            <button type="button" class="osk-key" data-key="2">2</button>
-            <button type="button" class="osk-key" data-key="3">3</button>
-            <button type="button" class="osk-key" data-key="4">4</button>
-            <button type="button" class="osk-key" data-key="5">5</button>
-            <button type="button" class="osk-key" data-key="6">6</button>
-            <button type="button" class="osk-key" data-key="7">7</button>
-            <button type="button" class="osk-key" data-key="8">8</button>
-            <button type="button" class="osk-key" data-key="9">9</button>
-            <button type="button" class="osk-key" data-key="0">0</button>
-            <button type="button" class="osk-key" data-key="%">%</button>
-            <button type="button" class="osk-key special" data-action="backspace">⌫ Del</button>
+        
+        <!-- 1. ALPHA MODE (QWERTY) -->
+        <div class="osk-layout active" id="layout-alpha">
+            <!-- Row 1: Numbers quick access -->
+            <div class="osk-row">
+                <button type="button" class="osk-key" data-key="1">1</button>
+                <button type="button" class="osk-key" data-key="2">2</button>
+                <button type="button" class="osk-key" data-key="3">3</button>
+                <button type="button" class="osk-key" data-key="4">4</button>
+                <button type="button" class="osk-key" data-key="5">5</button>
+                <button type="button" class="osk-key" data-key="6">6</button>
+                <button type="button" class="osk-key" data-key="7">7</button>
+                <button type="button" class="osk-key" data-key="8">8</button>
+                <button type="button" class="osk-key" data-key="9">9</button>
+                <button type="button" class="osk-key" data-key="0">0</button>
+            </div>
+            <!-- Row 2: QWERTYUIOP -->
+            <div class="osk-row">
+                <button type="button" class="osk-key letter" data-key="q">q</button>
+                <button type="button" class="osk-key letter" data-key="w">w</button>
+                <button type="button" class="osk-key letter" data-key="e">e</button>
+                <button type="button" class="osk-key letter" data-key="r">r</button>
+                <button type="button" class="osk-key letter" data-key="t">t</button>
+                <button type="button" class="osk-key letter" data-key="y">y</button>
+                <button type="button" class="osk-key letter" data-key="u">u</button>
+                <button type="button" class="osk-key letter" data-key="i">i</button>
+                <button type="button" class="osk-key letter" data-key="o">o</button>
+                <button type="button" class="osk-key letter" data-key="p">p</button>
+            </div>
+            <!-- Row 3: ASDFGHJKL -->
+            <div class="osk-row">
+                <button type="button" class="osk-key letter" data-key="a">a</button>
+                <button type="button" class="osk-key letter" data-key="s">s</button>
+                <button type="button" class="osk-key letter" data-key="d">d</button>
+                <button type="button" class="osk-key letter" data-key="f">f</button>
+                <button type="button" class="osk-key letter" data-key="g">g</button>
+                <button type="button" class="osk-key letter" data-key="h">h</button>
+                <button type="button" class="osk-key letter" data-key="j">j</button>
+                <button type="button" class="osk-key letter" data-key="k">k</button>
+                <button type="button" class="osk-key letter" data-key="l">l</button>
+            </div>
+            <!-- Row 4: SHIFT + ZXCVBNM + DEL -->
+            <div class="osk-row">
+                <button type="button" class="osk-key special" id="osk-shift-btn" data-action="shift">⇧</button>
+                <button type="button" class="osk-key letter" data-key="z">z</button>
+                <button type="button" class="osk-key letter" data-key="x">x</button>
+                <button type="button" class="osk-key letter" data-key="c">c</button>
+                <button type="button" class="osk-key letter" data-key="v">v</button>
+                <button type="button" class="osk-key letter" data-key="b">b</button>
+                <button type="button" class="osk-key letter" data-key="n">n</button>
+                <button type="button" class="osk-key letter" data-key="m">m</button>
+                <button type="button" class="osk-key special" data-action="backspace">⌫</button>
+            </div>
+            <!-- Row 5: ?123, Comma, Space, Period, Enter -->
+            <div class="osk-row">
+                <button type="button" class="osk-key special" data-action="to-sym1">?123</button>
+                <button type="button" class="osk-key" data-key=",">,</button>
+                <button type="button" class="osk-key space" data-key=" ">Space</button>
+                <button type="button" class="osk-key" data-key=".">.</button>
+                <button type="button" class="osk-key enter" data-action="enter">↵</button>
+            </div>
         </div>
 
-        <!-- Row 2: QWERTY -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="q">q</button>
-            <button type="button" class="osk-key" data-key="w">w</button>
-            <button type="button" class="osk-key" data-key="e">e</button>
-            <button type="button" class="osk-key" data-key="r">r</button>
-            <button type="button" class="osk-key" data-key="t">t</button>
-            <button type="button" class="osk-key" data-key="y">y</button>
-            <button type="button" class="osk-key" data-key="u">u</button>
-            <button type="button" class="osk-key" data-key="i">i</button>
-            <button type="button" class="osk-key" data-key="o">o</button>
-            <button type="button" class="osk-key" data-key="p">p</button>
-            <button type="button" class="osk-key" data-key="-">-</button>
+        <!-- 2. SYMBOL 1 MODE (?123) -->
+        <div class="osk-layout" id="layout-sym1">
+            <div class="osk-row">
+                <button type="button" class="osk-key" data-key="1">1</button>
+                <button type="button" class="osk-key" data-key="2">2</button>
+                <button type="button" class="osk-key" data-key="3">3</button>
+                <button type="button" class="osk-key" data-key="4">4</button>
+                <button type="button" class="osk-key" data-key="5">5</button>
+                <button type="button" class="osk-key" data-key="6">6</button>
+                <button type="button" class="osk-key" data-key="7">7</button>
+                <button type="button" class="osk-key" data-key="8">8</button>
+                <button type="button" class="osk-key" data-key="9">9</button>
+                <button type="button" class="osk-key" data-key="0">0</button>
+            </div>
+            <div class="osk-row">
+                <button type="button" class="osk-key" data-key="%">%</button>
+                <button type="button" class="osk-key" data-key="-">-</button>
+                <button type="button" class="osk-key" data-key="–" title="En-dash (range)">–</button>
+                <button type="button" class="osk-key" data-key="/" title="Slash">/</button>
+                <button type="button" class="osk-key" data-key=":" title="Colon">:</button>
+                <button type="button" class="osk-key" data-key=";" title="Semicolon">;</button>
+                <button type="button" class="osk-key" data-key="(">(</button>
+                <button type="button" class="osk-key" data-key=")">)</button>
+                <button type="button" class="osk-key" data-key="$">$</button>
+                <button type="button" class="osk-key" data-key="&">&</button>
+            </div>
+            <div class="osk-row">
+                <button type="button" class="osk-key special" data-action="to-sym2">=\&lt;</button>
+                <button type="button" class="osk-key" data-key="@">@</button>
+                <button type="button" class="osk-key" data-key='"' title='Double quote'>"</button>
+                <button type="button" class="osk-key" data-key="'" title="Single quote / apostrophe">'</button>
+                <button type="button" class="osk-key" data-key="!">!</button>
+                <button type="button" class="osk-key" data-key="?">?</button>
+                <button type="button" class="osk-key" data-key="#">#</button>
+                <button type="button" class="osk-key" data-key="*">*</button>
+                <button type="button" class="osk-key special" data-action="backspace">⌫</button>
+            </div>
+            <div class="osk-row">
+                <button type="button" class="osk-key special" data-action="to-alpha">ABC</button>
+                <button type="button" class="osk-key" data-key=",">,</button>
+                <button type="button" class="osk-key space" data-key=" ">Space</button>
+                <button type="button" class="osk-key" data-key=".">.</button>
+                <button type="button" class="osk-key enter" data-action="enter">↵</button>
+            </div>
         </div>
 
-        <!-- Row 3: ASDFGH -->
-        <div class="osk-row">
-            <button type="button" class="osk-key special" id="osk-shift-btn" data-action="shift">⇧ Shift</button>
-            <button type="button" class="osk-key" data-key="a">a</button>
-            <button type="button" class="osk-key" data-key="s">s</button>
-            <button type="button" class="osk-key" data-key="d">d</button>
-            <button type="button" class="osk-key" data-key="f">f</button>
-            <button type="button" class="osk-key" data-key="g">g</button>
-            <button type="button" class="osk-key" data-key="h">h</button>
-            <button type="button" class="osk-key" data-key="j">j</button>
-            <button type="button" class="osk-key" data-key="k">k</button>
-            <button type="button" class="osk-key" data-key="l">l</button>
-            <button type="button" class="osk-key" data-key=":">:</button>
-            <button type="button" class="osk-key enter" data-action="enter">↵ Enter</button>
+        <!-- 3. SYMBOL 2 MODE (=\< ADVANCED MATH/SYMBOLS) -->
+        <div class="osk-layout" id="layout-sym2">
+            <div class="osk-row">
+                <button type="button" class="osk-key" data-key="~">~</button>
+                <button type="button" class="osk-key" data-key="`">`</button>
+                <button type="button" class="osk-key" data-key="|">|</button>
+                <button type="button" class="osk-key" data-key="•">•</button>
+                <button type="button" class="osk-key" data-key="√">√</button>
+                <button type="button" class="osk-key" data-key="π">π</button>
+                <button type="button" class="osk-key" data-key="÷">÷</button>
+                <button type="button" class="osk-key" data-key="×">×</button>
+                <button type="button" class="osk-key" data-key="¶">¶</button>
+                <button type="button" class="osk-key" data-key="∆">∆</button>
+            </div>
+            <div class="osk-row">
+                <button type="button" class="osk-key" data-key="£">£</button>
+                <button type="button" class="osk-key" data-key="€">€</button>
+                <button type="button" class="osk-key" data-key="¥">¥</button>
+                <button type="button" class="osk-key" data-key="^">^</button>
+                <button type="button" class="osk-key" data-key="°">°</button>
+                <button type="button" class="osk-key" data-key="=">=</button>
+                <button type="button" class="osk-key" data-key="{">{</button>
+                <button type="button" class="osk-key" data-key="}">}</button>
+                <button type="button" class="osk-key" data-key="\">&bsol;</button>
+                <button type="button" class="osk-key" data-key="—" title="Em-dash">—</button>
+            </div>
+            <div class="osk-row">
+                <button type="button" class="osk-key special" data-action="to-sym1">?123</button>
+                <button type="button" class="osk-key" data-key="&lt;">&lt;</button>
+                <button type="button" class="osk-key" data-key="&gt;">&gt;</button>
+                <button type="button" class="osk-key" data-key="[">[</button>
+                <button type="button" class="osk-key" data-key="]">]</button>
+                <button type="button" class="osk-key" data-key="+">+</button>
+                <button type="button" class="osk-key" data-key="_">_</button>
+                <button type="button" class="osk-key" data-key="§">§</button>
+                <button type="button" class="osk-key special" data-action="backspace">⌫</button>
+            </div>
+            <div class="osk-row">
+                <button type="button" class="osk-key special" data-action="to-alpha">ABC</button>
+                <button type="button" class="osk-key" data-key=",">,</button>
+                <button type="button" class="osk-key space" data-key=" ">Space</button>
+                <button type="button" class="osk-key" data-key=".">.</button>
+                <button type="button" class="osk-key enter" data-action="enter">↵</button>
+            </div>
         </div>
 
-        <!-- Row 4: ZXCVB & Punctuation -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="z">z</button>
-            <button type="button" class="osk-key" data-key="x">x</button>
-            <button type="button" class="osk-key" data-key="c">c</button>
-            <button type="button" class="osk-key" data-key="v">v</button>
-            <button type="button" class="osk-key" data-key="b">b</button>
-            <button type="button" class="osk-key" data-key="n">n</button>
-            <button type="button" class="osk-key" data-key="m">m</button>
-            <button type="button" class="osk-key" data-key=",">,</button>
-            <button type="button" class="osk-key" data-key=".">.</button>
-            <button type="button" class="osk-key" data-key="(">(</button>
-            <button type="button" class="osk-key" data-key=")">)</button>
-        </div>
-
-        <!-- Row 5: Space & Secondary punctuation -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="'">'</button>
-            <button type="button" class="osk-key" data-key='"'>"</button>
-            <button type="button" class="osk-key space" data-key=" ">Space</button>
-            <button type="button" class="osk-key" data-key=";">;</button>
-            <button type="button" class="osk-key" data-key="/">/</button>
-        </div>
     </div>
 
     <!-- Peek Image Modal -->
@@ -729,7 +824,6 @@
             } else {
                 nav.classList.add('hidden-toolbar');
                 document.body.classList.add('toolbar-closed');
-                // Eye/Expand icon
                 icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
                 Toast.fire({ icon: 'info', title: 'Toolbar hidden (Zen Mode)' });
             }
@@ -1047,10 +1141,16 @@
                 : 100;
             document.getElementById('accuracy-stat').innerText = `${accuracy}%`;
 
-            // Auto-save silently every 5 characters typed
             if (currentIndex % 5 === 0 && currentIndex > 0) {
                 saveProgress(false);
             }
+        }
+
+        // Normalisasi Dash/Kutipan agar sesuai antara teks & tombol keyboard
+        function normalizeChar(c) {
+            if (c === '’' || c === '‘') return "'";
+            if (c === '“' || c === '”') return '"';
+            return c;
         }
 
         // Shared Typing Processor (Untuk Hardware & On-Screen Keyboard)
@@ -1060,9 +1160,15 @@
             totalTypedCount++;
             playTypingSound();
 
-            const expectedChar = targetText[currentIndex];
+            const rawExpected = targetText[currentIndex];
+            const expectedChar = normalizeChar(rawExpected);
+            const inputChar = normalizeChar(char);
 
-            if (char === expectedChar) {
+            // Cocokkan langsung atau alternatif dash (en-dash '–', em-dash '—', hyphen '-')
+            const isMatch = (inputChar === expectedChar) || 
+                            (['-', '–', '—'].includes(inputChar) && ['-', '–', '—'].includes(rawExpected));
+
+            if (isMatch) {
                 currentIndex++;
                 renderDisplay();
                 updateStats();
@@ -1099,7 +1205,7 @@
             isCompleted = true;
             renderDisplay();
             addCoins(100);
-            localStorage.removeItem(STORAGE_PROGRESS_KEY); // Clear progress when completed
+            localStorage.removeItem(STORAGE_PROGRESS_KEY);
 
             try {
                 confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
@@ -1155,7 +1261,7 @@
             }
         });
 
-        // ON-SCREEN KEYBOARD LOGIC
+        // ON-SCREEN KEYBOARD LOGIC (ANDROID / GBOARD REPLICA)
         function initOSK() {
             const osk = document.getElementById('osk-keyboard');
             
@@ -1182,10 +1288,24 @@
                     return;
                 }
 
+                // Layout Switcher (Persis Android)
+                if (action === 'to-sym1') {
+                    switchLayout('layout-sym1');
+                    return;
+                }
+                if (action === 'to-sym2') {
+                    switchLayout('layout-sym2');
+                    return;
+                }
+                if (action === 'to-alpha') {
+                    switchLayout('layout-alpha');
+                    return;
+                }
+
                 if (char) {
                     if (isShiftActive && /^[a-z]$/i.test(char)) {
                         char = char.toUpperCase();
-                        toggleShift(false);
+                        toggleShift(false); // Reset shift after character
                     }
                     processInputChar(char);
                 }
@@ -1197,6 +1317,12 @@
             } else {
                 setOSKState(false);
             }
+        }
+
+        function switchLayout(layoutId) {
+            document.querySelectorAll('.osk-layout').forEach(l => l.classList.remove('active'));
+            const target = document.getElementById(layoutId);
+            if (target) target.classList.add('active');
         }
 
         function toggleOSK(e) {
@@ -1229,9 +1355,9 @@
         function toggleShift(forcedState) {
             isShiftActive = forcedState !== undefined ? forcedState : !isShiftActive;
             const shiftBtn = document.getElementById('osk-shift-btn');
-            shiftBtn.classList.toggle('active', isShiftActive);
+            if (shiftBtn) shiftBtn.classList.toggle('active', isShiftActive);
 
-            const letterKeys = document.querySelectorAll('.osk-key[data-key]');
+            const letterKeys = document.querySelectorAll('.osk-key.letter');
             letterKeys.forEach(k => {
                 const raw = k.getAttribute('data-key');
                 if (/^[a-zA-Z]$/.test(raw)) {
