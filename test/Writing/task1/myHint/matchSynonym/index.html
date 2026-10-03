@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Match Synonym & Flow Game - IELTS Task 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kalam:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            user-select: none;
+            transition: padding-top 0.25s ease;
+        }
+
+        /* Top Navigation & Collapsible Toolbar */
+        .top-nav {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px 12px 64px; /* Space for toggle button */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            gap: 10px;
+            flex-wrap: wrap;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+        }
+
+        .top-nav.hidden-toolbar {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .nav-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Floating Toggle for Toolbar Menu */
+        .fab-toggle-toolbar {
+            position: fixed;
+            top: 10px;
+            left: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.2s;
+        }
+        .fab-toggle-toolbar:hover { background: #f8fafc; color: var(--primary); border-color: #818cf8; }
+        .fab-toggle-toolbar svg { width: 20px; height: 20px; stroke: currentColor; fill: none; }
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text-main);
+            transition: all 0.15s ease;
+            height: 36px;
+        }
+        button:hover { background: #f1f5f9; }
+        .btn-exit { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+        .btn-exit:hover { background: #fecaca; }
+        .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-toggle-sound {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: #475569;
+        }
+        .btn-toggle-sound.active {
+            background: #4f46e5;
+            border-color: #4338ca;
+            color: #ffffff;
+        }
+
+        .coin-pill {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #b45309;
+            padding: 0 14px;
+            height: 36px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Main Game Arena */
+        .game-arena {
+            flex: 1;
+            max-width: 1050px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            transition: padding-top 0.3s ease;
+        }
+        body.toolbar-closed .game-arena {
+            padding-top: 55px;
+        }
+
+        /* Status & Instructions Bar */
+        .status-header {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .instruction-text {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .instruction-text b { color: var(--text-main); }
+        .game-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .game-stats span b { color: var(--primary); }
+
+        /* Two Column Match Grid */
+        .match-columns-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .column-card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .column-header {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Interactive Cards */
+        .match-card {
+            background: #ffffff;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 52px;
+        }
+        .match-card:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+        }
+        .match-card.selected {
+            border-color: var(--primary);
+            background: #eef2ff;
+            color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+        .match-card.matched {
+            border-color: #a7f3d0;
+            background: #ecfdf5;
+            color: #065f46;
+            cursor: default;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.65;
+            text-decoration: line-through;
+            pointer-events: none;
+        }
+        .match-card.wrong {
+            border-color: #fca5a5;
+            background: #fee2e2;
+            color: #991b1b;
+            animation: shake 0.35s ease;
+        }
+
+        .badge-type {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #64748b;
+            white-space: nowrap;
+            font-weight: 700;
+            text-decoration: none !important;
+            display: inline-block;
+        }
+        .match-card.selected .badge-type {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        .match-card.matched .badge-type {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            background: #ffffff;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            .match-columns-container { grid-template-columns: 1fr; }
+            .match-card { padding: 12px 14px; font-size: 13.5px; }
+            .top-nav { padding: 10px 14px 10px 56px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Toggle Button for Toolbar Menu -->
+    <button class="fab-toggle-toolbar" id="btn-toggle-toolbar" onclick="toggleToolbarMenu(event)" title="Show / Hide Toolbar Menu">
+        <svg id="icon-toolbar-state" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <!-- Header Navigation -->
+    <div class="top-nav" id="top-nav-bar">
+        <div class="nav-title">
+            <span>🧩 Match Synonym & Flow Bank</span>
+        </div>
+        <div class="nav-actions">
+            <div class="coin-pill">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 1 0-5H12"></path></svg>
+                <span id="user-coins">0</span>
+            </div>
+
+            <!-- Sound Toggle Button -->
+            <button id="toggle-sound-btn" class="btn-toggle-sound active" onclick="toggleSound(event)" title="Toggle Sound Effects">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                <span id="toggle-sound-text">Sound: ON</span>
+            </button>
+
+            <button class="btn-primary" onclick="confirmRestartGame()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                Restart
+            </button>
+
+            <button class="btn-exit" onclick="closeMatchGame()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                Exit Game
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="game-arena">
+        <div class="status-header">
+            <div class="instruction-text">
+                Select an <b>Original Prompt / Base Term</b> on the left, then connect it to its <b>High-Level Synonyms & Flow</b> on the right!
+            </div>
+            <div class="game-stats">
+                <span>Matched: <b id="stat-matches">0</b> / <span id="stat-total">0</span></span>
+                <span>Tries: <b id="stat-tries">0</b></span>
+            </div>
+        </div>
+
+        <!-- 2 Column Arena -->
+        <div class="match-columns-container" id="match-container">
+            <!-- Left Column: Original / Base Terms -->
+            <div class="column-card-list">
+                <div class="column-header">
+                    <span>Original Prompt / Base Word</span>
+                    <span id="left-count">0 items</span>
+                </div>
+                <div id="left-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+
+            <!-- Right Column: High-Level Synonyms & Flow Variations -->
+            <div class="column-card-list">
+                <div class="column-header">
+                    <span>High-Level Synonyms & Connectors</span>
+                    <span id="right-count">0 items</span>
+                </div>
+                <div id="right-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+        </div>
+
+        <!-- Empty State if No Data in Field -->
+        <div class="empty-state" id="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <h3 style="color:#1e293b;">No Synonyms Found in Bank</h3>
+            <p style="font-size:14px; max-width:440px;">Please return to the AI Hint page and paste your synonyms bank formatted as: <br><code>• Original Term → Synonym 1, Synonym 2</code></p>
+            <button class="btn-primary" onclick="closeMatchGame()">Back to AI Hint</button>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_HINT_KEY = 'ielts_writing_task1_ai_hint';
+        const STORAGE_COIN_KEY = 'ielts_user_gold_coins';
+        const STORAGE_MATCH_PROGRESS_KEY = 'ielts_match_synonym_progress';
+        const STORAGE_MATCH_SOUND_KEY = 'ielts_match_synonym_sound';
+        const STORAGE_MATCH_TOOLBAR_KEY = 'ielts_match_synonym_toolbar';
+
+        let pairData = [];
+        let selectedLeft = null;
+        let selectedRight = null;
+        let matchedCount = 0;
+        let totalTries = 0;
+        let matchedIds = new Set();
+
+        let isSoundEnabled = true;
+        let isToolbarVisible = true;
+
+        // Web Audio API Synthesizer (No external mp3)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        // SweetAlert Toast Notification Helper
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1600,
+            timerProgressBar: true
+        });
+
+        function playTone(freq, type, duration) {
+            if (!isSoundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function playCorrectSound() {
+            playTone(523.25, 'sine', 0.12); // C5
+            setTimeout(() => playTone(659.25, 'sine', 0.2), 90); // E5
+        }
+
+        function playWrongSound() {
+            playTone(220, 'sawtooth', 0.18);
+        }
+
+        function toggleSound(e) {
+            if (e) e.stopPropagation();
+            setSoundState(!isSoundEnabled);
+            if (isSoundEnabled) playCorrectSound();
+        }
+
+        function setSoundState(enabled) {
+            isSoundEnabled = enabled;
+            localStorage.setItem(STORAGE_MATCH_SOUND_KEY, enabled ? 'true' : 'false');
+            const btn = document.getElementById('toggle-sound-btn');
+            const text = document.getElementById('toggle-sound-text');
+            if (enabled) {
+                btn.classList.add('active');
+                text.innerText = "Sound: ON";
+            } else {
+                btn.classList.remove('active');
+                text.innerText = "Sound: OFF";
+            }
+        }
+
+        function loadSoundPreference() {
+            const saved = localStorage.getItem(STORAGE_MATCH_SOUND_KEY);
+            setSoundState(saved !== 'false');
+        }
+
+        // Toolbar Zen Mode Toggle
+        function toggleToolbarMenu(e) {
+            if (e) e.stopPropagation();
+            setToolbarState(!isToolbarVisible);
+        }
+
+        function setToolbarState(visible) {
+            isToolbarVisible = visible;
+            localStorage.setItem(STORAGE_MATCH_TOOLBAR_KEY, visible ? 'true' : 'false');
+            const nav = document.getElementById('top-nav-bar');
+            const icon = document.getElementById('icon-toolbar-state');
+            if (visible) {
+                nav.classList.remove('hidden-toolbar');
+                document.body.classList.remove('toolbar-closed');
+                icon.innerHTML = '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+            } else {
+                nav.classList.add('hidden-toolbar');
+                document.body.classList.add('toolbar-closed');
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                Toast.fire({ icon: 'info', title: 'Toolbar hidden (Zen Mode)' });
+            }
+        }
+
+        function loadToolbarPreference() {
+            const saved = localStorage.getItem(STORAGE_MATCH_TOOLBAR_KEY);
+            setToolbarState(saved !== 'false');
+        }
+
+        function loadCoins() {
+            const coins = parseInt(localStorage.getItem(STORAGE_COIN_KEY) || "0", 10);
+            document.getElementById('user-coins').innerText = coins;
+        }
+
+        function addCoins(amount) {
+            let coins = parseInt(localStorage.getItem(STORAGE_COIN_KEY) || "0", 10);
+            coins += amount;
+            localStorage.setItem(STORAGE_COIN_KEY, coins);
+            document.getElementById('user-coins').innerText = coins;
+        }
+
+        function closeMatchGame() {
+            saveMatchProgress();
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage('CLOSE_MATCH_GAME', '*');
+            } else {
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Parse Synonym data from localStorage field
+        function extractPairsFromStorage() {
+            const rawHint = localStorage.getItem(STORAGE_HINT_KEY);
+            if (!rawHint) return [];
+
+            let text = "";
+            try {
+                const parsed = JSON.parse(rawHint);
+                text = parsed.synonyms || "";
+            } catch(e) {
+                return [];
+            }
+
+            if (!text.trim()) return [];
+
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            const pairs = [];
+
+            lines.forEach((line, idx) => {
+                let clean = line.replace(/^[-*•]\s*/, '').trim();
+
+                // Format: Original -> Synonym / Variation
+                if (clean.includes('→') || clean.includes('->') || clean.includes(':')) {
+                    let parts = clean.split(/→|->|:(.+)/).map(p => p ? p.trim() : '').filter(p => p.length > 0);
+                    if (parts.length >= 2) {
+                        pairs.push({
+                            id: `pair_${idx}`,
+                            original: parts[0],
+                            synonyms: parts[1]
+                        });
+                    }
+                }
+            });
+
+            return pairs;
+        }
+
+        function shuffle(array) {
+            return array.slice().sort(() => Math.random() - 0.5);
+        }
+
+        function saveMatchProgress() {
+            if (matchedCount > 0 && matchedCount < pairData.length) {
+                const progress = {
+                    matchedIds: Array.from(matchedIds),
+                    totalTries: totalTries,
+                    matchedCount: matchedCount,
+                    dataSignature: pairData.map(p => p.id).join(',')
+                };
+                localStorage.setItem(STORAGE_MATCH_PROGRESS_KEY, JSON.stringify(progress));
+            } else if (matchedCount >= pairData.length) {
+                localStorage.removeItem(STORAGE_MATCH_PROGRESS_KEY);
+            }
+        }
+
+        function checkAndResumeProgress() {
+            const raw = localStorage.getItem(STORAGE_MATCH_PROGRESS_KEY);
+            if (!raw) return false;
+
+            try {
+                const data = JSON.parse(raw);
+                const currentSig = pairData.map(p => p.id).join(',');
+                if (data.dataSignature === currentSig && data.matchedCount > 0 && data.matchedCount < pairData.length) {
+                    Swal.fire({
+                        title: 'Resume Match Session?',
+                        text: `You previously matched ${data.matchedCount} of ${pairData.length} pairs. Would you like to continue?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4f46e5',
+                        cancelButtonColor: '#94a3b8',
+                        confirmButtonText: 'Yes, Resume',
+                        cancelButtonText: 'Start Over'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            matchedIds = new Set(data.matchedIds || []);
+                            matchedCount = data.matchedCount || 0;
+                            totalTries = data.totalTries || 0;
+                            document.getElementById('stat-matches').innerText = matchedCount;
+                            document.getElementById('stat-tries').innerText = totalTries;
+
+                            // Apply matched state to rendered cards
+                            matchedIds.forEach(id => {
+                                const elL = document.getElementById(`left_${id}`);
+                                const elR = document.getElementById(`right_${id}`);
+                                if (elL) elL.classList.add('matched');
+                                if (elR) elR.classList.add('matched');
+                            });
+                            Toast.fire({ icon: 'success', title: 'Session resumed!' });
+                        } else {
+                            localStorage.removeItem(STORAGE_MATCH_PROGRESS_KEY);
+                        }
+                    });
+                    return true;
+                }
+            } catch(e) {}
+            return false;
+        }
+
+        function initGame() {
+            loadCoins();
+            loadSoundPreference();
+            loadToolbarPreference();
+            pairData = extractPairsFromStorage();
+
+            if (pairData.length === 0) {
+                document.getElementById('match-container').style.display = 'none';
+                document.getElementById('empty-state').style.display = 'flex';
+                return;
+            }
+
+            document.getElementById('match-container').style.display = 'grid';
+            document.getElementById('empty-state').style.display = 'none';
+
+            matchedCount = 0;
+            totalTries = 0;
+            matchedIds = new Set();
+            selectedLeft = null;
+            selectedRight = null;
+
+            document.getElementById('stat-matches').innerText = '0';
+            document.getElementById('stat-total').innerText = pairData.length;
+            document.getElementById('stat-tries').innerText = '0';
+            document.getElementById('left-count').innerText = `${pairData.length} items`;
+            document.getElementById('right-count').innerText = `${pairData.length} items`;
+
+            const leftList = document.getElementById('left-list');
+            const rightList = document.getElementById('right-list');
+            leftList.innerHTML = "";
+            rightList.innerHTML = "";
+
+            const shuffledLeft = shuffle(pairData);
+            const shuffledRight = shuffle(pairData);
+
+            shuffledLeft.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.id = `left_${item.id}`;
+                card.dataset.id = item.id;
+                card.dataset.side = 'left';
+                card.innerHTML = `<span>${item.original}</span><span class="badge-type">BASE</span>`;
+                card.onclick = () => onCardClick(card, 'left');
+                leftList.appendChild(card);
+            });
+
+            shuffledRight.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.id = `right_${item.id}`;
+                card.dataset.id = item.id;
+                card.dataset.side = 'right';
+                card.innerHTML = `<span>${item.synonyms}</span><span class="badge-type">VARIATION / FLOW</span>`;
+                card.onclick = () => onCardClick(card, 'right');
+                rightList.appendChild(card);
+            });
+
+            checkAndResumeProgress();
+        }
+
+        function onCardClick(card, side) {
+            if (card.classList.contains('matched')) return;
+
+            if (side === 'left') {
+                if (selectedLeft) selectedLeft.classList.remove('selected');
+                selectedLeft = card;
+                card.classList.add('selected');
+            } else {
+                if (selectedRight) selectedRight.classList.remove('selected');
+                selectedRight = card;
+                card.classList.add('selected');
+            }
+
+            // Both sides selected -> verify pair
+            if (selectedLeft && selectedRight) {
+                totalTries++;
+                document.getElementById('stat-tries').innerText = totalTries;
+
+                const leftId = selectedLeft.dataset.id;
+                const rightId = selectedRight.dataset.id;
+
+                if (leftId === rightId) {
+                    playCorrectSound();
+                    const elL = selectedLeft;
+                    const elR = selectedRight;
+                    elL.classList.remove('selected');
+                    elR.classList.remove('selected');
+                    elL.classList.add('matched');
+                    elR.classList.add('matched');
+
+                    matchedIds.add(leftId);
+                    selectedLeft = null;
+                    selectedRight = null;
+                    matchedCount++;
+                    document.getElementById('stat-matches').innerText = matchedCount;
+
+                    saveMatchProgress();
+
+                    if (matchedCount >= pairData.length) {
+                        finishMatchGame();
+                    }
+                } else {
+                    playWrongSound();
+                    const elL = selectedLeft;
+                    const elR = selectedRight;
+                    elL.classList.add('wrong');
+                    elR.classList.add('wrong');
+
+                    setTimeout(() => {
+                        elL.classList.remove('selected', 'wrong');
+                        elR.classList.remove('selected', 'wrong');
+                    }, 400);
+
+                    selectedLeft = null;
+                    selectedRight = null;
+                }
+            }
+        }
+
+        function finishMatchGame() {
+            addCoins(100);
+            localStorage.removeItem(STORAGE_MATCH_PROGRESS_KEY);
+
+            try {
+                confetti({ particleCount: 160, spread: 85, origin: { y: 0.6 } });
+            } catch(e) {}
+
+            Swal.fire({
+                title: 'Outstanding Match! 🏆',
+                html: `You paired all <b>${pairData.length}</b> synonym & flow groups successfully with great lexical mastery!<br><br><span style="color:#b45309; font-weight:800; font-size:18px;">+100 Gold Coins Claimed</span>`,
+                icon: 'success',
+                confirmButtonText: 'Play Again',
+                showCancelButton: true,
+                cancelButtonText: 'Finish & Exit',
+                confirmButtonColor: '#4f46e5'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    initGame();
+                } else {
+                    closeMatchGame();
+                }
+            });
+        }
+
+        function confirmRestartGame() {
+            Swal.fire({
+                title: 'Restart Game?',
+                text: 'Your current match session will be reset from the beginning.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Yes, Restart'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    localStorage.removeItem(STORAGE_MATCH_PROGRESS_KEY);
+                    initGame();
+                    Toast.fire({ icon: 'success', title: 'Game restarted!' });
+                }
+            });
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
