@@ -213,14 +213,14 @@
         <!-- AI Prompt Copy Card -->
         <div class="prompt-banner">
             <div class="prompt-banner-header">
-                <span>📋 Copy 4-Snippet Prompt (No Markdown Tables)</span>
+                <span>📋 Copy 4-Snippet Prompt (Zero Repetition & High-Level Flow)</span>
                 <button class="btn-prompt" onclick="copyAIPrompt()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     Copy AI Prompt
                 </button>
             </div>
             <div class="prompt-desc">
-                Format prompt sudah disetel bebas dari tabel bergaris yang merusak tampilan HP. Semua kosakata dan sinonim tersusun dalam format <b>• Kata → Sinonim</b> dengan spasi baris yang lega.
+                Prompt telah diperketat: AI diwajibkan menggunakan variasi kata kerja (*verbs*), kata benda (*nouns*), dan penghubung alur (*flow/connectors*) yang natural dan berbeda di setiap paragraf tanpa pengulangan kata yang kaku.
             </div>
         </div>
 
@@ -231,7 +231,7 @@
                     <span>1. Model Answer (Band 9)</span>
                 </div>
                 <div class="card-header-right">
-                    <!-- Tombol SVG Typing Game -->
+                    <!-- Tombol Retype Typing Game -->
                     <button type="button" 
                             style="background:#ede9fe; color:#6366f1; border:1px solid #ddd6fe; padding:4px 9px; font-size:11px; border-radius:6px; cursor:pointer;" 
                             onclick="event.stopPropagation(); window.parent.postMessage('OPEN_TYPE_GAME', '*');">
@@ -290,24 +290,30 @@
                 </div>
             </div>
             <div class="card-body">
-                <textarea id="ai-vocab" rows="6" placeholder="• Reporting Verbs: illustrates, compares, displays&#10;&#10;• Key Collocations: youth dance classes, distinct age groups&#10;&#10;• Advanced Grammar: participle clauses, contrasting adverbs" oninput="cleanAndSave('ai-vocab')"></textarea>
+                <textarea id="ai-vocab" rows="6" placeholder="• Reporting Verbs: illustrates, compares, displays&#10;&#10;• Key Collocations: youth dance classes, distinct age groups&#10;&#10;• Transitional Connectors: in stark contrast, whereas, regarding" oninput="cleanAndSave('ai-vocab')"></textarea>
             </div>
         </div>
 
-        <!-- 4. Synonyms & Paraphrasing -->
+        <!-- 4. Synonyms & Paraphrasing with Match Game Button -->
         <div class="card" id="card-synonyms">
-            <div class="card-header" onclick="toggleCard('card-synonyms')">
-                <div class="card-header-left">
+            <div class="card-header">
+                <div class="card-header-left" onclick="toggleCard('card-synonyms')" style="flex:1;">
                     <span>4. Synonyms & Paraphrasing Bank</span>
                 </div>
                 <div class="card-header-right">
-                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Tombol Match Synonym & Flow Game -->
+                    <button type="button" 
+                            style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; padding:4px 9px; font-size:11px; border-radius:6px; cursor:pointer;" 
+                            onclick="event.stopPropagation(); window.parent.postMessage('OPEN_MATCH_GAME', '*');">
+                        🧩 Match Game
+                    </button>
+                    <svg class="toggle-icon" onclick="toggleCard('card-synonyms')" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
             </div>
             <div class="card-body">
-                <textarea id="ai-synonyms" rows="6" placeholder="• Show / Give info → illustrates, compares, depicts&#10;&#10;• Location → venue, facility, setting, distribution&#10;&#10;• Young people → youth, teenagers, younger learners, cohorts" oninput="cleanAndSave('ai-synonyms')"></textarea>
+                <textarea id="ai-synonyms" rows="6" placeholder="• Show / Give info → illustrates, compares, depicts&#10;&#10;• Location → venue, facility, setting, distribution&#10;&#10;• Young people → youth, teenagers, younger learners, cohorts&#10;&#10;• While / But → whereas, conversely, in stark contrast" oninput="cleanAndSave('ai-synonyms')"></textarea>
             </div>
         </div>
     </div>
@@ -316,32 +322,33 @@
         const STORAGE_KEY = 'ielts_writing_task1_ai_hint';
         const COLLAPSE_KEY = 'ielts_writing_task1_collapsed_cards';
 
-        // Prompt tegas: Dilarang keras membuat tabel markdown pipe (|)
+        // Prompt super ketat: Menuntut variasi kata/kalimat/penghubung per paragraf tanpa repetisi
         const AI_PROMPT_TEXT = `Please act as an official IELTS Examiner. Analyze the attached IELTS Writing Task 1 visual and write a Band 9 sample answer.
 
-IMPORTANT FORMATTING RULES:
-1. Divide your entire answer into EXACTLY 4 separate markdown code snippet blocks (\`\`\`text ... \`\`\`).
-2. DO NOT use markdown tables (no "|" pipes, no table grids) anywhere because they are unreadable on mobile devices.
-3. For sections 2, 3, and 4: use ONLY plain bullet points (\`• \`) with a BLANK LINE (double enter) between each item for maximum mobile readability.
+CRITICAL LEXICAL & FLOW REQUIREMENTS:
+1. Use high-level yet simple, natural, and familiar academic verbs, nouns, and transitional connectors for each paragraph without repetitive phrasing across paragraphs.
+2. Avoid mechanical clichés. Paraphrase all key metrics, categories, and trends gracefully.
+3. Divide your entire answer into EXACTLY 4 separate markdown code snippet blocks (\`\`\`text ... \`\`\`).
+4. DO NOT use markdown tables (no "|" pipes). Use only clean bullet points (• ) with a blank line between items.
 
 Format strictly as follows:
 
 ### 1. Band 9 Model Answer
 \`\`\`text
-[Write complete 4-paragraph essay here:
-- Paragraph 1: Introduction (paraphrase prompt)
-- Paragraph 2: Overview (broad trends/features)
-- Paragraph 3: Body Paragraph 1 (grouped data)
-- Paragraph 4: Body Paragraph 2 (remaining data)]
+[Complete 4-paragraph essay:
+- Paragraph 1: Introduction (paraphrase with fresh nouns & verbs)
+- Paragraph 2: Overview (broad trends with high-level comparison linkers)
+- Paragraph 3: Body Paragraph 1 (grouped data using varied trend verbs)
+- Paragraph 4: Body Paragraph 2 (remaining data avoiding any verbs/nouns used in Body 1)]
 \`\`\`
 
 ### 2. Reason Why It Deserves Band 9
 \`\`\`text
-• Task Achievement: [Key trends highlighted, accurate comparisons, clear overview]
+• Task Achievement: [Key features highlighted, accurate comparisons, clear overview]
 
 • Coherence & Cohesion: [Logical paragraphing, seamless transition phrases]
 
-• Lexical Resource: [Precise academic vocabulary without unnatural repetition]
+• Lexical Resource: [Diverse, natural academic vocabulary without unnatural repetition]
 
 • Grammatical Range & Accuracy: [Complex structures, error-free passive and participle clauses]
 \`\`\`
@@ -352,23 +359,25 @@ Format strictly as follows:
 
 • Academic Collocations: [collocation 1], [collocation 2], [collocation 3]
 
-• Grammar Structures: [Pattern 1 with brief example], [Pattern 2 with brief example]
+• Transitional Connectors & Flow: [connector 1], [connector 2], [connector 3]
 
-• Data / Approximation Terms: [term 1], [term 2], [term 3]
+• Complex Grammar Structures: [Pattern 1 with example], [Pattern 2 with example]
 \`\`\`
 
 ### 4. Synonyms & Paraphrasing Bank
 \`\`\`text
-• [Original Prompt Word] → [Synonym 1], [Synonym 2], [Synonym 3]
+• [Original Prompt Term] → [Synonym 1], [Synonym 2], [Synonym 3]
 
-• [Category / Subject Term] → [Synonym 1], [Synonym 2], [Synonym 3]
+• [Trend Verb / Action] → [Alternative Verb 1], [Alternative Verb 2], [Alternative Verb 3]
 
-• [Location / Metric Term] → [Synonym 1], [Synonym 2], [Synonym 3]
+• [Category / Group Noun] → [Variation 1], [Variation 2], [Variation 3]
 
-• [Trend / Percentage Term] → [Synonym 1], [Synonym 2], [Synonym 3]
+• [Transitional Flow / Connector] → [Linker 1], [Linker 2], [Linker 3]
+
+• [Metric / Quantity Term] → [Paraphrase 1], [Paraphrase 2], [Paraphrase 3]
 \`\`\``;
 
-        // Auto-Cleaner: Merombak tabel markdown (|...|) dan bullet (* / -) menjadi format bersih (• ... \n\n)
+        // Auto-Cleaner: Merombak tabel markdown (|...|) dan format pemisah (->, :, dll) menjadi format bersih (• ... → ... \n\n)
         function cleanFormat(text) {
             if (!text || !text.trim()) return text;
 
@@ -378,7 +387,6 @@ Format strictly as follows:
                 const cleanedItems = [];
 
                 lines.forEach(line => {
-                    // Abaikan header tabel dan garis pemisah (|---|---|)
                     if (line.includes('---') || /original|term|prompt/i.test(line)) return;
 
                     const cols = line.split('|').map(c => c.trim()).filter(c => c.length > 0);
@@ -401,7 +409,6 @@ Format strictly as follows:
             if (hasListStyle) {
                 return lines.map(line => {
                     let clean = line.replace(/^[-*•]\s*/, '').trim();
-                    // Rapikan jika ada tanda panah yang tidak seragam
                     clean = clean.replace(/\s*(?:->|=>)\s*/g, ' → ');
                     return `• ${clean}`;
                 }).join('\n\n');
@@ -412,8 +419,7 @@ Format strictly as follows:
 
         function cleanAndSave(elementId) {
             const el = document.getElementById(elementId);
-            // Jalankan cleaner jika terdeteksi tabel markdown atau list markdown
-            if (el.value.includes('|') || el.value.includes('* ') || el.value.includes('- ')) {
+            if (el.value.includes('|') || el.value.includes('* ') || el.value.includes('- ') || el.value.includes('->')) {
                 const start = el.selectionStart;
                 el.value = cleanFormat(el.value);
                 el.setSelectionRange(start, start);
