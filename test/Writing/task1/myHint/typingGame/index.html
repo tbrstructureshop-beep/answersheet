@@ -1,868 +1,455 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Handwritten Retype Practice - Band 9</title>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@300;400;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <style>
-        :root {
-            --paper-bg: #fefcf3;
-            --line-color: #e5dfd3;
-            --margin-line: #fca5a5;
-            --ink-blue: #1e3a8a;
-            --ink-ghost: rgba(30, 58, 138, 0.25);
-            --ink-error: #ef4444;
-            --primary: #4f46e5;
-            --kb-bg: #e2e8f0;
-            --key-bg: #ffffff;
-            --key-active: #cbd5e1;
-            --key-text: #1e293b;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Efek Suara Ketikan & Tulisan Tangan</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body {
-            background: #ede8dc;
-            font-family: 'Kalam', cursive;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            color: #1e293b;
-            padding-bottom: 20px;
-            user-select: none;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f1ea;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        body.has-osk {
-            padding-bottom: 270px;
-        }
+    .container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 650px;
+    }
 
-        /* Top Bar */
-        .top-nav {
-            background: #ffffff;
-            border-bottom: 2px dashed #d1c7b7;
-            padding: 10px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'Inter', sans-serif;
-            z-index: 100;
-            position: sticky;
-            top: 0;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .top-nav .title-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            font-size: 14px;
-            color: #4338ca;
-        }
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12.5px;
-            font-weight: 600;
-            border: 1px solid #cbd5e1;
-            background: #fff;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            text-decoration: none;
-            color: #334155;
-        }
-        .btn-action:hover { background: #f8fafc; border-color: #94a3b8; }
-        .btn-peek {
-            background: #fef08a;
-            border-color: #facc15;
-            color: #854d0e;
-        }
-        .btn-peek:hover { background: #fde047; }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #2c3e50;
+    }
 
-        /* Keyboard Toggle Pill */
-        .btn-toggle-kb {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-            color: #475569;
-        }
-        .btn-toggle-kb.active {
-            background: #4f46e5;
-            border-color: #4338ca;
-            color: #ffffff;
-        }
+    /* Sound Control Panel (Toggle ON/OFF & Select) */
+    .sound-control-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
 
-        .coin-pill {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            color: #b45309;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12.5px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
 
-        /* Handwritten Desk Layout */
-        .desk-workspace {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            padding: 16px 12px;
-        }
+    .toggle-switch {
+      position: relative;
+      width: 46px;
+      height: 24px;
+      background-color: #cbd5e1;
+      border-radius: 24px;
+      transition: background-color 0.25s ease;
+    }
 
-        /* Notebook Paper Style */
-        .notebook-paper {
-            width: 100%;
-            max-width: 860px;
-            background: var(--paper-bg);
-            border-radius: 6px;
-            box-shadow: 2px 3px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px #e2dac9;
-            padding: 30px 24px 50px 54px;
-            position: relative;
-            background-image: repeating-linear-gradient(var(--paper-bg) 0px, var(--paper-bg) 31px, var(--line-color) 32px);
-            line-height: 32px;
-        }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: transform 0.25s ease;
+    }
 
-        /* Red margin line */
-        .notebook-paper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 40px;
-            width: 2px;
-            background-color: var(--margin-line);
-        }
+    .toggle-checkbox {
+      display: none;
+    }
 
-        /* Stats Sub-bar */
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            font-family: 'Inter', sans-serif;
-            font-size: 12.5px;
-            color: #64748b;
-            margin-bottom: 16px;
-            border-bottom: 1px solid #e2dac9;
-            padding-bottom: 8px;
-        }
+    .toggle-checkbox:checked + .toggle-switch {
+      background-color: #10b981;
+    }
 
-        /* Typing Area Engine */
-        .typing-container {
-            position: relative;
-            min-height: 280px;
-            cursor: text;
-        }
+    .toggle-checkbox:checked + .toggle-switch::after {
+      transform: translateX(22px);
+    }
 
-        /* Ghost & Typed Layer */
-        .display-stream {
-            font-family: 'Caveat', cursive;
-            font-size: 26px;
-            letter-spacing: 0.5px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            line-height: 32px;
-            user-select: none;
-            pointer-events: none;
-        }
+    .toggle-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .char-typed {
-            color: var(--ink-blue);
-            font-weight: 700;
-        }
-        .char-ghost {
-            color: var(--ink-ghost);
-            font-weight: 600;
-        }
-        .char-error {
-            color: var(--ink-error);
-            background: #fee2e2;
-            border-radius: 2px;
-            text-decoration: underline wavy #ef4444;
-        }
-        .caret {
-            border-left: 3px solid #ef4444;
-            animation: blink 0.9s infinite;
-            margin-left: -1px;
-            margin-right: -1px;
-            display: inline-block;
-            height: 24px;
-            vertical-align: middle;
-        }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .select-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        /* Hidden functional input */
-        #hidden-input {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
-        }
+    .select-wrapper label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+    }
 
-        /* Peek Modal for Graph Diagram */
-        .peek-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(4px);
-            z-index: 2500;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .peek-modal {
-            background: #fff;
-            padding: 14px;
-            border-radius: 12px;
-            max-width: 92vw;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
-        }
-        .peek-modal img {
-            max-width: 100%;
-            max-height: 70vh;
-            object-fit: contain;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        .peek-footer {
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-        }
+    .sound-select {
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e293b;
+      background-color: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
 
-        /* Floating Peek Image Button */
-        .fab-peek {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: #fbbf24;
-            color: #78350f;
-            border-radius: 50%;
-            border: none;
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.2s;
-        }
-        .fab-peek:hover { transform: scale(1.08); background: #f59e0b; color: #fff; }
-        .fab-peek svg { width: 24px; height: 24px; stroke: currentColor; fill: none; }
+    .sound-select:focus {
+      border-color: #2c3e50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+    }
 
-        /* ON-SCREEN QWERTY KEYBOARD (FULL) */
-        .osk-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #cbd5e1;
-            padding: 8px 6px 12px 6px;
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            z-index: 1500;
-            font-family: 'Inter', system-ui, sans-serif;
-            border-top: 1px solid #94a3b8;
-            max-width: 800px;
-            margin: 0 auto;
-            border-radius: 12px 12px 0 0;
-        }
-        .osk-container.visible {
-            display: flex;
-        }
+    .sound-select:disabled {
+      background-color: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+      border-color: #e2e8f0;
+    }
 
-        .osk-row {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            width: 100%;
-        }
+    /* Pilihan Efek Suara (Tombol Grid) */
+    .selector-group {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-        .osk-key {
-            flex: 1;
-            max-width: 54px;
-            height: 42px;
-            background: #ffffff;
-            border: 1px solid #94a3b8;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 0 #94a3b8;
-            touch-action: manipulation;
-            user-select: none;
-            transition: all 0.08s ease;
-        }
-        .osk-key:active, .osk-key.pressed {
-            transform: translateY(2px);
-            box-shadow: 0 0 0 #94a3b8;
-            background: #e2e8f0;
-        }
+    @media (min-width: 500px) {
+      .selector-group {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
 
-        .osk-key.special {
-            background: #94a3b8;
-            color: #ffffff;
-            font-size: 12.5px;
-            font-weight: 700;
-            max-width: 76px;
-        }
-        .osk-key.special.active {
-            background: #4f46e5;
-            color: #ffffff;
-            border-color: #3730a3;
-        }
-        .osk-key.space {
-            flex: 4;
-            max-width: 260px;
-        }
-        .osk-key.enter {
-            flex: 1.5;
-            max-width: 80px;
-            background: #10b981;
-            color: white;
-            border-color: #059669;
-            box-shadow: 0 2px 0 #059669;
-        }
-        .osk-key.enter:active {
-            box-shadow: 0 0 0 #059669;
-        }
+    .sound-btn {
+      padding: 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
 
-        /* Reward Modal */
-        .reward-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 3000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .reward-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            font-family: 'Inter', sans-serif;
-            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .coin-icon-huge {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 16px;
-            filter: drop-shadow(0 4px 6px rgba(245, 158, 11, 0.3));
-        }
+    .sound-btn:hover {
+      border-color: #a0a0a0;
+      background-color: #f0f0f0;
+    }
 
-        /* Mobile adjustments */
-        @media (max-width: 640px) {
-            .notebook-paper { padding: 24px 12px 40px 36px; }
-            .notebook-paper::before { left: 24px; }
-            .display-stream { font-size: 21px; line-height: 32px; }
-            .osk-key { height: 38px; font-size: 13.5px; }
-            .fab-peek { bottom: 15px; right: 15px; }
-            body.has-osk { padding-bottom: 240px; }
-        }
-    </style>
+    .sound-btn.active {
+      border-color: #2c3e50;
+      background-color: #2c3e50;
+      color: #ffffff;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 15px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s ease, font-family 0.2s ease;
+    }
+
+    textarea:focus {
+      border-color: #2c3e50;
+    }
+
+    /* Font dinamis sesuai instrumen */
+    textarea.font-typewriter { font-family: 'Courier New', Courier, monospace; }
+    textarea.font-pencil { font-family: 'Comic Sans MS', 'Chalkboard SE', cursive; }
+    textarea.font-chalk { font-family: 'Comic Sans MS', 'Chalkboard SE', cursive; }
+    textarea.font-dippen { font-family: 'Georgia', 'Times New Roman', serif; font-style: italic; }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      text-align: center;
+    }
+  </style>
 </head>
-<body onclick="handleDeskClick()">
+<body>
 
-    <!-- Top Navigation -->
-    <div class="top-nav">
-        <div class="title-group">
-            <a href="../index.html" class="btn-action" title="Back to Hints">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                Hint
-            </a>
-            <span>✍️ Handwritten Retype</span>
-        </div>
+  <div class="container">
+    <h1>Efek Suara Ketikan & Tulisan Tangan</h1>
 
-        <div style="display: flex; gap: 6px; align-items: center;">
-            <div class="coin-pill">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 1 0-5H12"></path></svg>
-                <span id="user-coins">0</span>
-            </div>
+    <!-- Panel Kontrol Suara (Toggle ON/OFF & Dropdown Select) -->
+    <div class="sound-control-panel">
+      <!-- Toggle Switch ON/OFF -->
+      <label class="toggle-wrapper" for="sound-toggle">
+        <input type="checkbox" id="sound-toggle" class="toggle-checkbox" checked>
+        <span class="toggle-switch"></span>
+        <span class="toggle-label" id="toggle-label-text">🔊 Suara: ON</span>
+      </label>
 
-            <!-- Toggle Button for On-Screen Keyboard -->
-            <button id="toggle-osk-btn" class="btn-action btn-toggle-kb" onclick="toggleOSK(event)" title="Toggle On-Screen Keyboard">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="10" y1="12" x2="10" y2="12"></line><line x1="14" y1="12" x2="14" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
-                <span id="toggle-osk-text">Keyboard: OFF</span>
-            </button>
-
-            <button class="btn-action btn-peek" onclick="openPeekModal(event)">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                Peek
-            </button>
-        </div>
+      <!-- Select Dropdown Suara -->
+      <div class="select-wrapper">
+        <label for="sound-dropdown">Pilih Suara:</label>
+        <select id="sound-dropdown" class="sound-select">
+          <option value="typewriter" data-font="font-typewriter">Typewriter (Mesin Tik)</option>
+          <option value="pencil" data-font="font-pencil">Pensil (Pencil)</option>
+          <option value="chalk" data-font="font-chalk">Kapur Tulis (Chalk)</option>
+          <option value="dippen" data-font="font-dippen">Pena Celup (Dip Pen)</option>
+        </select>
+      </div>
     </div>
 
-    <!-- Main Desk -->
-    <div class="desk-workspace">
-        <div class="notebook-paper">
-            <div class="stats-bar">
-                <span>Progress: <b id="progress-percent">0%</b></span>
-                <span>Accuracy: <b id="accuracy-stat">100%</b></span>
-                <span>Remaining: <b id="chars-remaining">0 chars</b></span>
-            </div>
-
-            <!-- The Typing Canvas Layer -->
-            <div class="typing-container">
-                <div id="text-display" class="display-stream">Loading model answer...</div>
-            </div>
-        </div>
+    <!-- Pilihan Cepat Tombol Instrumen -->
+    <div class="selector-group">
+      <button class="sound-btn active" data-sound="typewriter" data-font="font-typewriter">Typewriter</button>
+      <button class="sound-btn" data-sound="pencil" data-font="font-pencil">Pensil</button>
+      <button class="sound-btn" data-sound="chalk" data-font="font-chalk">Kapur</button>
+      <button class="sound-btn" data-sound="dippen" data-font="font-dippen">Pena Celup</button>
     </div>
 
-    <!-- Hidden input to capture physical keyboard / software keyboard on devices -->
-    <input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <!-- Area Ketik -->
+    <textarea id="editor" class="font-typewriter" placeholder="Mulai mengetik untuk mendengarkan suara..."></textarea>
 
-    <!-- Floating Quick-Peek Button -->
-    <button class="fab-peek" onclick="openPeekModal(event)" title="Peek Graph / Diagram">
-        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-    </button>
+    <div class="hint">Suara dibuat secara <i>real-time</i> menggunakan Web Audio API tanpa file eksternal.</div>
+  </div>
 
-    <!-- ON-SCREEN FULL QWERTY KEYBOARD -->
-    <div class="osk-container" id="osk-keyboard">
-        <!-- Row 1: Numbers & Symbols -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="1">1</button>
-            <button type="button" class="osk-key" data-key="2">2</button>
-            <button type="button" class="osk-key" data-key="3">3</button>
-            <button type="button" class="osk-key" data-key="4">4</button>
-            <button type="button" class="osk-key" data-key="5">5</button>
-            <button type="button" class="osk-key" data-key="6">6</button>
-            <button type="button" class="osk-key" data-key="7">7</button>
-            <button type="button" class="osk-key" data-key="8">8</button>
-            <button type="button" class="osk-key" data-key="9">9</button>
-            <button type="button" class="osk-key" data-key="0">0</button>
-            <button type="button" class="osk-key" data-key="%">%</button>
-            <button type="button" class="osk-key special" data-action="backspace">⌫ Del</button>
-        </div>
+  <script>
+    const STORAGE_SOUND_ENABLED = 'typing_sound_enabled';
+    const STORAGE_SOUND_TYPE = 'typing_sound_type';
 
-        <!-- Row 2: QWERTY -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="q">q</button>
-            <button type="button" class="osk-key" data-key="w">w</button>
-            <button type="button" class="osk-key" data-key="e">e</button>
-            <button type="button" class="osk-key" data-key="r">r</button>
-            <button type="button" class="osk-key" data-key="t">t</button>
-            <button type="button" class="osk-key" data-key="y">y</button>
-            <button type="button" class="osk-key" data-key="u">u</button>
-            <button type="button" class="osk-key" data-key="i">i</button>
-            <button type="button" class="osk-key" data-key="o">o</button>
-            <button type="button" class="osk-key" data-key="p">p</button>
-            <button type="button" class="osk-key" data-key="-">-</button>
-        </div>
+    // Inisialisasi Audio Context
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
 
-        <!-- Row 3: ASDFGH -->
-        <div class="osk-row">
-            <button type="button" class="osk-key special" id="osk-shift-btn" data-action="shift">⇧ Shift</button>
-            <button type="button" class="osk-key" data-key="a">a</button>
-            <button type="button" class="osk-key" data-key="s">s</button>
-            <button type="button" class="osk-key" data-key="d">d</button>
-            <button type="button" class="osk-key" data-key="f">f</button>
-            <button type="button" class="osk-key" data-key="g">g</button>
-            <button type="button" class="osk-key" data-key="h">h</button>
-            <button type="button" class="osk-key" data-key="j">j</button>
-            <button type="button" class="osk-key" data-key="k">k</button>
-            <button type="button" class="osk-key" data-key="l">l</button>
-            <button type="button" class="osk-key" data-key=":">:</button>
-            <button type="button" class="osk-key enter" data-action="enter">↵ Enter</button>
-        </div>
+    let isSoundEnabled = true;
+    let selectedSound = 'typewriter';
 
-        <!-- Row 4: ZXCVB & Punctuation -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="z">z</button>
-            <button type="button" class="osk-key" data-key="x">x</button>
-            <button type="button" class="osk-key" data-key="c">c</button>
-            <button type="button" class="osk-key" data-key="v">v</button>
-            <button type="button" class="osk-key" data-key="b">b</button>
-            <button type="button" class="osk-key" data-key="n">n</button>
-            <button type="button" class="osk-key" data-key="m">m</button>
-            <button type="button" class="osk-key" data-key=",">,</button>
-            <button type="button" class="osk-key" data-key=".">.</button>
-            <button type="button" class="osk-key" data-key="(">(</button>
-            <button type="button" class="osk-key" data-key=")">)</button>
-        </div>
+    // Element Selector
+    const soundToggle = document.getElementById('sound-toggle');
+    const toggleLabelText = document.getElementById('toggle-label-text');
+    const soundDropdown = document.getElementById('sound-dropdown');
+    const buttons = document.querySelectorAll('.sound-btn');
+    const editor = document.getElementById('editor');
 
-        <!-- Row 5: Space & Secondary punctuation -->
-        <div class="osk-row">
-            <button type="button" class="osk-key" data-key="'">'</button>
-            <button type="button" class="osk-key" data-key='"'>"</button>
-            <button type="button" class="osk-key space" data-key=" ">Space</button>
-            <button type="button" class="osk-key" data-key=";">;</button>
-            <button type="button" class="osk-key" data-key="/">/</button>
-        </div>
-    </div>
+    // Generator Noise Buffer
+    function createNoiseBuffer(durationSec) {
+      const bufferSize = audioCtx.sampleRate * durationSec;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      return buffer;
+    }
 
-    <!-- Peek Image Modal -->
-    <div class="peek-overlay" id="peek-overlay" onclick="closePeekModal(event)">
-        <div class="peek-modal" onclick="event.stopPropagation()">
-            <img id="peek-img" src="" alt="Graph Diagram">
-            <div class="peek-footer">
-                <span style="color: #64748b;">Click outside or Esc to close & continue typing</span>
-                <button class="btn-action" onclick="closePeekModal()">Close</button>
-            </div>
-        </div>
-    </div>
+    // 1. Suara Mesin Tik (Typewriter)
+    function playTypewriter() {
+      const buffer = createNoiseBuffer(0.03);
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
 
-    <!-- Victory 100 Gold Coins Modal -->
-    <div class="reward-overlay" id="reward-overlay">
-        <div class="reward-card">
-            <svg class="coin-icon-huge" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M12 6v12M15 9.5H9.5a2.5 2.5 0 0 1 0-5H12"></path>
-            </svg>
-            <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Magnificent! 🏆</h2>
-            <p style="font-size: 14px; color: #475569; margin-bottom: 18px;">
-                You successfully retyped the whole Band 9 Model Answer with high muscle memory!
-            </p>
-            <div style="background: #fef3c7; border: 1px dashed #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
-                <span style="font-size: 13px; color: #92400e; font-weight: 600;">Reward Claimed:</span>
-                <div style="font-size: 26px; font-weight: 800; color: #b45309;">+100 Gold Coins</div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-action" style="flex:1;" onclick="restartRetype()">Retype Again</button>
-                <a href="../index.html" class="btn-action btn-peek" style="flex:1; justify-content:center;">Back to Hint</a>
-            </div>
-        </div>
-    </div>
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1000 + Math.random() * 400;
 
-    <script>
-        const STORAGE_HINT_KEY = 'ielts_writing_task1_ai_hint';
-        const STORAGE_WORKSPACE_KEY = 'ielts_writing_task1_workspace';
-        const STORAGE_COIN_KEY = 'ielts_user_gold_coins';
-        const STORAGE_OSK_KEY = 'ielts_retype_osk_enabled';
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
 
-        let targetText = "";
-        let currentIndex = 0;
-        let errorsCount = 0;
-        let totalTypedCount = 0;
-        let isCompleted = false;
+      whiteNoise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
 
-        let isShiftActive = false;
-        let isOSKVisible = false;
+      whiteNoise.start();
+    }
 
-        function loadCoins() {
-            const coins = parseInt(localStorage.getItem(STORAGE_COIN_KEY) || "0", 10);
-            document.getElementById('user-coins').innerText = coins;
+    // 2. Suara Pensil (Pencil)
+    function playPencil() {
+      const buffer = createNoiseBuffer(0.05);
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 3000 + Math.random() * 800;
+
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+      whiteNoise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      whiteNoise.start();
+    }
+
+    // 3. Suara Kapur (Chalk)
+    function playChalk() {
+      const buffer = createNoiseBuffer(0.04);
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 800 + Math.random() * 300;
+      filter.Q.value = 2.0;
+
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+
+      whiteNoise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      whiteNoise.start();
+    }
+
+    // 4. Suara Pena Celup (Dip Pen)
+    function playDipPen() {
+      const buffer = createNoiseBuffer(0.03);
+      const whiteNoise = audioCtx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 5500 + Math.random() * 1000;
+
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+
+      whiteNoise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      whiteNoise.start();
+    }
+
+    // Pemutar Suara Utama
+    function playSound() {
+      if (!isSoundEnabled) return;
+
+      if (!audioCtx) audioCtx = new AudioContext();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      switch (selectedSound) {
+        case 'typewriter': playTypewriter(); break;
+        case 'pencil': playPencil(); break;
+        case 'chalk': playChalk(); break;
+        case 'dippen': playDipPen(); break;
+      }
+    }
+
+    // Sinkronisasi Pilihan Suara & Font
+    function applySoundSelection(soundName) {
+      selectedSound = soundName;
+      localStorage.setItem(STORAGE_SOUND_TYPE, soundName);
+
+      // Sinkronkan Select Dropdown
+      soundDropdown.value = soundName;
+
+      // Sinkronkan Tombol Grid
+      buttons.forEach(btn => {
+        if (btn.dataset.sound === soundName) {
+          btn.classList.add('active');
+          editor.className = btn.dataset.font;
+        } else {
+          btn.classList.remove('active');
         }
+      });
+    }
 
-        function addCoins(amount) {
-            let coins = parseInt(localStorage.getItem(STORAGE_COIN_KEY) || "0", 10);
-            coins += amount;
-            localStorage.setItem(STORAGE_COIN_KEY, coins);
-            document.getElementById('user-coins').innerText = coins;
-        }
+    // Event: Toggle ON / OFF
+    soundToggle.addEventListener('change', () => {
+      isSoundEnabled = soundToggle.checked;
+      localStorage.setItem(STORAGE_SOUND_ENABLED, isSoundEnabled ? 'true' : 'false');
+      
+      toggleLabelText.innerText = isSoundEnabled ? '🔊 Suara: ON' : '🔇 Suara: OFF';
+      soundDropdown.disabled = !isSoundEnabled;
+      buttons.forEach(btn => {
+        btn.style.opacity = isSoundEnabled ? '1' : '0.5';
+      });
+    });
 
-        function loadModelAnswer() {
-            const rawHint = localStorage.getItem(STORAGE_HINT_KEY);
-            if (rawHint) {
-                try {
-                    const parsed = JSON.parse(rawHint);
-                    targetText = (parsed.full || "").trim();
-                } catch(e) {}
-            }
+    // Event: Select Dropdown Changed
+    soundDropdown.addEventListener('change', (e) => {
+      applySoundSelection(e.target.value);
+      playSound(); // Test play suara saat dipilih
+    });
 
-            if (!targetText) {
-                targetText = "Please go back to AI Hint and paste a Band 9 Model Answer first!";
-            }
+    // Event: Tombol Grid Diklik
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        applySoundSelection(btn.dataset.sound);
+        playSound();
+      });
+    });
 
-            renderDisplay();
-            updateStats();
-        }
+    // Event: Ketikan Keyboard
+    editor.addEventListener('keydown', (e) => {
+      if (['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'].includes(e.key)) return;
+      playSound();
+    });
 
-        function renderDisplay() {
-            const container = document.getElementById('text-display');
-            container.innerHTML = "";
-
-            const typedPart = targetText.slice(0, currentIndex);
-            const remainingPart = targetText.slice(currentIndex);
-
-            // Tinta biru tulisan tangan
-            const typedSpan = document.createElement('span');
-            typedSpan.className = 'char-typed';
-            typedSpan.textContent = typedPart;
-
-            // Caret kedip
-            const caret = document.createElement('span');
-            caret.className = 'caret';
-
-            // Ghost text 25% opacity
-            const ghostSpan = document.createElement('span');
-            ghostSpan.className = 'char-ghost';
-            ghostSpan.textContent = remainingPart;
-
-            container.appendChild(typedSpan);
-            if (!isCompleted) container.appendChild(caret);
-            container.appendChild(ghostSpan);
-
-            // Auto-scroll follow caret
-            caret.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function updateStats() {
-            const total = targetText.length;
-            const progress = total > 0 ? Math.round((currentIndex / total) * 100) : 0;
-            document.getElementById('progress-percent').innerText = `${progress}%`;
-            document.getElementById('chars-remaining').innerText = `${total - currentIndex} chars`;
-
-            const accuracy = totalTypedCount > 0 
-                ? Math.max(0, Math.round(((totalTypedCount - errorsCount) / totalTypedCount) * 100))
-                : 100;
-            document.getElementById('accuracy-stat').innerText = `${accuracy}%`;
-        }
-
-        // Shared Typing Processor (Untuk Hardware & On-Screen Keyboard)
-        function processInputChar(char) {
-            if (isCompleted) return;
-
-            totalTypedCount++;
-            const expectedChar = targetText[currentIndex];
-
-            if (char === expectedChar) {
-                currentIndex++;
-                renderDisplay();
-                updateStats();
-
-                if (currentIndex >= targetText.length) {
-                    finishGame();
-                }
-            } else {
-                errorsCount++;
-                updateStats();
-                flashError();
-            }
-        }
-
-        function processBackspace() {
-            if (isCompleted) return;
-            if (currentIndex > 0) {
-                currentIndex--;
-                renderDisplay();
-                updateStats();
-            }
-        }
-
-        function flashError() {
-            const paper = document.querySelector('.notebook-paper');
-            paper.style.boxShadow = "0 0 0 3px #ef4444";
-            setTimeout(() => {
-                paper.style.boxShadow = "2px 3px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px #e2dac9";
-            }, 180);
-        }
-
-        function finishGame() {
-            isCompleted = true;
-            renderDisplay();
-            addCoins(100);
-
-            try {
-                confetti({ particleCount: 130, spread: 85, origin: { y: 0.6 } });
-            } catch(e) {}
-
-            document.getElementById('reward-overlay').style.display = 'flex';
-        }
-
-        function restartRetype() {
-            currentIndex = 0;
-            errorsCount = 0;
-            totalTypedCount = 0;
-            isCompleted = false;
-            document.getElementById('reward-overlay').style.display = 'none';
-            renderDisplay();
-            updateStats();
-            focusInput();
-        }
-
-        function focusInput() {
-            if (!isOSKVisible) {
-                document.getElementById('hidden-input').focus();
-            }
-        }
-
-        function handleDeskClick() {
-            focusInput();
-        }
-
-        // Hardware Keyboard Listener
-        window.addEventListener('keydown', (e) => {
-            if (isCompleted) return;
-
-            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
-
-            if (e.key === 'Escape') {
-                closePeekModal();
-                return;
-            }
-
-            if (e.key === 'Backspace') {
-                processBackspace();
-                e.preventDefault();
-                return;
-            }
-
-            let key = e.key;
-            if (key === 'Enter') key = '\n';
-
-            if (key.length === 1 || key === '\n') {
-                processInputChar(key);
-                e.preventDefault();
-            }
+    // Load Preferensi Tersimpan
+    function loadSavedPreferences() {
+      const savedEnabled = localStorage.getItem(STORAGE_SOUND_ENABLED);
+      if (savedEnabled !== null) {
+        isSoundEnabled = savedEnabled === 'true';
+        soundToggle.checked = isSoundEnabled;
+        toggleLabelText.innerText = isSoundEnabled ? '🔊 Suara: ON' : '🔇 Suara: OFF';
+        soundDropdown.disabled = !isSoundEnabled;
+        buttons.forEach(btn => {
+          btn.style.opacity = isSoundEnabled ? '1' : '0.5';
         });
+      }
 
-        // ON-SCREEN KEYBOARD LOGIC
-        function initOSK() {
-            const osk = document.getElementById('osk-keyboard');
-            
-            osk.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const keyBtn = e.target.closest('.osk-key');
-                if (!keyBtn) return;
+      const savedType = localStorage.getItem(STORAGE_SOUND_TYPE);
+      if (savedType) {
+        applySoundSelection(savedType);
+      }
+    }
 
-                const action = keyBtn.getAttribute('data-action');
-                let char = keyBtn.getAttribute('data-key');
+    loadSavedPreferences();
+  </script>
 
-                if (action === 'backspace') {
-                    processBackspace();
-                    return;
-                }
-
-                if (action === 'enter') {
-                    processInputChar('\n');
-                    return;
-                }
-
-                if (action === 'shift') {
-                    toggleShift();
-                    return;
-                }
-
-                if (char) {
-                    if (isShiftActive && /^[a-z]$/i.test(char)) {
-                        char = char.toUpperCase();
-                        toggleShift(false); // Reset shift after single char
-                    }
-                    processInputChar(char);
-                }
-            });
-
-            // Load saved preference
-            const savedState = localStorage.getItem(STORAGE_OSK_KEY);
-            if (savedState === 'true') {
-                setOSKState(true);
-            } else {
-                setOSKState(false);
-            }
-        }
-
-        function toggleOSK(e) {
-            if (e) e.stopPropagation();
-            setOSKState(!isOSKVisible);
-        }
-
-        function setOSKState(visible) {
-            isOSKVisible = visible;
-            localStorage.setItem(STORAGE_OSK_KEY, visible ? 'true' : 'false');
-
-            const osk = document.getElementById('osk-keyboard');
-            const btn = document.getElementById('toggle-osk-btn');
-            const text = document.getElementById('toggle-osk-text');
-
-            if (visible) {
-                osk.classList.add('visible');
-                btn.classList.add('active');
-                text.innerText = "Keyboard: ON";
-                document.body.classList.add('has-osk');
-            } else {
-                osk.classList.remove('visible');
-                btn.classList.remove('active');
-                text.innerText = "Keyboard: OFF";
-                document.body.classList.remove('has-osk');
-                focusInput();
-            }
-        }
-
-        function toggleShift(forcedState) {
-            isShiftActive = forcedState !== undefined ? forcedState : !isShiftActive;
-            const shiftBtn = document.getElementById('osk-shift-btn');
-            shiftBtn.classList.toggle('active', isShiftActive);
-
-            // Update on-screen letters display (Caps/Lower)
-            const letterKeys = document.querySelectorAll('.osk-key[data-key]');
-            letterKeys.forEach(k => {
-                const raw = k.getAttribute('data-key');
-                if (/^[a-zA-Z]$/.test(raw)) {
-                    k.textContent = isShiftActive ? raw.toUpperCase() : raw.toLowerCase();
-                }
-            });
-        }
-
-        // Peek Modal Handler
-        function openPeekModal(e) {
-            if (e) e.stopPropagation();
-            const rawWorkspace = localStorage.getItem(STORAGE_WORKSPACE_KEY);
-            let imgSrc = "";
-            if (rawWorkspace) {
-                try {
-                    const parsed = JSON.parse(rawWorkspace);
-                    imgSrc = parsed.image || "";
-                } catch(e) {}
-            }
-
-            const imgEl = document.getElementById('peek-img');
-            if (imgSrc && imgSrc.length > 20) {
-                imgEl.src = imgSrc;
-                imgEl.style.display = 'block';
-            } else {
-                imgEl.style.display = 'none';
-                alert("No image uploaded yet in Writing Workspace!");
-                return;
-            }
-            document.getElementById('peek-overlay').style.display = 'flex';
-        }
-
-        function closePeekModal(e) {
-            if (e) e.stopPropagation();
-            document.getElementById('peek-overlay').style.display = 'none';
-            focusInput();
-        }
-
-        window.onload = () => {
-            loadCoins();
-            loadModelAnswer();
-            initOSK();
-            focusInput();
-        };
-    </script>
 </body>
 </html>
