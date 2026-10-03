@@ -21,13 +21,14 @@
 
         /* Header */
         .hint-header {
-            padding: 14px 18px;
+            padding: 12px 18px;
             background: #fff;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-shrink: 0;
+            gap: 10px;
         }
         .hint-title {
             display: flex;
@@ -39,7 +40,7 @@
         }
         .hint-title svg { width: 20px; height: 20px; stroke: var(--primary); }
 
-        .btn-group { display: flex; gap: 6px; }
+        .btn-group { display: flex; gap: 6px; align-items: center; }
         button {
             display: inline-flex;
             align-items: center;
@@ -57,9 +58,11 @@
         button:hover { background: #f1f5f9; }
         button.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
         button.btn-primary:hover { background: var(--primary-hover); }
+        button.btn-prompt { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+        button.btn-prompt:hover { background: #dcfce7; }
         button svg { width: 14px; height: 14px; }
 
-        /* Workspace Content */
+        /* Content Area */
         .hint-content {
             flex: 1;
             overflow-y: auto;
@@ -69,6 +72,39 @@
             gap: 14px;
         }
 
+        /* Banner Prompt Box */
+        .prompt-banner {
+            background: #f0fdf4;
+            border: 1px dashed #86efac;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .prompt-banner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #166534;
+        }
+        .prompt-text {
+            font-size: 11.5px;
+            color: #374151;
+            line-height: 1.45;
+            background: #ffffff;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #dcfce7;
+            user-select: all;
+            max-height: 80px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -123,7 +159,7 @@
     <div class="hint-header">
         <div class="hint-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            AI Hint / Reference
+            AI Hint & Breakdown
         </div>
         <div class="btn-group">
             <span id="save-indicator" class="badge-status">Saved</span>
@@ -133,27 +169,63 @@
             </button>
             <button class="btn-primary" onclick="copyAll()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                Copy
+                Copy All
             </button>
         </div>
     </div>
 
     <div class="hint-content">
-        <!-- Full AI Model Answer -->
-        <div class="card">
-            <div class="card-header">
-                <span>Model Answer / Full Reference</span>
-                <span id="full-wc" style="font-size: 11px;">0 words</span>
+        <!-- AI Prompt Copy Assistant -->
+        <div class="prompt-banner">
+            <div class="prompt-banner-header">
+                <span>🤖 AI Chat Prompt (Ready to paste with your image)</span>
+                <button class="btn-prompt" onclick="copyAIPrompt()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copy Prompt
+                </button>
             </div>
-            <textarea id="ai-full" rows="10" placeholder="Paste full AI prompt response/essay here..." oninput="autoSave()"></textarea>
+            <div class="prompt-text" id="ai-prompt-template">Please act as an ex-IELTS Examiner. Analyze the uploaded IELTS Writing Task 1 visual and provide a Band 9 sample answer. 
+
+Requirements:
+1. Strict 4-paragraph structure:
+   - Paragraph 1: Introduction (Paraphrase the prompt precisely)
+   - Paragraph 2: Overview (Clear key features, main trends, and significant differences)
+   - Paragraph 3: Body 1 (Specific grouped data, key comparisons)
+   - Paragraph 4: Body 2 (Remaining grouped data and comparisons)
+2. Use natural, punchy, and precise vocabulary without unnatural or repetitive words. Meet all IELTS Band 9 criteria (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammatical Range & Accuracy).
+3. Output the answer in clean, plain paragraphs.
+4. After the essay, provide:
+   - [REASON WHY IT DESERVES BAND 9]: Brief bullet points justifying the score against the 4 official criteria.
+   - [KEY VOCABULARY & GRAMMAR]: High-value collocations, trend verbs, and complex structures used.</div>
         </div>
 
-        <!-- Key Vocabulary / Collocations -->
+        <!-- 1. Full AI Model Answer -->
         <div class="card">
             <div class="card-header">
-                <span>Key Vocabulary & Grammar Patterns</span>
+                <span>1. Model Answer (Band 9)</span>
+                <span id="full-wc" style="font-size: 11px;">0 words</span>
             </div>
-            <textarea id="ai-vocab" rows="5" placeholder="e.g. witnessed a dramatic surge, plateaued at, accounted for..." oninput="autoSave()"></textarea>
+            <textarea id="ai-full" rows="8" placeholder="Paste the 4-paragraph Band 9 response here..." oninput="autoSave()"></textarea>
+        </div>
+
+        <!-- 2. Reason Why It Got Band 9 (In between) -->
+        <div class="card">
+            <div class="card-header">
+                <span>2. Reason Why It Deserves Band 9 (Score Justification)</span>
+            </div>
+            <textarea id="ai-reason" rows="5" placeholder="e.g. 
+- TA: Key trends clearly highlighted without missing data.
+- CC: Logical progression, seamless transition words.
+- LR: Accurate collocation ('witnessed a marked rise', 'plateaued').
+- GRA: Flawless complex sentences, passives, and participle clauses." oninput="autoSave()"></textarea>
+        </div>
+
+        <!-- 3. Key Vocabulary / Collocations -->
+        <div class="card">
+            <div class="card-header">
+                <span>3. Key Vocabulary & Grammar Patterns</span>
+            </div>
+            <textarea id="ai-vocab" rows="5" placeholder="e.g. saw an exponential climb, in stark contrast, represented the lion's share..." oninput="autoSave()"></textarea>
         </div>
     </div>
 
@@ -163,16 +235,18 @@
         function autoSave() {
             const data = {
                 full: document.getElementById('ai-full').value,
+                reason: document.getElementById('ai-reason').value,
                 vocab: document.getElementById('ai-vocab').value
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             
             // Update word count
-            const words = data.full.trim() ? data.full.trim().split(/\s+/).length : 0;
+            const words = data.full.trim() ? data.full.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
             document.getElementById('full-wc').innerText = `${words} words`;
 
             // Status flash
             const badge = document.getElementById('save-indicator');
+            badge.innerText = 'Saved';
             badge.style.display = 'inline-block';
             clearTimeout(window._t);
             window._t = setTimeout(() => badge.style.display = 'none', 1200);
@@ -183,25 +257,46 @@
             if (raw) {
                 const data = JSON.parse(raw);
                 document.getElementById('ai-full').value = data.full || '';
+                document.getElementById('ai-reason').value = data.reason || '';
                 document.getElementById('ai-vocab').value = data.vocab || '';
-                const words = data.full ? data.full.trim().split(/\s+/).length : 0;
+                
+                const words = data.full ? data.full.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
                 document.getElementById('full-wc').innerText = `${words} words`;
             }
         }
 
-        function copyAll() {
-            const text = document.getElementById('ai-full').value;
-            if(!text) return;
-            navigator.clipboard.writeText(text);
+        function copyAIPrompt() {
+            const promptText = document.getElementById('ai-prompt-template').innerText;
+            navigator.clipboard.writeText(promptText);
             const badge = document.getElementById('save-indicator');
-            badge.innerText = 'Copied!';
+            badge.innerText = 'Prompt Copied!';
+            badge.style.display = 'inline-block';
+            setTimeout(() => { badge.innerText = 'Saved'; badge.style.display = 'none'; }, 1500);
+        }
+
+        function copyAll() {
+            const full = document.getElementById('ai-full').value;
+            const reason = document.getElementById('ai-reason').value;
+            const vocab = document.getElementById('ai-vocab').value;
+            
+            let combined = "";
+            if (full) combined += `--- MODEL ANSWER ---\n${full}\n\n`;
+            if (reason) combined += `--- SCORE JUSTIFICATION (BAND 9) ---\n${reason}\n\n`;
+            if (vocab) combined += `--- KEY VOCABULARY & GRAMMAR ---\n${vocab}`;
+
+            if(!combined.trim()) return;
+
+            navigator.clipboard.writeText(combined.trim());
+            const badge = document.getElementById('save-indicator');
+            badge.innerText = 'All Copied!';
             badge.style.display = 'inline-block';
             setTimeout(() => { badge.innerText = 'Saved'; badge.style.display = 'none'; }, 1500);
         }
 
         function clearHint() {
-            if(confirm("Clear this AI hint?")) {
+            if(confirm("Clear all AI hint fields?")) {
                 document.getElementById('ai-full').value = '';
+                document.getElementById('ai-reason').value = '';
                 document.getElementById('ai-vocab').value = '';
                 localStorage.removeItem(STORAGE_KEY);
                 document.getElementById('full-wc').innerText = '0 words';
