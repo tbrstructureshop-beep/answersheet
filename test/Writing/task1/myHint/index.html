@@ -170,92 +170,98 @@
         <!-- AI Prompt Copy Card -->
         <div class="prompt-banner">
             <div class="prompt-banner-header">
-                <span>📋 Copy Snippet Prompt for AI</span>
+                <span>📋 Copy 4-Snippet Prompt for AI</span>
                 <button class="btn-prompt" onclick="copyAIPrompt()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     Copy AI Prompt
                 </button>
             </div>
             <div class="prompt-desc">
-                Klik tombol di atas lalu paste ke chat AI bersama gambar soal. Jawaban AI akan otomatis muncul terpisah dalam kotak snippet (code block) sehingga tinggal klik "Copy" per bagian di chat AI.
+                Klik tombol di atas lalu paste ke chat AI bersama gambar soal. AI akan otomatis membagi jawabannya menjadi tepat <b>4 kotak snippet</b> (Answer, Reason, Vocab, Synonyms) sehingga sangat mudah dicopy.
             </div>
         </div>
 
-        <!-- 1. Full Answer -->
+        <!-- 1. Model Answer -->
         <div class="card">
             <div class="card-header">
-                <span>Model Answer (Paste paragraphs here)</span>
+                <span>1. Model Answer (Band 9)</span>
                 <span id="full-wc" style="font-size: 11px;">0 words</span>
             </div>
-            <textarea id="ai-full" rows="8" placeholder="Paste the paragraphs you copied from AI chat snippets here..." oninput="autoSave()"></textarea>
+            <textarea id="ai-full" rows="8" placeholder="Paste Snippet 1 (Model Answer) from AI chat here..." oninput="autoSave()"></textarea>
         </div>
 
-        <!-- 2. Reason Why It Got Band 9 (In between) -->
+        <!-- 2. Reason Why It Got Band 9 -->
         <div class="card">
             <div class="card-header">
-                <span>Reason Why It Deserves Band 9 (Score Justification)</span>
+                <span>2. Reason Why It Deserves Band 9 (Score Justification)</span>
             </div>
-            <textarea id="ai-reason" rows="6" placeholder="Paste the reason snippet from AI chat here..." oninput="autoSave()"></textarea>
+            <textarea id="ai-reason" rows="5" placeholder="Paste Snippet 2 (Reason) from AI chat here..." oninput="autoSave()"></textarea>
         </div>
 
-        <!-- 3. Key Vocabulary / Collocations -->
+        <!-- 3. Key Vocabulary & Grammar Patterns -->
         <div class="card">
             <div class="card-header">
-                <span>Key Vocabulary & Grammar Patterns</span>
+                <span>3. Key Vocabulary & Grammar Patterns</span>
             </div>
-            <textarea id="ai-vocab" rows="6" placeholder="Paste the vocabulary snippet from AI chat here..." oninput="autoSave()"></textarea>
+            <textarea id="ai-vocab" rows="5" placeholder="Paste Snippet 3 (Vocabulary & Grammar) from AI chat here..." oninput="autoSave()"></textarea>
+        </div>
+
+        <!-- 4. Synonyms & Paraphrasing -->
+        <div class="card">
+            <div class="card-header">
+                <span>4. Synonyms & Paraphrasing Bank</span>
+            </div>
+            <textarea id="ai-synonyms" rows="5" placeholder="Paste Snippet 4 (Synonyms) from AI chat here..." oninput="autoSave()"></textarea>
         </div>
     </div>
 
     <script>
         const STORAGE_KEY = 'ielts_writing_task1_ai_hint';
 
-        // Prompt teks yang disalin ke clipboard
-        const AI_PROMPT_TEXT = `Please act as an official IELTS Examiner. Analyze the attached IELTS Writing Task 1 image and write a Band 9 sample answer.
+        // Prompt teks yang disalin ke clipboard: Hanya 4 Snippet
+        const AI_PROMPT_TEXT = `Please act as an official IELTS Examiner. Analyze the attached IELTS Writing Task 1 visual and write a Band 9 sample answer.
 
-IMPORTANT: You MUST output each section and each paragraph inside its own separate markdown code snippet block (\`\`\`text ... \`\`\`) so I can copy each part individually with one click. Do not merge paragraphs into one block.
+IMPORTANT: You MUST divide your entire response into EXACTLY 4 separate markdown code snippet blocks (\`\`\`text ... \`\`\`) so I can copy each part individually with one click.
 
-Output strictly in this format:
+Format strictly as follows:
 
-### Paragraph 1: Introduction
+### 1. Band 9 Model Answer
 \`\`\`text
-[Paraphrased introduction here]
+[Write complete 4-paragraph essay here:
+- Paragraph 1: Introduction
+- Paragraph 2: Overview
+- Paragraph 3: Body Paragraph 1
+- Paragraph 4: Body Paragraph 2]
 \`\`\`
 
-### Paragraph 2: Overview
+### 2. Reason Why It Deserves Band 9
 \`\`\`text
-[Clear overview with key trends and prominent features here]
+[Bullet points justifying:
+- Task Achievement: key features & data
+- Coherence & Cohesion: logical layout & flow
+- Lexical Resource: natural punchy vocabulary
+- Grammatical Range & Accuracy: sentence variety & accuracy]
 \`\`\`
 
-### Paragraph 3: Body Paragraph 1
+### 3. Key Vocabulary & Grammar Patterns
 \`\`\`text
-[Grouped detailed comparisons and data here]
+[List of key trend verbs, high-value collocations, participle clauses, and comparison structures used]
 \`\`\`
 
-### Paragraph 4: Body Paragraph 2
+### 4. Synonyms & Paraphrasing Bank
 \`\`\`text
-[Remaining grouped data and comparisons here]
-\`\`\`
-
-### Reason Why It Deserves Band 9
-\`\`\`text
-[Bullet points justifying Task Achievement, Coherence & Cohesion, Lexical Resource, and Grammatical Range & Accuracy]
-\`\`\`
-
-### Key Vocabulary & Grammar Patterns
-\`\`\`text
-[List of high-value collocations, verbs for trends/proportions, and grammatical structures used]
-\`\`\`
-
-Criteria to meet:
-- Band 9 natural punchy vocabulary without artificial/repetitive jargon.
-- Clear 4-paragraph structure.`;
+[Table or bullet list of keywords from the task and their natural synonyms used to avoid repetition, e.g.:
+- Venue: settings / locations / facilities
+- Young people: youth / teenagers / cohorts / learners
+- Show: illustrate / compare / depict / represent]
+\`\`\``;
 
         function autoSave() {
             const data = {
                 full: document.getElementById('ai-full').value,
                 reason: document.getElementById('ai-reason').value,
-                vocab: document.getElementById('ai-vocab').value
+                vocab: document.getElementById('ai-vocab').value,
+                synonyms: document.getElementById('ai-synonyms').value
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             
@@ -272,6 +278,7 @@ Criteria to meet:
                 document.getElementById('ai-full').value = data.full || '';
                 document.getElementById('ai-reason').value = data.reason || '';
                 document.getElementById('ai-vocab').value = data.vocab || '';
+                document.getElementById('ai-synonyms').value = data.synonyms || '';
                 
                 const words = data.full ? data.full.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
                 document.getElementById('full-wc').innerText = `${words} words`;
@@ -290,7 +297,6 @@ Criteria to meet:
             navigator.clipboard.writeText(AI_PROMPT_TEXT).then(() => {
                 flashBadge('Prompt Copied!');
             }).catch(() => {
-                // Fallback jika clipboard permissions diblokir browser
                 const temp = document.createElement('textarea');
                 temp.value = AI_PROMPT_TEXT;
                 document.body.appendChild(temp);
@@ -305,11 +311,13 @@ Criteria to meet:
             const full = document.getElementById('ai-full').value;
             const reason = document.getElementById('ai-reason').value;
             const vocab = document.getElementById('ai-vocab').value;
+            const synonyms = document.getElementById('ai-synonyms').value;
             
             let combined = "";
             if (full) combined += `--- MODEL ANSWER ---\n${full}\n\n`;
             if (reason) combined += `--- SCORE JUSTIFICATION (BAND 9) ---\n${reason}\n\n`;
-            if (vocab) combined += `--- KEY VOCABULARY & GRAMMAR ---\n${vocab}`;
+            if (vocab) combined += `--- KEY VOCABULARY & GRAMMAR ---\n${vocab}\n\n`;
+            if (synonyms) combined += `--- SYNONYMS & PARAPHRASING ---\n${synonyms}`;
 
             if (!combined.trim()) return;
 
@@ -322,6 +330,7 @@ Criteria to meet:
                 document.getElementById('ai-full').value = '';
                 document.getElementById('ai-reason').value = '';
                 document.getElementById('ai-vocab').value = '';
+                document.getElementById('ai-synonyms').value = '';
                 localStorage.removeItem(STORAGE_KEY);
                 document.getElementById('full-wc').innerText = '0 words';
                 flashBadge('Cleared');
