@@ -93,7 +93,7 @@
         .prompt-desc {
             font-size: 11.5px;
             color: #047857;
-            line-height: 1.4;
+            line-height: 1.45;
         }
 
         /* Collapsible Cards */
@@ -121,9 +121,7 @@
             user-select: none;
             transition: background 0.15s;
         }
-        .card-header:hover {
-            background: #f8fafc;
-        }
+        .card-header:hover { background: #f8fafc; }
         .card-header-left {
             display: flex;
             align-items: center;
@@ -153,7 +151,6 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            transition: max-height 0.25s ease;
         }
         .card.collapsed .card-body {
             display: none;
@@ -163,9 +160,9 @@
             width: 100%;
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px;
             font-size: 13.5px;
-            line-height: 1.6;
+            line-height: 1.7;
             color: var(--text-main);
             background: #fbfcfe;
             resize: vertical;
@@ -198,8 +195,8 @@
         <div class="btn-group">
             <span id="save-indicator" class="badge-status">Saved</span>
             <button onclick="toggleAllCards()" title="Minimize / Expand All">
-                <svg id="toggle-all-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
-                <span id="toggle-all-text">Toggle All</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
+                <span>Toggle All</span>
             </button>
             <button onclick="clearHint()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -216,14 +213,14 @@
         <!-- AI Prompt Copy Card -->
         <div class="prompt-banner">
             <div class="prompt-banner-header">
-                <span>📋 Copy 4-Snippet Prompt for AI</span>
+                <span>📋 Copy 4-Snippet Prompt (No Markdown Tables)</span>
                 <button class="btn-prompt" onclick="copyAIPrompt()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                     Copy AI Prompt
                 </button>
             </div>
             <div class="prompt-desc">
-                Klik tombol di atas lalu paste ke chat AI bersama gambar. AI akan membagi jawabannya ke dalam <b>4 kotak snippet</b> dengan bullet <b>•</b> rapi dan jarak satu baris.
+                Format prompt sudah disetel bebas dari tabel bergaris yang merusak tampilan HP. Semua kosakata dan sinonim tersusun dalam format <b>• Kata → Sinonim</b> dengan spasi baris yang lega.
             </div>
         </div>
 
@@ -235,7 +232,6 @@
                 </div>
                 <div class="card-header-right">
                     <span id="full-wc" style="font-size: 11px; color: var(--text-muted);">0 words</span>
-                    <!-- Chevron 'v' icon -->
                     <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
@@ -253,7 +249,6 @@
                     <span>2. Reason Why It Deserves Band 9</span>
                 </div>
                 <div class="card-header-right">
-                    <!-- Chevron 'v' icon -->
                     <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
@@ -271,14 +266,13 @@
                     <span>3. Key Vocabulary & Grammar Patterns</span>
                 </div>
                 <div class="card-header-right">
-                    <!-- Chevron 'v' icon -->
                     <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
             </div>
             <div class="card-body">
-                <textarea id="ai-vocab" rows="6" placeholder="• Item 1&#10;&#10;• Item 2" oninput="formatAndSave('ai-vocab')"></textarea>
+                <textarea id="ai-vocab" rows="6" placeholder="• Reporting Verbs: illustrates, compares, displays&#10;&#10;• Key Collocations: youth dance classes, distinct age groups&#10;&#10;• Advanced Grammar: participle clauses, contrasting adverbs" oninput="cleanAndSave('ai-vocab')"></textarea>
             </div>
         </div>
 
@@ -289,14 +283,13 @@
                     <span>4. Synonyms & Paraphrasing Bank</span>
                 </div>
                 <div class="card-header-right">
-                    <!-- Chevron 'v' icon -->
                     <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </div>
             </div>
             <div class="card-body">
-                <textarea id="ai-synonyms" rows="6" placeholder="• Original: Synonym 1 / Synonym 2&#10;&#10;• Original: Synonym 1 / Synonym 2" oninput="formatAndSave('ai-synonyms')"></textarea>
+                <textarea id="ai-synonyms" rows="6" placeholder="• Show / Give info → illustrates, compares, depicts&#10;&#10;• Location → venue, facility, setting, distribution&#10;&#10;• Young people → youth, teenagers, younger learners, cohorts" oninput="cleanAndSave('ai-synonyms')"></textarea>
             </div>
         </div>
     </div>
@@ -305,74 +298,106 @@
         const STORAGE_KEY = 'ielts_writing_task1_ai_hint';
         const COLLAPSE_KEY = 'ielts_writing_task1_collapsed_cards';
 
-        // Prompt teks yang disalin ke clipboard
+        // Prompt tegas: Dilarang keras membuat tabel markdown pipe (|)
         const AI_PROMPT_TEXT = `Please act as an official IELTS Examiner. Analyze the attached IELTS Writing Task 1 visual and write a Band 9 sample answer.
 
-IMPORTANT: You MUST divide your entire response into EXACTLY 4 separate markdown code snippet blocks (\`\`\`text ... \`\`\`) so I can copy each part individually with one click.
-
-For sections 2, 3, and 4, format every single point with a bullet • followed by a blank line (double space) between items.
+IMPORTANT FORMATTING RULES:
+1. Divide your entire answer into EXACTLY 4 separate markdown code snippet blocks (\`\`\`text ... \`\`\`).
+2. DO NOT use markdown tables (no "|" pipes, no table grids) anywhere because they are unreadable on mobile devices.
+3. For sections 2, 3, and 4: use ONLY plain bullet points (\`• \`) with a BLANK LINE (double enter) between each item for maximum mobile readability.
 
 Format strictly as follows:
 
 ### 1. Band 9 Model Answer
 \`\`\`text
 [Write complete 4-paragraph essay here:
-- Paragraph 1: Introduction
-- Paragraph 2: Overview
-- Paragraph 3: Body Paragraph 1
-- Paragraph 4: Body Paragraph 2]
+- Paragraph 1: Introduction (paraphrase prompt)
+- Paragraph 2: Overview (broad trends/features)
+- Paragraph 3: Body Paragraph 1 (grouped data)
+- Paragraph 4: Body Paragraph 2 (remaining data)]
 \`\`\`
 
 ### 2. Reason Why It Deserves Band 9
 \`\`\`text
-• Task Achievement: [Key features highlighted, accurate comparisons, and clear overview]
+• Task Achievement: [Key trends highlighted, accurate comparisons, clear overview]
 
 • Coherence & Cohesion: [Logical paragraphing, seamless transition phrases]
 
 • Lexical Resource: [Precise academic vocabulary without unnatural repetition]
 
-• Grammatical Range & Accuracy: [Complex structures, flawless passive and participle clauses]
+• Grammatical Range & Accuracy: [Complex structures, error-free passive and participle clauses]
 \`\`\`
 
 ### 3. Key Vocabulary & Grammar Patterns
 \`\`\`text
-• [Trend verbs and collocations used]
+• Key Trend Verbs: [verb 1], [verb 2], [verb 3]
 
-• [Data and category terms used]
+• Academic Collocations: [collocation 1], [collocation 2], [collocation 3]
 
-• [Participle clauses or comparison patterns used]
+• Grammar Structures: [Pattern 1 with brief example], [Pattern 2 with brief example]
+
+• Data / Approximation Terms: [term 1], [term 2], [term 3]
 \`\`\`
 
 ### 4. Synonyms & Paraphrasing Bank
 \`\`\`text
-• [Word from prompt]: [Synonym 1] / [Synonym 2] / [Synonym 3]
+• [Original Prompt Word] → [Synonym 1], [Synonym 2], [Synonym 3]
 
-• [Category term]: [Alternative phrase 1] / [Alternative phrase 2]
+• [Category / Subject Term] → [Synonym 1], [Synonym 2], [Synonym 3]
 
-• [Metric / Data term]: [Alternative phrase 1] / [Alternative phrase 2]
+• [Location / Metric Term] → [Synonym 1], [Synonym 2], [Synonym 3]
+
+• [Trend / Percentage Term] → [Synonym 1], [Synonym 2], [Synonym 3]
 \`\`\``;
 
-        // Auto format pasted text to ensure bullet '• ' and double newline spacing
-        function formatBullets(text) {
+        // Auto-Cleaner: Merombak tabel markdown (|...|) dan bullet (* / -) menjadi format bersih (• ... \n\n)
+        function cleanFormat(text) {
             if (!text || !text.trim()) return text;
-            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-            
-            // Check if lines have markdown bullets (*, -, •)
-            const hasListStyle = lines.some(l => /^[-*•]\s+/.test(l));
-            if (!hasListStyle) return text;
 
-            return lines.map(line => {
-                let clean = line.replace(/^[-*•]\s*/, '').trim();
-                return `• ${clean}`;
-            }).join('\n\n');
+            // Jika teks berupa tabel markdown (| Original | Synonyms |)
+            if (text.includes('|')) {
+                const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.startsWith('|') && l.endsWith('|'));
+                const cleanedItems = [];
+
+                lines.forEach(line => {
+                    // Abaikan header tabel dan garis pemisah (|---|---|)
+                    if (line.includes('---') || /original|term|prompt/i.test(line)) return;
+
+                    const cols = line.split('|').map(c => c.trim()).filter(c => c.length > 0);
+                    if (cols.length >= 2) {
+                        const original = cols[0];
+                        const synonyms = cols[1];
+                        cleanedItems.push(`• ${original} → ${synonyms}`);
+                    }
+                });
+
+                if (cleanedItems.length > 0) {
+                    return cleanedItems.join('\n\n');
+                }
+            }
+
+            // Jika teks menggunakan bullet biasa (*, -, dll)
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            const hasListStyle = lines.some(l => /^[-*•]\s+/.test(l));
+
+            if (hasListStyle) {
+                return lines.map(line => {
+                    let clean = line.replace(/^[-*•]\s*/, '').trim();
+                    // Rapikan jika ada tanda panah yang tidak seragam
+                    clean = clean.replace(/\s*(?:->|=>)\s*/g, ' → ');
+                    return `• ${clean}`;
+                }).join('\n\n');
+            }
+
+            return text;
         }
 
-        function formatAndSave(elementId) {
+        function cleanAndSave(elementId) {
             const el = document.getElementById(elementId);
-            // Hanya auto-format jika pengguna baru saja mem-paste banyak baris
-            if (el.value.includes('\n') && (el.value.includes('* ') || el.value.includes('- '))) {
+            // Jalankan cleaner jika terdeteksi tabel markdown atau list markdown
+            if (el.value.includes('|') || el.value.includes('* ') || el.value.includes('- ')) {
                 const start = el.selectionStart;
-                el.value = formatBullets(el.value);
+                el.value = cleanFormat(el.value);
                 el.setSelectionRange(start, start);
             }
             autoSave();
