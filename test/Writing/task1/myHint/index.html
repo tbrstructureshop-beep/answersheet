@@ -48,7 +48,7 @@
             background: #fff;
             border: 1px solid var(--border);
             color: var(--text-main);
-            padding: 6px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
@@ -58,8 +58,8 @@
         button:hover { background: #f1f5f9; }
         button.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
         button.btn-primary:hover { background: var(--primary-hover); }
-        button.btn-prompt { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-        button.btn-prompt:hover { background: #dcfce7; }
+        button.btn-prompt { background: #10b981; color: #fff; border-color: #10b981; }
+        button.btn-prompt:hover { background: #059669; }
         button svg { width: 14px; height: 14px; }
 
         /* Content Area */
@@ -74,8 +74,8 @@
 
         /* Banner Prompt Box */
         .prompt-banner {
-            background: #f0fdf4;
-            border: 1px dashed #86efac;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
             border-radius: 10px;
             padding: 12px 14px;
             display: flex;
@@ -86,22 +86,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
-            color: #166534;
+            color: #065f46;
         }
-        .prompt-text {
+        .prompt-desc {
             font-size: 11.5px;
-            color: #374151;
-            line-height: 1.45;
-            background: #ffffff;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #dcfce7;
-            user-select: all;
-            max-height: 80px;
-            overflow-y: auto;
-            white-space: pre-wrap;
+            color: #047857;
+            line-height: 1.4;
         }
 
         /* Cards */
@@ -159,7 +151,7 @@
     <div class="hint-header">
         <div class="hint-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            AI Hint & Breakdown
+            AI Hint & Reference
         </div>
         <div class="btn-group">
             <span id="save-indicator" class="badge-status">Saved</span>
@@ -175,62 +167,89 @@
     </div>
 
     <div class="hint-content">
-        <!-- AI Prompt Copy Assistant -->
+        <!-- AI Prompt Copy Card -->
         <div class="prompt-banner">
             <div class="prompt-banner-header">
-                <span>🤖 AI Chat Prompt (Ready to paste with your image)</span>
+                <span>📋 Copy Snippet Prompt for AI</span>
                 <button class="btn-prompt" onclick="copyAIPrompt()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    Copy Prompt
+                    Copy AI Prompt
                 </button>
             </div>
-            <div class="prompt-text" id="ai-prompt-template">Please act as an ex-IELTS Examiner. Analyze the uploaded IELTS Writing Task 1 visual and provide a Band 9 sample answer. 
-
-Requirements:
-1. Strict 4-paragraph structure:
-   - Paragraph 1: Introduction (Paraphrase the prompt precisely)
-   - Paragraph 2: Overview (Clear key features, main trends, and significant differences)
-   - Paragraph 3: Body 1 (Specific grouped data, key comparisons)
-   - Paragraph 4: Body 2 (Remaining grouped data and comparisons)
-2. Use natural, punchy, and precise vocabulary without unnatural or repetitive words. Meet all IELTS Band 9 criteria (Task Achievement, Coherence & Cohesion, Lexical Resource, Grammatical Range & Accuracy).
-3. Output the answer in clean, plain paragraphs.
-4. After the essay, provide:
-   - [REASON WHY IT DESERVES BAND 9]: Brief bullet points justifying the score against the 4 official criteria.
-   - [KEY VOCABULARY & GRAMMAR]: High-value collocations, trend verbs, and complex structures used.</div>
+            <div class="prompt-desc">
+                Klik tombol di atas lalu paste ke chat AI bersama gambar soal. Jawaban AI akan otomatis muncul terpisah dalam kotak snippet (code block) sehingga tinggal klik "Copy" per bagian di chat AI.
+            </div>
         </div>
 
-        <!-- 1. Full AI Model Answer -->
+        <!-- 1. Full Answer -->
         <div class="card">
             <div class="card-header">
-                <span>1. Model Answer (Band 9)</span>
+                <span>Model Answer (Paste paragraphs here)</span>
                 <span id="full-wc" style="font-size: 11px;">0 words</span>
             </div>
-            <textarea id="ai-full" rows="8" placeholder="Paste the 4-paragraph Band 9 response here..." oninput="autoSave()"></textarea>
+            <textarea id="ai-full" rows="8" placeholder="Paste the paragraphs you copied from AI chat snippets here..." oninput="autoSave()"></textarea>
         </div>
 
         <!-- 2. Reason Why It Got Band 9 (In between) -->
         <div class="card">
             <div class="card-header">
-                <span>2. Reason Why It Deserves Band 9 (Score Justification)</span>
+                <span>Reason Why It Deserves Band 9 (Score Justification)</span>
             </div>
-            <textarea id="ai-reason" rows="5" placeholder="e.g. 
-- TA: Key trends clearly highlighted without missing data.
-- CC: Logical progression, seamless transition words.
-- LR: Accurate collocation ('witnessed a marked rise', 'plateaued').
-- GRA: Flawless complex sentences, passives, and participle clauses." oninput="autoSave()"></textarea>
+            <textarea id="ai-reason" rows="6" placeholder="Paste the reason snippet from AI chat here..." oninput="autoSave()"></textarea>
         </div>
 
         <!-- 3. Key Vocabulary / Collocations -->
         <div class="card">
             <div class="card-header">
-                <span>3. Key Vocabulary & Grammar Patterns</span>
+                <span>Key Vocabulary & Grammar Patterns</span>
             </div>
-            <textarea id="ai-vocab" rows="5" placeholder="e.g. saw an exponential climb, in stark contrast, represented the lion's share..." oninput="autoSave()"></textarea>
+            <textarea id="ai-vocab" rows="6" placeholder="Paste the vocabulary snippet from AI chat here..." oninput="autoSave()"></textarea>
         </div>
     </div>
 
     <script>
         const STORAGE_KEY = 'ielts_writing_task1_ai_hint';
+
+        // Prompt teks yang disalin ke clipboard
+        const AI_PROMPT_TEXT = `Please act as an official IELTS Examiner. Analyze the attached IELTS Writing Task 1 image and write a Band 9 sample answer.
+
+IMPORTANT: You MUST output each section and each paragraph inside its own separate markdown code snippet block (\`\`\`text ... \`\`\`) so I can copy each part individually with one click. Do not merge paragraphs into one block.
+
+Output strictly in this format:
+
+### Paragraph 1: Introduction
+\`\`\`text
+[Paraphrased introduction here]
+\`\`\`
+
+### Paragraph 2: Overview
+\`\`\`text
+[Clear overview with key trends and prominent features here]
+\`\`\`
+
+### Paragraph 3: Body Paragraph 1
+\`\`\`text
+[Grouped detailed comparisons and data here]
+\`\`\`
+
+### Paragraph 4: Body Paragraph 2
+\`\`\`text
+[Remaining grouped data and comparisons here]
+\`\`\`
+
+### Reason Why It Deserves Band 9
+\`\`\`text
+[Bullet points justifying Task Achievement, Coherence & Cohesion, Lexical Resource, and Grammatical Range & Accuracy]
+\`\`\`
+
+### Key Vocabulary & Grammar Patterns
+\`\`\`text
+[List of high-value collocations, verbs for trends/proportions, and grammatical structures used]
+\`\`\`
+
+Criteria to meet:
+- Band 9 natural punchy vocabulary without artificial/repetitive jargon.
+- Clear 4-paragraph structure.`;
 
         function autoSave() {
             const data = {
@@ -240,16 +259,10 @@ Requirements:
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             
-            // Update word count
             const words = data.full.trim() ? data.full.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
             document.getElementById('full-wc').innerText = `${words} words`;
 
-            // Status flash
-            const badge = document.getElementById('save-indicator');
-            badge.innerText = 'Saved';
-            badge.style.display = 'inline-block';
-            clearTimeout(window._t);
-            window._t = setTimeout(() => badge.style.display = 'none', 1200);
+            flashBadge('Saved');
         }
 
         function loadData() {
@@ -265,13 +278,27 @@ Requirements:
             }
         }
 
-        function copyAIPrompt() {
-            const promptText = document.getElementById('ai-prompt-template').innerText;
-            navigator.clipboard.writeText(promptText);
+        function flashBadge(text) {
             const badge = document.getElementById('save-indicator');
-            badge.innerText = 'Prompt Copied!';
+            badge.innerText = text;
             badge.style.display = 'inline-block';
-            setTimeout(() => { badge.innerText = 'Saved'; badge.style.display = 'none'; }, 1500);
+            clearTimeout(window._t);
+            window._t = setTimeout(() => badge.style.display = 'none', 1400);
+        }
+
+        function copyAIPrompt() {
+            navigator.clipboard.writeText(AI_PROMPT_TEXT).then(() => {
+                flashBadge('Prompt Copied!');
+            }).catch(() => {
+                // Fallback jika clipboard permissions diblokir browser
+                const temp = document.createElement('textarea');
+                temp.value = AI_PROMPT_TEXT;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                flashBadge('Prompt Copied!');
+            });
         }
 
         function copyAll() {
@@ -284,22 +311,20 @@ Requirements:
             if (reason) combined += `--- SCORE JUSTIFICATION (BAND 9) ---\n${reason}\n\n`;
             if (vocab) combined += `--- KEY VOCABULARY & GRAMMAR ---\n${vocab}`;
 
-            if(!combined.trim()) return;
+            if (!combined.trim()) return;
 
             navigator.clipboard.writeText(combined.trim());
-            const badge = document.getElementById('save-indicator');
-            badge.innerText = 'All Copied!';
-            badge.style.display = 'inline-block';
-            setTimeout(() => { badge.innerText = 'Saved'; badge.style.display = 'none'; }, 1500);
+            flashBadge('All Copied!');
         }
 
         function clearHint() {
-            if(confirm("Clear all AI hint fields?")) {
+            if (confirm("Clear all hint fields?")) {
                 document.getElementById('ai-full').value = '';
                 document.getElementById('ai-reason').value = '';
                 document.getElementById('ai-vocab').value = '';
                 localStorage.removeItem(STORAGE_KEY);
                 document.getElementById('full-wc').innerText = '0 words';
+                flashBadge('Cleared');
             }
         }
 
