@@ -468,17 +468,26 @@
             window.open(printPath, '_blank');
         }
 
-        // Listener untuk membuka & menutup Typing Game Fullscreen dari myHint maupun Game itu sendiri
+        // Listener untuk menangani pembukaan & penutupan Retype Typing Game & Match Synonym Game
         window.addEventListener('message', (event) => {
+            const overlay = document.getElementById('typegame-overlay');
+            const iframe = document.getElementById('typegame-iframe');
+            if (!overlay || !iframe) return;
+        
+            // Buka Handwritten Retype Game
             if (event.data === 'OPEN_TYPE_GAME') {
-                const overlay = document.getElementById('typegame-overlay');
-                const iframe = document.getElementById('typegame-iframe');
                 iframe.src = 'myHint/typingGame/index.html';
                 overlay.classList.add('active');
             }
-            if (event.data === 'CLOSE_TYPE_GAME') {
-                const overlay = document.getElementById('typegame-overlay');
-                const iframe = document.getElementById('typegame-iframe');
+        
+            // Buka Match Synonym & Flow Game
+            if (event.data === 'OPEN_MATCH_GAME') {
+                iframe.src = 'myHint/matchSynonym/index.html';
+                overlay.classList.add('active');
+            }
+        
+            // Tutup Game apa pun dan kembali ke workspace Task 1
+            if (event.data === 'CLOSE_TYPE_GAME' || event.data === 'CLOSE_MATCH_GAME') {
                 overlay.classList.remove('active');
                 iframe.src = '';
             }
