@@ -96,16 +96,16 @@
             line-height: 1.4;
         }
 
-        /* Cards */
+        /* Collapsible Cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 12px 14px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            overflow: hidden;
+            transition: all 0.2s ease;
         }
 
         .card-header {
@@ -115,6 +115,48 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-muted);
+            padding: 12px 14px;
+            background: #ffffff;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .card-header:hover {
+            background: #f8fafc;
+        }
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+        .card-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toggle Chevron Icon (v) */
+        .toggle-icon {
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-muted);
+            transition: transform 0.25s ease;
+        }
+        .card.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .card-body {
+            padding: 0 14px 14px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: max-height 0.25s ease;
+        }
+        .card.collapsed .card-body {
+            display: none;
         }
 
         textarea {
@@ -155,6 +197,10 @@
         </div>
         <div class="btn-group">
             <span id="save-indicator" class="badge-status">Saved</span>
+            <button onclick="toggleAllCards()" title="Minimize / Expand All">
+                <svg id="toggle-all-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 13 12 18 17 13"></polyline><polyline points="7 6 12 11 17 6"></polyline></svg>
+                <span id="toggle-all-text">Toggle All</span>
+            </button>
             <button onclick="clearHint()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 Clear
@@ -177,51 +223,94 @@
                 </button>
             </div>
             <div class="prompt-desc">
-                Klik tombol di atas lalu paste ke chat AI bersama gambar soal. AI akan otomatis membagi jawabannya menjadi tepat <b>4 kotak snippet</b> (Answer, Reason, Vocab, Synonyms) sehingga sangat mudah dicopy.
+                Klik tombol di atas lalu paste ke chat AI bersama gambar. AI akan membagi jawabannya ke dalam <b>4 kotak snippet</b> dengan bullet <b>•</b> rapi dan jarak satu baris.
             </div>
         </div>
 
         <!-- 1. Model Answer -->
-        <div class="card">
-            <div class="card-header">
-                <span>1. Model Answer (Band 9)</span>
-                <span id="full-wc" style="font-size: 11px;">0 words</span>
+        <div class="card" id="card-full">
+            <div class="card-header" onclick="toggleCard('card-full')">
+                <div class="card-header-left">
+                    <span>1. Model Answer (Band 9)</span>
+                </div>
+                <div class="card-header-right">
+                    <span id="full-wc" style="font-size: 11px; color: var(--text-muted);">0 words</span>
+                    <!-- Chevron 'v' icon -->
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
-            <textarea id="ai-full" rows="8" placeholder="Paste Snippet 1 (Model Answer) from AI chat here..." oninput="autoSave()"></textarea>
+            <div class="card-body">
+                <textarea id="ai-full" rows="8" placeholder="Paste Snippet 1 (Model Answer) from AI chat here..." oninput="autoSave()"></textarea>
+            </div>
         </div>
 
         <!-- 2. Reason Why It Got Band 9 -->
-        <div class="card">
-            <div class="card-header">
-                <span>2. Reason Why It Deserves Band 9 (Score Justification)</span>
+        <div class="card" id="card-reason">
+            <div class="card-header" onclick="toggleCard('card-reason')">
+                <div class="card-header-left">
+                    <span>2. Reason Why It Deserves Band 9</span>
+                </div>
+                <div class="card-header-right">
+                    <!-- Chevron 'v' icon -->
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
-            <textarea id="ai-reason" rows="5" placeholder="Paste Snippet 2 (Reason) from AI chat here..." oninput="autoSave()"></textarea>
+            <div class="card-body">
+                <textarea id="ai-reason" rows="6" placeholder="Paste Snippet 2 (Reason) from AI chat here..." oninput="autoSave()"></textarea>
+            </div>
         </div>
 
         <!-- 3. Key Vocabulary & Grammar Patterns -->
-        <div class="card">
-            <div class="card-header">
-                <span>3. Key Vocabulary & Grammar Patterns</span>
+        <div class="card" id="card-vocab">
+            <div class="card-header" onclick="toggleCard('card-vocab')">
+                <div class="card-header-left">
+                    <span>3. Key Vocabulary & Grammar Patterns</span>
+                </div>
+                <div class="card-header-right">
+                    <!-- Chevron 'v' icon -->
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
-            <textarea id="ai-vocab" rows="5" placeholder="Paste Snippet 3 (Vocabulary & Grammar) from AI chat here..." oninput="autoSave()"></textarea>
+            <div class="card-body">
+                <textarea id="ai-vocab" rows="6" placeholder="• Item 1&#10;&#10;• Item 2" oninput="formatAndSave('ai-vocab')"></textarea>
+            </div>
         </div>
 
         <!-- 4. Synonyms & Paraphrasing -->
-        <div class="card">
-            <div class="card-header">
-                <span>4. Synonyms & Paraphrasing Bank</span>
+        <div class="card" id="card-synonyms">
+            <div class="card-header" onclick="toggleCard('card-synonyms')">
+                <div class="card-header-left">
+                    <span>4. Synonyms & Paraphrasing Bank</span>
+                </div>
+                <div class="card-header-right">
+                    <!-- Chevron 'v' icon -->
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
-            <textarea id="ai-synonyms" rows="5" placeholder="Paste Snippet 4 (Synonyms) from AI chat here..." oninput="autoSave()"></textarea>
+            <div class="card-body">
+                <textarea id="ai-synonyms" rows="6" placeholder="• Original: Synonym 1 / Synonym 2&#10;&#10;• Original: Synonym 1 / Synonym 2" oninput="formatAndSave('ai-synonyms')"></textarea>
+            </div>
         </div>
     </div>
 
     <script>
         const STORAGE_KEY = 'ielts_writing_task1_ai_hint';
+        const COLLAPSE_KEY = 'ielts_writing_task1_collapsed_cards';
 
-        // Prompt teks yang disalin ke clipboard: Hanya 4 Snippet
+        // Prompt teks yang disalin ke clipboard
         const AI_PROMPT_TEXT = `Please act as an official IELTS Examiner. Analyze the attached IELTS Writing Task 1 visual and write a Band 9 sample answer.
 
 IMPORTANT: You MUST divide your entire response into EXACTLY 4 separate markdown code snippet blocks (\`\`\`text ... \`\`\`) so I can copy each part individually with one click.
+
+For sections 2, 3, and 4, format every single point with a bullet • followed by a blank line (double space) between items.
 
 Format strictly as follows:
 
@@ -236,25 +325,94 @@ Format strictly as follows:
 
 ### 2. Reason Why It Deserves Band 9
 \`\`\`text
-[Bullet points justifying:
-- Task Achievement: key features & data
-- Coherence & Cohesion: logical layout & flow
-- Lexical Resource: natural punchy vocabulary
-- Grammatical Range & Accuracy: sentence variety & accuracy]
+• Task Achievement: [Key features highlighted, accurate comparisons, and clear overview]
+
+• Coherence & Cohesion: [Logical paragraphing, seamless transition phrases]
+
+• Lexical Resource: [Precise academic vocabulary without unnatural repetition]
+
+• Grammatical Range & Accuracy: [Complex structures, flawless passive and participle clauses]
 \`\`\`
 
 ### 3. Key Vocabulary & Grammar Patterns
 \`\`\`text
-[List of key trend verbs, high-value collocations, participle clauses, and comparison structures used]
+• [Trend verbs and collocations used]
+
+• [Data and category terms used]
+
+• [Participle clauses or comparison patterns used]
 \`\`\`
 
 ### 4. Synonyms & Paraphrasing Bank
 \`\`\`text
-[Table or bullet list of keywords from the task and their natural synonyms used to avoid repetition, e.g.:
-- Venue: settings / locations / facilities
-- Young people: youth / teenagers / cohorts / learners
-- Show: illustrate / compare / depict / represent]
+• [Word from prompt]: [Synonym 1] / [Synonym 2] / [Synonym 3]
+
+• [Category term]: [Alternative phrase 1] / [Alternative phrase 2]
+
+• [Metric / Data term]: [Alternative phrase 1] / [Alternative phrase 2]
 \`\`\``;
+
+        // Auto format pasted text to ensure bullet '• ' and double newline spacing
+        function formatBullets(text) {
+            if (!text || !text.trim()) return text;
+            const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            
+            // Check if lines have markdown bullets (*, -, •)
+            const hasListStyle = lines.some(l => /^[-*•]\s+/.test(l));
+            if (!hasListStyle) return text;
+
+            return lines.map(line => {
+                let clean = line.replace(/^[-*•]\s*/, '').trim();
+                return `• ${clean}`;
+            }).join('\n\n');
+        }
+
+        function formatAndSave(elementId) {
+            const el = document.getElementById(elementId);
+            // Hanya auto-format jika pengguna baru saja mem-paste banyak baris
+            if (el.value.includes('\n') && (el.value.includes('* ') || el.value.includes('- '))) {
+                const start = el.selectionStart;
+                el.value = formatBullets(el.value);
+                el.setSelectionRange(start, start);
+            }
+            autoSave();
+        }
+
+        function toggleCard(cardId) {
+            const card = document.getElementById(cardId);
+            card.classList.toggle('collapsed');
+            saveCollapseState();
+        }
+
+        function toggleAllCards() {
+            const cards = document.querySelectorAll('.card');
+            const anyOpen = Array.from(cards).some(c => !c.classList.contains('collapsed'));
+            cards.forEach(card => {
+                if (anyOpen) card.classList.add('collapsed');
+                else card.classList.remove('collapsed');
+            });
+            saveCollapseState();
+        }
+
+        function saveCollapseState() {
+            const state = {};
+            ['card-full', 'card-reason', 'card-vocab', 'card-synonyms'].forEach(id => {
+                const el = document.getElementById(id);
+                state[id] = el ? el.classList.contains('collapsed') : false;
+            });
+            localStorage.setItem(COLLAPSE_KEY, JSON.stringify(state));
+        }
+
+        function loadCollapseState() {
+            const raw = localStorage.getItem(COLLAPSE_KEY);
+            if (raw) {
+                const state = JSON.parse(raw);
+                Object.keys(state).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && state[id]) el.classList.add('collapsed');
+                });
+            }
+        }
 
         function autoSave() {
             const data = {
@@ -283,6 +441,7 @@ Format strictly as follows:
                 const words = data.full ? data.full.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
                 document.getElementById('full-wc').innerText = `${words} words`;
             }
+            loadCollapseState();
         }
 
         function flashBadge(text) {
