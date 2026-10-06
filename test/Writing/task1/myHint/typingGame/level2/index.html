@@ -1,1 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Handwritten Retype - Level 2 (Recall & Type)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@300;400;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --paper-bg: #fefcf3;
+            --line-color: #e5dfd3;
+            --margin-line: #fca5a5;
+            --ink-blue: #1e3a8a;
+            --ink-ghost: rgba(30, 58, 138, 0.25);
+            --ink-error: #ef4444;
+            --primary: #4f46e5;
+            --line-height-val: 36px;
+        }
 
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #ede8dc;
+            font-family: 'Kalam', cursive;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1e293b;
+            user-select: none;
+        }
+
+        /* Top Bar */
+        .top-nav {
+            background: #ffffff;
+            border-bottom: 2px dashed #d1c7b7;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .title-group { font-weight: 700; font-size: 15px; color: #4338ca; display: flex; align-items: center; gap: 10px;}
+        .btn-action {
+            display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+            border-radius: 8px; font-size: 13px; font-weight: 600; border: 1px solid #cbd5e1;
+            background: #fff; cursor: pointer; transition: 0.15s;
+        }
+        .btn-action:hover { background: #f8fafc; border-color: #94a3b8; }
+        .btn-exit { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+        .btn-exit:hover { background: #fecaca; }
+
+        /* Desk & Paper */
+        .desk-workspace { flex: 1; display: flex; justify-content: center; padding: 24px 20px; }
+        .notebook-paper {
+            width: 100%; max-width: 980px; background-color: var(--paper-bg);
+            border-radius: 8px; box-shadow: 2px 4px 24px rgba(0, 0, 0, 0.09), 0 0 0 1px #e2dac9;
+            padding: 30px 32px 60px 68px; position: relative;
+            background-image: repeating-linear-gradient(transparent 0px, transparent calc(var(--line-height-val) - 1px), var(--line-color) calc(var(--line-height-val) - 1px), var(--line-color) var(--line-height-val));
+            background-size: 100% var(--line-height-val); line-height: var(--line-height-val);
+        }
+        .notebook-paper::before { content: ''; position: absolute; top: 0; bottom: 0; left: 48px; width: 2px; background-color: var(--margin-line); }
+
+        /* Typing Engine */
+        .typing-container { position: relative; min-height: 320px; cursor: text; }
+        .display-stream {
+            font-family: 'Caveat', cursive; font-size: 26px; letter-spacing: 0.5px;
+            white-space: pre-wrap; word-break: break-word; line-height: var(--line-height-val); pointer-events: none;
+        }
+        .char-typed { color: var(--ink-blue); font-weight: 700; }
+        .char-ghost { color: var(--ink-ghost); font-weight: 600; }
+        .char-blank { color: #f59e0b; font-weight: 800; text-decoration: underline; letter-spacing: 2px; }
+        .caret { border-left: 2.5px solid #ef4444; animation: blink 0.9s infinite; margin-right: 1px; display: inline-block; height: 26px; vertical-align: -3px; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        #hidden-input { position: absolute; left: -9999px; opacity: 0; }
+
+        /* Setup / Config Modal */
+        .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.8); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .setup-card { background: #fff; padding: 32px; border-radius: 16px; width: 90%; max-width: 400px; font-family: 'Inter', sans-serif; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .setup-card h2 { color: #1e293b; margin-bottom: 12px; }
+        .setup-card p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+        .option-grid { display: flex; gap: 10px; margin-bottom: 24px; }
+        .blank-btn { flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; background: #fff; cursor: pointer; font-weight: 700; color: #475569; transition: 0.2s; }
+        .blank-btn.active { border-color: #4f46e5; background: #e0e7ff; color: #4338ca; }
+        .btn-start { width: 100%; padding: 14px; background: #4f46e5; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-start:hover { background: #4338ca; }
+
+        /* Multiple Choice Popup */
+        .mcq-popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fff; border: 2px solid #4f46e5; padding: 20px; border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); z-index: 3000; display: none; flex-direction: column; gap: 12px; font-family: 'Inter', sans-serif; text-align: center; width: 320px;
+        }
+        .mcq-popup h3 { font-size: 16px; color: #1e293b; margin-bottom: 5px;}
+        .mcq-btn {
+            background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;
+            font-size: 15px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s;
+        }
+        .mcq-btn:hover { background: #e2e8f0; }
+        .mcq-btn.correct { background: #10b981; color: white; border-color: #059669; }
+        .mcq-btn.wrong { background: #ef4444; color: white; border-color: #dc2626; animation: shake 0.4s; }
+        
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body onclick="focusInput()">
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+        <div class="title-group">
+            <button class="btn-action btn-exit" onclick="goBack()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                Exit Level 2
+            </button>
+            <span>🧠 Level 2: Recall & Type</span>
+        </div>
+        <div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; color: #64748b;">
+            Progress: <span id="progress-text">0%</span>
+        </div>
+    </div>
+
+    <!-- Desk -->
+    <div class="desk-workspace">
+        <div class="notebook-paper">
+            <div class="typing-container" id="text-display">
+                <!-- Rendering text here -->
+            </div>
+        </div>
+    </div>
+    
+    <input type="text" id="hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+
+    <!-- Config Modal -->
+    <div class="overlay" id="config-modal">
+        <div class="setup-card">
+            <h2>Level 2 Setup</h2>
+            <p>Berapa banyak kata yang ingin kamu hilangkan dari setiap paragraf untuk melatih ingatanmu?</p>
+            
+            <div class="option-grid">
+                <button class="blank-btn" onclick="setDifficulty(1, this)">1 Word</button>
+                <button class="blank-btn active" onclick="setDifficulty(2, this)">2 Words</button>
+                <button class="blank-btn" onclick="setDifficulty(3, this)">3 Words</button>
+            </div>
+            
+            <button class="btn-start" onclick="startGame()">Start Typing Game</button>
+        </div>
+    </div>
+
+    <!-- Multiple Choice Popup -->
+    <div class="mcq-popup" id="mcq-popup">
+        <h3>Pilih kata yang tepat:</h3>
+        <button class="mcq-btn" onclick="checkAnswer(0)" id="mcq-0">Option 1</button>
+        <button class="mcq-btn" onclick="checkAnswer(1)" id="mcq-1">Option 2</button>
+        <button class="mcq-btn" onclick="checkAnswer(2)" id="mcq-2">Option 3</button>
+    </div>
+
+    <script>
+        const STORAGE_HINT_KEY = 'ielts_writing_task1_ai_hint';
+        
+        let targetText = "";
+        let currentIndex = 0;
+        let wordsToHidePerParagraph = 2;
+        let blanks = []; // Array of objects: { startIndex, endIndex, word, solved, options }
+        
+        let activeBlank = null; 
+        let isGameComplete = false;
+
+        // Kosakata pengecoh umum (Academic Task 1)
+        const distractors = ["significant", "illustrates", "trend", "fluctuated", "whereas", "proportion", "respectively", "majority", "overall", "remained", "peak", "declined", "compared", "slightly", "dramatically", "percentage", "amount", "steadily"];
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function setDifficulty(num, btn) {
+            wordsToHidePerParagraph = num;
+            document.querySelectorAll('.blank-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function loadModelAnswer() {
+            const rawHint = localStorage.getItem(STORAGE_HINT_KEY);
+            if (rawHint) {
+                try {
+                    const parsed = JSON.parse(rawHint);
+                    targetText = (parsed.full || "").trim();
+                } catch(e) {}
+            }
+            if (!targetText) targetText = "Please go back to AI Hint and paste a Band 9 Model Answer first! This is just a fallback text to test the system overall.";
+        }
+
+        // Logic untuk memilih kata acak yang akan di-blank
+        function generateBlanks() {
+            blanks = [];
+            // Pisahkan teks berdasarkan Double Enter (Paragraf)
+            const paragraphs = targetText.split(/\n\s*\n/);
+            let currentOffset = 0;
+
+            paragraphs.forEach(para => {
+                // Cari kata-kata dalam paragraf yang panjangnya > 4 huruf
+                let wordMatches = [];
+                const regex = /\b[a-zA-Z]{5,}\b/g;
+                let match;
+                while ((match = regex.exec(para)) !== null) {
+                    wordMatches.push({
+                        word: match[0],
+                        startIndex: currentOffset + match.index,
+                        endIndex: currentOffset + match.index + match[0].length
+                    });
+                }
+
+                // Acak kata yang ditemukan dan ambil sejumlah wordsToHidePerParagraph
+                wordMatches.sort(() => 0.5 - Math.random());
+                const selectedWords = wordMatches.slice(0, wordsToHidePerParagraph);
+
+                selectedWords.forEach(sw => {
+                    blanks.push({
+                        startIndex: sw.startIndex,
+                        endIndex: sw.endIndex,
+                        word: sw.word,
+                        solved: false,
+                        options: generateOptions(sw.word)
+                    });
+                });
+
+                currentOffset += para.length + 2; // +2 for the \n\n (atau sesuaikan)
+            });
+
+            // Urutkan blanks berdasarkan startIndex
+            blanks.sort((a, b) => a.startIndex - b.startIndex);
+        }
+
+        function generateOptions(correctWord) {
+            let opts = [correctWord];
+            // Tambahkan 2 pengecoh
+            let availableDistractors = distractors.filter(d => d.toLowerCase() !== correctWord.toLowerCase());
+            availableDistractors.sort(() => 0.5 - Math.random());
+            opts.push(availableDistractors[0]);
+            opts.push(availableDistractors[1]);
+            // Acak urutan 3 pilihan
+            return opts.sort(() => 0.5 - Math.random());
+        }
+
+        function startGame() {
+            document.getElementById('config-modal').style.display = 'none';
+            loadModelAnswer();
+            generateBlanks();
+            renderDisplay();
+            focusInput();
+        }
+
+        // Rendering Teks (Mewarnai tulisan, Caret, & Garis Bawah Blanks)
+        function renderDisplay() {
+            const container = document.getElementById('text-display');
+            container.innerHTML = "";
+
+            // 1. Teks yang sudah diketik
+            const typedSpan = document.createElement('span');
+            typedSpan.className = 'char-typed';
+            typedSpan.textContent = targetText.slice(0, currentIndex);
+            container.appendChild(typedSpan);
+
+            // 2. Caret (Kursor)
+            if (!isGameComplete) {
+                const caret = document.createElement('span');
+                caret.className = 'caret';
+                container.appendChild(caret);
+            }
+
+            // 3. Teks sisa yang belum diketik
+            let remainingText = "";
+            let i = currentIndex;
+
+            while (i < targetText.length) {
+                // Cek apakah index ini adalah bagian dari blank yang belum disolve
+                let currentBlank = blanks.find(b => i >= b.startIndex && i < b.endIndex && !b.solved);
+                
+                if (currentBlank) {
+                    // Render string samaran
+                    const spanBlank = document.createElement('span');
+                    spanBlank.className = 'char-blank';
+                    spanBlank.textContent = "_".repeat(currentBlank.word.length);
+                    
+                    // Masukkan teks sisa yang belum dibungkus sebelum blank ini
+                    if (remainingText) {
+                        const rSpan = document.createElement('span');
+                        rSpan.className = 'char-ghost';
+                        rSpan.textContent = remainingText;
+                        container.appendChild(rSpan);
+                        remainingText = "";
+                    }
+                    container.appendChild(spanBlank);
+                    i = currentBlank.endIndex; // Loncati indeks
+                } else {
+                    remainingText += targetText[i];
+                    i++;
+                }
+            }
+
+            // Sisa teks paling akhir
+            if (remainingText) {
+                const rSpan = document.createElement('span');
+                rSpan.className = 'char-ghost';
+                rSpan.textContent = remainingText;
+                container.appendChild(rSpan);
+            }
+
+            // Update Progress Text
+            const percent = Math.round((currentIndex / targetText.length) * 100) || 0;
+            document.getElementById('progress-text').innerText = `${percent}%`;
+
+            // Scroll focus ke caret
+            const c = document.querySelector('.caret');
+            if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function processInputChar(char) {
+            if (isGameComplete || activeBlank) return; // Kunci keyboard jika ada popup
+
+            // Cek apakah kita menginjak huruf pertama dari blank yang belum di-solve
+            let upcomingBlank = blanks.find(b => b.startIndex === currentIndex && !b.solved);
+            if (upcomingBlank) {
+                showMCQPopup(upcomingBlank);
+                return; // Jangan ketik dulu
+            }
+
+            // Logika mengetik normal
+            const expectedChar = normalizeChar(targetText[currentIndex]);
+            const inputChar = normalizeChar(char);
+
+            if (inputChar === expectedChar) {
+                currentIndex++;
+                renderDisplay();
+                if (currentIndex >= targetText.length) finishGame();
+            } else {
+                flashError();
+            }
+        }
+
+        function normalizeChar(c) {
+            if (c === '’' || c === '‘') return "'";
+            if (c === '“' || c === '”') return '"';
+            return c;
+        }
+
+        function flashError() {
+            const paper = document.querySelector('.notebook-paper');
+            paper.style.boxShadow = "0 0 0 3px #ef4444";
+            setTimeout(() => { paper.style.boxShadow = "2px 4px 24px rgba(0, 0, 0, 0.09), 0 0 0 1px #e2dac9"; }, 180);
+        }
+
+        // --- SISTEM POPUP MCQ ---
+        function showMCQPopup(blankObj) {
+            activeBlank = blankObj;
+            const popup = document.getElementById('mcq-popup');
+            
+            // Set teks tombol
+            document.getElementById('mcq-0').innerText = blankObj.options[0];
+            document.getElementById('mcq-1').innerText = blankObj.options[1];
+            document.getElementById('mcq-2').innerText = blankObj.options[2];
+            
+            // Reset class tombol
+            document.querySelectorAll('.mcq-btn').forEach(btn => {
+                btn.classList.remove('correct', 'wrong');
+            });
+
+            popup.style.display = 'flex';
+        }
+
+        function checkAnswer(btnIndex) {
+            if (!activeBlank) return;
+            const btn = document.getElementById(`mcq-${btnIndex}`);
+            const chosenWord = activeBlank.options[btnIndex];
+
+            if (chosenWord === activeBlank.word) {
+                // Benar!
+                btn.classList.add('correct');
+                
+                setTimeout(() => {
+                    activeBlank.solved = true;
+                    activeBlank = null;
+                    document.getElementById('mcq-popup').style.display = 'none';
+                    renderDisplay(); // Underscore berubah jadi huruf pudar, siap diketik
+                    focusInput();
+                }, 500); // Tahan hijau setengah detik
+            } else {
+                // Salah!
+                btn.classList.add('wrong');
+                setTimeout(() => { btn.classList.remove('wrong'); }, 400); // Hapus animasi getar biar bisa ditekan lagi
+            }
+        }
+
+        function finishGame() {
+            isGameComplete = true;
+            renderDisplay();
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            Swal.fire('Level 2 Selesai!', 'Hebat! Kamu berhasil mengingat dan mengetik seluruh essai.', 'success');
+        }
+
+        function focusInput() {
+            if (!activeBlank && !isGameComplete && document.getElementById('config-modal').style.display === 'none') {
+                document.getElementById('hidden-input').focus();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (activeBlank || isGameComplete) return; 
+            if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return;
+
+            if (e.key === 'Backspace') {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    renderDisplay();
+                }
+                e.preventDefault();
+                return;
+            }
+
+            let key = e.key;
+            if (key === 'Enter') key = '\n';
+            if (key.length === 1 || key === '\n') {
+                processInputChar(key);
+                e.preventDefault();
+            }
+        });
+
+    </script>
+</body>
+</html>
