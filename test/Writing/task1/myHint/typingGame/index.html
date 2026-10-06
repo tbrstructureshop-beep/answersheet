@@ -768,13 +768,23 @@
             <p style="font-size: 14px; color: #475569; margin-bottom: 18px;">
                 You successfully retyped the whole Band 9 Model Answer with high muscle memory!
             </p>
+            
             <div style="background: #fef3c7; border: 1px dashed #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
                 <span style="font-size: 13px; color: #92400e; font-weight: 600;">Reward Claimed:</span>
                 <div style="font-size: 26px; font-weight: 800; color: #b45309;">+100 Gold Coins</div>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-action" style="flex:1;" onclick="restartRetype()">Retype Again</button>
-                <button class="btn-action btn-peek" style="flex:1; justify-content:center;" onclick="closeGame()">Finish & Exit</button>
+
+            <h3 style="font-size: 14px; color: #1e293b; margin-bottom: 12px;">Do you want to challenge Level 2 (Recall & Type)?</h3>
+            
+            <!-- Action Buttons -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="btn-action" style="background: #4f46e5; color: white; border-color: #4338ca; justify-content:center;" onclick="goToLevel2()">
+                    🚀 Yes, Go to Level 2
+                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-action" style="flex:1; justify-content:center;" onclick="restartRetype()">Retype Again</button>
+                    <button class="btn-action btn-exit" style="flex:1; justify-content:center;" onclick="closeGame()">Finish & Exit</button>
+                </div>
             </div>
         </div>
     </div>
@@ -821,6 +831,13 @@
             } else {
                 window.location.href = '../index.html';
             }
+        }
+
+
+        function goToLevel2() {
+            // Karena sekarang kita ada di folder typingGame/,
+            // kita cukup arahkan ke folder level2/
+            window.location.href = 'level2/index.html';
         }
 
         // Toolbar Menu Hide / Show Toggle
