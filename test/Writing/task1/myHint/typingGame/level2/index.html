@@ -91,10 +91,13 @@
 
         /* Typing Engine */
         .typing-container { position: relative; min-height: 320px; cursor: text; }
+        
+        /* THIS IS THE MAGIC CLASS FROM LEVEL 1 FOR PARAGRAPHS */
         .display-stream {
             font-family: 'Caveat', cursive; font-size: 26px; letter-spacing: 0.5px;
-            white-space: pre-wrap; word-break: break-word; line-height: var(--line-height-val); pointer-events: none;
+            white-space: pre-wrap; word-break: break-word; line-height: var(--line-height-val); pointer-events: none; display: inline;
         }
+        
         .char-typed { color: var(--ink-blue); font-weight: 700; }
         .char-ghost { color: var(--ink-ghost); font-weight: 600; }
         .char-blank { color: #f59e0b; font-weight: 800; letter-spacing: 2px; background: rgba(245, 158, 11, 0.15); border-radius: 4px; padding: 0 4px; border-bottom: 2px dashed #f59e0b; }
@@ -218,8 +221,11 @@
                 <span>Progress: <b id="progress-percent">0%</b></span>
                 <span>Target: <b id="words-remaining">0 Blanks Left</b></span>
             </div>
-            <!-- Display Container -->
-            <div class="typing-container" id="text-display"></div>
+            
+            <!-- Display Container - SAMA PERSIS DENGAN LEVEL 1 -->
+            <div class="typing-container">
+                <div id="text-display" class="display-stream"></div>
+            </div>
         </div>
     </div>
     
@@ -229,7 +235,7 @@
     <div class="overlay" id="config-modal">
         <div class="setup-card">
             <h2>Level 2 Setup</h2>
-            <p>Berapa banyak kata yang ingin kamu <b>hilangkan per paragraf</b> untuk melatih daya ingatmu?</p>
+            <p>Berapa banyak kata yang ingin kamu <b>hilangkan per baris</b> untuk melatih daya ingatmu?</p>
             <div class="option-grid">
                 <button class="blank-btn" onclick="setDifficulty(1, this)">1 Word</button>
                 <button class="blank-btn active" onclick="setDifficulty(2, this)">2 Words</button>
@@ -432,68 +438,55 @@
             if (rawHint) {
                 try {
                     const parsed = JSON.parse(rawHint);
-                    // Kita pakai load text persis seperti Level 1.
-                    // TANPA ada modifikasi regex/replace yang berpotensi merusak indeks
+                    // PENGGUNAAN TARGET TEXT PERSIS LEVEL 1: TANPA REPLACE
                     targetText = (parsed.full || "").trim(); 
                 } catch(e) {}
             }
             if (!targetText) targetText = "Please go back to AI Hint and paste a Band 9 Model Answer first!";
         }
 
-        // GENERATE BLANKS - Murni dari Teks Mentah
+        // GENERATE BLANKS - Split berdasarkan per baris/paragraf dengan aman
         function generateBlanks() {
             blanks = [];
-            let allWords = [];
-            const regex = /\b[a-zA-Z]{5,}\b/g;
-            let match;
             
-            // 1. Dapatkan index SEMUA kata global di targetText
-            while ((match = regex.exec(targetText)) !== null) {
-                allWords.push({
-                    word: match[0],
-                    startIndex: match.index,
-                    endIndex: match.index + match[0].length
-                });
-            }
+            // Kita pisahkan teks berdasarkan baris asli (termasuk Enter tunggal atau ganda)
+            const lines = targetText.split('\n');
+            let currentOffset = 0;
 
-            // 2. Kelompokkan kata-kata berdasarkan paragraf (dicari dari adanya '\n' di antara dua kata)
-            let paragraphsWords = [];
-            let currentPara = [];
-            
-            for (let i = 0; i < allWords.length; i++) {
-                currentPara.push(allWords[i]);
-                
-                // Cek teks antara kata saat ini dan kata berikutnya
-                if (i < allWords.length - 1) {
-                    let textBetween = targetText.substring(allWords[i].endIndex, allWords[i+1].startIndex);
-                    // Jika ada garis baru, berarti sudah beda paragraf
-                    if (textBetween.includes('\n')) {
-                        paragraphsWords.push(currentPara);
-                        currentPara = [];
-                    }
-                } else {
-                    // Akhir dari text
-                    paragraphsWords.push(currentPara);
+            lines.forEach(line => {
+                // Cari kata-kata dalam satu baris ini saja
+                let wordMatches = [];
+                const regex = /\b[a-zA-Z]{5,}\b/g;
+                let match;
+                while ((match = regex.exec(line)) !== null) {
+                    wordMatches.push({
+                        word: match[0],
+                        startIndex: currentOffset + match.index,
+                        endIndex: currentOffset + match.index + match[0].length
+                    });
                 }
-            }
-
-            // 3. Ambil kata acak untuk di-blank dari masing-masing paragraf
-            paragraphsWords.forEach(paraWords => {
-                paraWords.sort(() => 0.5 - Math.random());
-                let selectedWords = paraWords.slice(0, wordsToHidePerParagraph);
                 
-                selectedWords.forEach(sw => {
-                    let opts = [sw.word];
-                    let availableDistractors = distractors.filter(d => d.toLowerCase() !== sw.word.toLowerCase());
-                    availableDistractors.sort(() => 0.5 - Math.random());
-                    opts.push(availableDistractors[0]); opts.push(availableDistractors[1]);
-                    opts.sort(() => 0.5 - Math.random());
+                // Jika di baris ini ada kata yang bisa di-blank
+                if (wordMatches.length > 0) {
+                    wordMatches.sort(() => 0.5 - Math.random());
+                    const selectedWords = wordMatches.slice(0, wordsToHidePerParagraph);
                     
-                    blanks.push({ startIndex: sw.startIndex, endIndex: sw.endIndex, word: sw.word, solved: false, options: opts });
-                });
+                    selectedWords.forEach(sw => {
+                        let opts = [sw.word];
+                        let availableDistractors = distractors.filter(d => d.toLowerCase() !== sw.word.toLowerCase());
+                        availableDistractors.sort(() => 0.5 - Math.random());
+                        opts.push(availableDistractors[0]); opts.push(availableDistractors[1]);
+                        opts.sort(() => 0.5 - Math.random());
+                        
+                        blanks.push({ startIndex: sw.startIndex, endIndex: sw.endIndex, word: sw.word, solved: false, options: opts });
+                    });
+                }
+                
+                // Update offset untuk baris selanjutnya (+1 karena ada karakter \n yang dihilangkan oleh .split())
+                currentOffset += line.length + 1; 
             });
 
-            // Urutkan ulang secara kronologis dari atas ke bawah
+            // Pastikan urut sesuai indexnya
             blanks.sort((a, b) => a.startIndex - b.startIndex);
         }
 
@@ -537,7 +530,7 @@
                 if (blank.solved || blank.endIndex <= i) continue;
                 
                 if (blank.startIndex >= i) {
-                    // Masukkan teks mentah SEBELUM blank (termasuk \n asli)
+                    // Masukkan teks mentah SEBELUM blank (Termasuk \n akan masuk sini dan dirender sempurna oleh CSS pre-wrap)
                     let textBefore = targetText.substring(i, blank.startIndex);
                     if (textBefore) {
                         const rSpan = document.createElement('span'); 
