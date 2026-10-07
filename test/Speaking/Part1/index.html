@@ -71,17 +71,46 @@
         .q-title { font-weight: 600; font-size: 0.95rem; line-height: 1.4; color: var(--text-main); flex: 1; }
         .q-actions { display: flex; gap: 6px; }
 
-        .answer-draft { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 0.875rem; resize: vertical; min-height: 60px; line-height: 1.4; color: var(--text-main); }
+        .draft-container { position: relative; width: 100%; }
+        .answer-draft { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-size: 0.95rem; resize: vertical; min-height: 80px; line-height: 1.6; color: var(--text-main); background: #ffffff; }
         .answer-draft:focus { outline: none; border-color: var(--primary); }
 
-        .practice-zone { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; }
+        /* Karaoke Teleprompter Display */
+        .karaoke-display { 
+            display: none; 
+            width: 100%; 
+            min-height: 80px; 
+            border: 2px solid #bfdbfe; 
+            background: #f0f7ff; 
+            border-radius: 6px; 
+            padding: 12px; 
+            font-size: 1.05rem; 
+            line-height: 1.8; 
+            user-select: none;
+            overflow-y: auto;
+            max-height: 220px;
+        }
+        .karaoke-word { 
+            color: #94a3b8; 
+            transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease; 
+            display: inline-block; 
+            margin: 0 3px; 
+            border-radius: 4px;
+            padding: 0 3px;
+        }
+        /* Word Hit Karaoke - Biru Cerah & Jelas */
+        .karaoke-word.hit { 
+            color: #1d4ed8 !important; 
+            background-color: #dbeafe; 
+            font-weight: 700; 
+            transform: scale(1.05); 
+        }
+
+        .practice-zone { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; }
         .practice-actions { display: flex; align-items: center; justify-content: space-between; }
-        .speech-result { min-height: 30px; font-size: 0.9rem; line-height: 1.5; color: var(--text-muted); }
+        .speech-result { min-height: 24px; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
         
-        /* Word analysis tags */
-        .word-match { color: var(--success); font-weight: 600; }
-        .word-diff { color: var(--danger); text-decoration: underline; }
-        .accuracy-pill { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; font-weight: bold; }
+        .accuracy-pill { font-size: 0.75rem; padding: 3px 10px; border-radius: 999px; background: #e0e7ff; color: #1e40af; font-weight: bold; border: 1px solid #c7d2fe; }
     </style>
 </head>
 <body>
@@ -94,7 +123,7 @@
             </button>
             <div class="header-title">
                 <span>Speaking Part 1 Studio</span>
-                <span class="badge">Practice & Rec</span>
+                <span class="badge">Karaoke Pronunciation</span>
             </div>
         </div>
         <button class="btn btn-outline" onclick="saveUserAnswers()">
@@ -129,7 +158,7 @@
             </div>
         </div>
 
-        <!-- Question Preparation & Pronunciation Testing -->
+        <!-- Question Preparation & Karaoke Pronunciation Testing -->
         <div class="q-panel">
             <div class="topic-selector-card">
                 <label for="topicSelect">Select Practice Topic</label>
@@ -233,6 +262,7 @@
         const STORAGE_KEY_ANSWERS = 'ielts_p1_saved_answers';
         let savedAnswers = JSON.parse(localStorage.getItem(STORAGE_KEY_ANSWERS) || '{}');
         let activeRecognition = null;
+        let activeUniqueKey = null;
 
         /* --- WEBRTC RECORDER --- */
         let mediaRecorder;
@@ -332,7 +362,6 @@
                 select.appendChild(opt);
             });
 
-            // Baca parameter URL jika ada navigasi balik dari Hint
             const urlParams = new URLSearchParams(window.location.search);
             const topicParam = urlParams.get('topic');
             if (topicParam && TOPICS_DATA.some(t => t.id === topicParam)) {
@@ -348,7 +377,6 @@
             const container = document.getElementById('qListContainer');
             container.innerHTML = '';
 
-            // Update fresh values from localStorage
             savedAnswers = JSON.parse(localStorage.getItem(STORAGE_KEY_ANSWERS) || '{}');
 
             topic.questions.forEach((qText, idx) => {
@@ -371,17 +399,23 @@
                         </div>
                     </div>
 
-                    <textarea class="answer-draft" id="draft_${uniqueKey}" placeholder="Type your ideal answer notes / response here to test your pronunciation..." oninput="autoSave('${uniqueKey}', this.value)">${savedText}</textarea>
+                    <div class="draft-container">
+                        <!-- Editable Input Area -->
+                        <textarea class="answer-draft" id="draft_${uniqueKey}" placeholder="Type your response draft here, or click Hint to use a Band 9 example..." oninput="autoSave('${uniqueKey}', this.value)">${savedText}</textarea>
+                        
+                        <!-- Real-time Karaoke Teleprompter Overlay -->
+                        <div class="karaoke-display" id="karaoke_${uniqueKey}"></div>
+                    </div>
 
                     <div class="practice-zone">
                         <div class="practice-actions">
-                            <button class="btn btn-outline" style="font-size:0.8rem; padding: 5px 10px;" id="btnMic_${uniqueKey}" onclick="testPronunciation('${uniqueKey}')">
+                            <button class="btn btn-outline" style="font-size:0.8rem; padding: 6px 12px;" id="btnMic_${uniqueKey}" onclick="testPronunciation('${uniqueKey}')">
                                 <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                                 <span>Check Pronunciation</span>
                             </button>
                             <span class="accuracy-pill" id="score_${uniqueKey}" style="display:none;">Score: 0%</span>
                         </div>
-                        <div class="speech-result" id="result_${uniqueKey}">Spoken transcript & accuracy comparison will appear here.</div>
+                        <div class="speech-result" id="result_${uniqueKey}">Speak clearly into your mic. Correct words turn blue instantly!</div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -404,86 +438,133 @@
             }
         }
 
-        /* --- SPEECH RECOGNITION & ACCURACY ANALYZER --- */
+        /* --- REAL-TIME KARAOKE PRONUNCIATION ENGINE --- */
         function testPronunciation(uniqueKey) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                Swal.fire('Not Supported', 'Speech recognition is optimal in Google Chrome or Microsoft Edge.', 'warning');
+                Swal.fire('Not Supported', 'Live voice recognition requires Google Chrome or Microsoft Edge.', 'warning');
                 return;
             }
 
             const btn = document.getElementById(`btnMic_${uniqueKey}`);
+            const draftEl = document.getElementById(`draft_${uniqueKey}`);
+            const karaokeEl = document.getElementById(`karaoke_${uniqueKey}`);
             const resultBox = document.getElementById(`result_${uniqueKey}`);
-            const targetText = document.getElementById(`draft_${uniqueKey}`).value.trim();
+            const scorePill = document.getElementById(`score_${uniqueKey}`);
+            const targetText = draftEl.value.trim();
 
             if (!targetText) {
-                Swal.fire('Empty Script', 'Please type your target response draft before testing pronunciation.', 'info');
+                Swal.fire('Draft is Empty', 'Please write or paste your response text first, or import one from the Band 9 Hint.', 'info');
                 return;
             }
 
+            // If user clicks the active recording button, stop it safely
             if (activeRecognition) {
                 activeRecognition.stop();
-                activeRecognition = null;
-                btn.classList.remove('btn-danger');
                 return;
             }
 
+            // 1. Setup the Karaoke Teleprompter Elements
+            const rawTokens = targetText.split(/(\s+)/); // Preserves spacing
+            karaokeEl.innerHTML = '';
+            
+            rawTokens.forEach(token => {
+                if (token.trim() === '') {
+                    karaokeEl.appendChild(document.createTextNode(token));
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'karaoke-word';
+                    span.innerText = token;
+                    // Normalized alphanumeric representation
+                    span.dataset.clean = token.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    karaokeEl.appendChild(span);
+                }
+            });
+
+            // Switch view to Karaoke Display
+            draftEl.style.display = 'none';
+            karaokeEl.style.display = 'block';
+
+            // 2. Initialize Real-Time Streaming Speech Recognition
             const recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.continuous = false;
+            recognition.interimResults = true; // Essential for instant karaoke reaction
+            recognition.continuous = true;
 
             recognition.onstart = () => {
                 activeRecognition = recognition;
-                btn.classList.add('btn-danger');
-                btn.querySelector('span').innerText = 'Listening... Speak now';
-                resultBox.innerHTML = '<span style="color: var(--primary);">Listening closely to your voice...</span>';
+                activeUniqueKey = uniqueKey;
+                btn.className = 'btn btn-danger';
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop & Done</span>`;
+                resultBox.innerHTML = '<span style="color: var(--primary); font-weight: 600;">Listening live... Speak out loud!</span>';
+                scorePill.style.display = 'inline-block';
+                scorePill.innerText = 'Listening...';
             };
 
             recognition.onresult = (event) => {
-                const spokenText = event.results[0][0].transcript;
-                analyzeAccuracy(uniqueKey, targetText, spokenText);
+                let streamTranscript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    streamTranscript += event.results[i][0].transcript + ' ';
+                }
+
+                // Process Karaoke Word Matching
+                updateKaraokeHighlights(karaokeEl, streamTranscript, scorePill);
+                resultBox.innerHTML = `<strong>Heard:</strong> "${streamTranscript.trim()}"`;
             };
 
-            recognition.onerror = () => {
-                resultBox.innerText = 'Unable to recognize audio clearly. Try again.';
+            recognition.onerror = (e) => {
+                if (e.error !== 'no-speech') {
+                    resultBox.innerText = `Microphone notice: ${e.error}`;
+                }
             };
 
             recognition.onend = () => {
                 activeRecognition = null;
-                btn.classList.remove('btn-danger');
-                btn.querySelector('span').innerText = 'Check Pronunciation';
+                activeUniqueKey = null;
+                btn.className = 'btn btn-outline';
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg><span>Practice Again</span>`;
+                
+                // Allow user to click back into text mode
+                karaokeEl.onclick = () => {
+                    karaokeEl.style.display = 'none';
+                    draftEl.style.display = 'block';
+                    draftEl.focus();
+                };
+                resultBox.innerHTML += ' <span style="color:#64748b;">(Click text area anytime to edit again)</span>';
             };
 
             recognition.start();
         }
 
-        function analyzeAccuracy(uniqueKey, targetText, spokenText) {
-            const cleanTarget = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
-            const cleanSpoken = spokenText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+        // Live Matcher: turns pronounced words BLUE
+        function updateKaraokeHighlights(karaokeContainer, streamText, scoreBadge) {
+            const spokenTokens = streamText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+            const wordElements = karaokeContainer.querySelectorAll('.karaoke-word');
             
-            let matchedCount = 0;
-            const diffHtml = cleanTarget.map(word => {
-                if (cleanSpoken.includes(word)) {
-                    matchedCount++;
-                    return `<span class="word-match">${word}</span>`;
+            let matchCount = 0;
+            let totalWords = 0;
+
+            wordElements.forEach(span => {
+                const cleanWord = span.dataset.clean;
+                if (!cleanWord) return;
+                totalWords++;
+
+                // Check if spoken text contains the word
+                if (spokenTokens.includes(cleanWord)) {
+                    span.classList.add('hit');
+                    matchCount++;
                 } else {
-                    return `<span class="word-diff">${word}</span>`;
+                    span.classList.remove('hit');
                 }
-            }).join(' ');
+            });
 
-            const score = Math.round((matchedCount / cleanTarget.length) * 100);
-            
-            const scoreBadge = document.getElementById(`score_${uniqueKey}`);
-            scoreBadge.style.display = 'inline-block';
-            scoreBadge.innerText = `Pronunciation Match: ${score}%`;
-            scoreBadge.style.color = score >= 75 ? 'var(--success)' : (score >= 50 ? 'var(--warning)' : 'var(--danger)');
-
-            const resultBox = document.getElementById(`result_${uniqueKey}`);
-            resultBox.innerHTML = `
-                <div><strong>Heard:</strong> "${spokenText}"</div>
-                <div style="margin-top: 4px;"><strong>Target Match:</strong> ${diffHtml}</div>
-            `;
+            if (totalWords > 0) {
+                const score = Math.round((matchCount / totalWords) * 100);
+                scoreBadge.innerText = `Score: ${score}%`;
+                scoreBadge.style.background = score >= 80 ? '#ecfdf5' : '#eff6ff';
+                scoreBadge.style.color = score >= 80 ? '#047857' : '#1d4ed8';
+                scoreBadge.style.borderColor = score >= 80 ? '#a7f3d0' : '#bfdbfe';
+            }
         }
 
         /* --- STORAGE LOGIC --- */
