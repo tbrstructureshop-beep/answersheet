@@ -3,55 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speaking Part 1 - Practice</title>
+    <title>IELTS Speaking Part 1 - Practice & Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --primary: #2563eb; --bg-color: #f1f5f9; --card-bg: #ffffff; --border: #e2e8f0; --text-main: #1e293b; --danger: #ef4444; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-        html, body { height: 100%; display: flex; flex-direction: column; background: var(--bg-color); color: var(--text-main); overflow: hidden;}
+        :root { 
+            --primary: #2563eb; 
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc; 
+            --card-bg: #ffffff; 
+            --border: #e2e8f0; 
+            --text-main: #0f172a; 
+            --text-muted: #64748b;
+            --danger: #ef4444; 
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
         
-        .sticky-header { padding: 15px 20px; background: var(--card-bg); border-bottom: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; flex-shrink: 0;}
-        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; color: white; background: var(--primary); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        html, body { height: 100%; display: flex; flex-direction: column; background: var(--bg-color); color: var(--text-main); overflow: hidden; }
+        
+        /* Icons */
+        .icon { width: 18px; height: 18px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+        
+        /* Header */
+        .sticky-header { padding: 12px 24px; background: var(--card-bg); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 100; flex-shrink: 0; }
+        .header-title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.15rem; }
+        .badge { font-size: 0.75rem; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+        
+        /* Buttons */
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 500; font-size: 0.875rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: white; background: var(--primary); transition: all 0.2s; }
+        .btn:hover { opacity: 0.95; }
         .btn-back { background: #64748b; }
         .btn-danger { background: var(--danger); }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: #eff6ff; }
-        
+        .btn-warning { background: var(--warning); color: #000; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-icon { padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        .btn-icon:hover { color: var(--text-main); background: #f1f5f9; }
+
+        /* Workspace */
         .main-workspace { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
-        @media (min-width: 800px) { .main-workspace { flex-direction: row; } }
+        @media (min-width: 900px) { .main-workspace { flex-direction: row; } }
         
         /* Video Panel */
-        .video-panel { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 15px; border-right: 2px solid var(--border); overflow-y: auto; background: #0f172a;}
-        .video-container { flex: 1; background: #000; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 300px;}
+        .video-panel { flex: 1.1; padding: 20px; display: flex; flex-direction: column; gap: 15px; border-right: 1px solid var(--border); overflow-y: auto; background: #0b1120; }
+        .video-container { flex: 1; background: #000; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 320px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); }
         video { width: 100%; height: 100%; object-fit: cover; }
         
-        .timer { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem; letter-spacing: 1px;}
-        .timer.recording { color: #fca5a5; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        .timer { position: absolute; top: 16px; right: 16px; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); color: white; padding: 4px 12px; border-radius: 20px; font-family: monospace; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.1); }
+        .timer.recording { color: #f87171; border-color: #ef4444; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        .cam-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;}
-        .cam-controls .btn { flex: 1; min-width: 120px; justify-content: center; }
-
-        /* Questions Panel */
-        .q-panel { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: var(--bg-color); }
-        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .cam-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         
-        .q-card { background: var(--card-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 10px; }
-        .q-card textarea { flex: 1; border: none; outline: none; resize: none; font-size: 15px; min-height: 50px; }
-        .q-card textarea:focus { border-bottom: 2px solid var(--primary); }
+        /* Questions Panel */
+        .q-panel { flex: 1.4; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: var(--bg-color); }
+        .topic-selector-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+        .topic-selector-card label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--text-muted); }
+        .select-field { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.9rem; background: var(--card-bg); color: var(--text-main); outline: none; }
+        
+        .q-list { display: flex; flex-direction: column; gap: 12px; }
+        .q-card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        
+        .q-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .q-title { font-weight: 600; font-size: 0.95rem; line-height: 1.4; color: var(--text-main); flex: 1; }
+        .q-actions { display: flex; gap: 6px; }
+
+        .answer-draft { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 0.875rem; resize: vertical; min-height: 60px; line-height: 1.4; color: var(--text-main); }
+        .answer-draft:focus { outline: none; border-color: var(--primary); }
+
+        .practice-zone { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; }
+        .practice-actions { display: flex; align-items: center; justify-content: space-between; }
+        .speech-result { min-height: 30px; font-size: 0.9rem; line-height: 1.5; color: var(--text-muted); }
+        
+        /* Word analysis tags */
+        .word-match { color: var(--success); font-weight: 600; }
+        .word-diff { color: var(--danger); text-decoration: underline; }
+        .accuracy-pill { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: #f1f5f9; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="sticky-header">
-        <button class="btn btn-back" onclick="window.location.href='../index.html'">⬅ Back</button>
-        <h2 style="font-size: 1.2rem;">Part 1 (Interview)</h2>
-        <button class="btn btn-outline" onclick="saveQuestions()">💾 Save Qs</button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn btn-outline" onclick="window.location.href='../index.html'">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <span>Back</span>
+            </button>
+            <div class="header-title">
+                <span>Speaking Part 1 Studio</span>
+                <span class="badge">Practice & Rec</span>
+            </div>
+        </div>
+        <button class="btn btn-outline" onclick="saveUserAnswers()">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            <span>Save Answers</span>
+        </button>
     </div>
 
     <div class="main-workspace">
         
-        <!-- Perekam Video -->
+        <!-- Video Recording Studio -->
         <div class="video-panel">
             <div class="video-container">
                 <div class="timer" id="timerDisplay">00:00</div>
@@ -60,40 +112,139 @@
             </div>
             
             <div class="cam-controls">
-                <button class="btn" id="btnSwitchCam" onclick="switchCamera()">🔄 Switch Cam</button>
-                <button class="btn btn-danger" id="btnRecord" onclick="toggleRecording()">🔴 Start Record</button>
-                <button class="btn btn-outline" id="btnDownload" onclick="downloadVideo()" style="display:none; color: white; border-color: white;">⬇ Download Video</button>
+                <button class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.2);" onclick="switchCamera()">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    <span>Camera</span>
+                </button>
+                <button class="btn btn-danger" id="btnRecord" onclick="toggleRecording()">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                    <span>Start Record</span>
+                </button>
+                <button class="btn btn-outline" id="btnDownload" onclick="downloadVideo()" style="display:none; color: white; border-color: rgba(255,255,255,0.2);">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Download</span>
+                </button>
             </div>
         </div>
 
-        <!-- Daftar Pertanyaan -->
+        <!-- Question Preparation & Pronunciation Testing -->
         <div class="q-panel">
-            <div class="q-header">
-                <h3>Examiner Questions</h3>
-                <button class="btn" onclick="addQuestion()">➕ Add Question</button>
+            <div class="topic-selector-card">
+                <label for="topicSelect">Select Practice Topic</label>
+                <select id="topicSelect" class="select-field" onchange="renderCurrentTopic()">
+                    <!-- Populated via JavaScript -->
+                </select>
             </div>
-            <div id="q-list"></div>
+
+            <div class="q-list" id="qListContainer">
+                <!-- Question cards populated dynamically -->
+            </div>
         </div>
 
     </div>
 
     <script>
-        const STORAGE_KEY = 'ielts_speak_p1';
-        
-        /* --- WEBRTC VIDEO LOGIC --- */
+        // Preset IELTS Speaking Part 1 Questions
+        const TOPICS_DATA = [
+            {
+                id: "work_study",
+                title: "1. Work or Studies",
+                questions: [
+                    "Do you work or are you a student?",
+                    "What do you like most about your job or studies?",
+                    "Why did you choose that particular field or major?",
+                    "Is there anything you would like to change about your work or studies?"
+                ]
+            },
+            {
+                id: "hometown",
+                title: "2. Hometown",
+                questions: [
+                    "Where is your hometown?",
+                    "What do you like most about your hometown?",
+                    "Is there anything you dislike about it?",
+                    "Has your hometown changed much since you were a child?"
+                ]
+            },
+            {
+                id: "accommodation",
+                title: "3. Accommodation & Living Space",
+                questions: [
+                    "Do you live in a house or an apartment?",
+                    "What is your favorite room in your home, and why?",
+                    "Would you like to move to a different home in the future?",
+                    "How is the neighborhood around your living area?"
+                ]
+            },
+            {
+                id: "free_time",
+                title: "4. Free Time & Hobbies",
+                questions: [
+                    "What do you usually do in your free time?",
+                    "Did you have different hobbies when you were younger?",
+                    "Do you prefer spending your free time alone or with other people?",
+                    "Is there a new hobby you would like to try in the future?"
+                ]
+            },
+            {
+                id: "weather",
+                title: "5. Weather & Seasons",
+                questions: [
+                    "What kind of weather do you like the most?",
+                    "Does the weather affect your mood or daily routine?",
+                    "Do you prefer rainy days or sunny days?",
+                    "What is the climate like in your country?"
+                ]
+            },
+            {
+                id: "tech_social",
+                title: "6. Technology & Social Media",
+                questions: [
+                    "How often do you use social media?",
+                    "Do you think people spend too much time on their phones nowadays?",
+                    "What kind of apps do you use most frequently?",
+                    "Did you use the internet a lot when you were a child?"
+                ]
+            },
+            {
+                id: "food_cooking",
+                title: "7. Food & Cooking",
+                questions: [
+                    "Do you like cooking? Why or why not?",
+                    "What is your favorite type of food?",
+                    "Do you prefer eating at home or eating at a restaurant?",
+                    "Did you learn how to cook when you were young?"
+                ]
+            },
+            {
+                id: "daily_routine",
+                title: "8. Daily Routine",
+                questions: [
+                    "What is the first thing you do when you wake up in the morning?",
+                    "Are your mornings usually busy or relaxed?",
+                    "Do you prefer getting up early or staying up late?",
+                    "Has your daily routine changed much over the last few years?"
+                ]
+            }
+        ];
+
+        /* --- STATE MANAGEMENT --- */
+        const STORAGE_KEY_ANSWERS = 'ielts_p1_saved_answers';
+        let savedAnswers = JSON.parse(localStorage.getItem(STORAGE_KEY_ANSWERS) || '{}');
+        let activeRecognition = null;
+
+        /* --- WEBRTC RECORDER --- */
         let mediaRecorder;
         let recordedChunks = [];
         let currentStream;
         let isRecording = false;
-        let facingMode = "user"; // "user" = depan, "environment" = belakang
+        let facingMode = "user";
         let videoBlob = null;
-
-        // Timer Variables
         let timerInterval;
         let secondsPassed = 0;
 
         async function initCamera() {
-            if (currentStream) { currentStream.getTracks().forEach(track => track.stop()); }
+            if (currentStream) currentStream.getTracks().forEach(t => t.stop());
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: facingMode },
@@ -104,12 +255,12 @@
                 document.getElementById('playbackVideo').style.display = "none";
                 document.getElementById('btnDownload').style.display = "none";
             } catch (err) {
-                Swal.fire('Camera Error', 'Cannot access camera/microphone. Ensure you have given permissions and are using HTTPS/Localhost.', 'error');
+                Swal.fire('Camera Error', 'Cannot access webcam/microphone. Ensure HTTPS/permissions are active.', 'error');
             }
         }
 
         function switchCamera() {
-            facingMode = facingMode === "user" ? "environment" : "user";
+            facingMode = (facingMode === "user") ? "environment" : "user";
             initCamera();
         }
 
@@ -124,17 +275,13 @@
             const timerDisplay = document.getElementById('timerDisplay');
             
             if (!isRecording) {
-                // START RECORDING
                 recordedChunks = [];
                 mediaRecorder = new MediaRecorder(currentStream);
-                
                 mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
                 mediaRecorder.onstop = () => {
                     videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const videoURL = URL.createObjectURL(videoBlob);
-                    
                     const playback = document.getElementById('playbackVideo');
-                    playback.src = videoURL;
+                    playback.src = URL.createObjectURL(videoBlob);
                     playback.style.display = "block";
                     document.getElementById('liveVideo').style.display = "none";
                     document.getElementById('btnDownload').style.display = "inline-flex";
@@ -142,11 +289,9 @@
 
                 mediaRecorder.start();
                 isRecording = true;
-                btn.innerHTML = "⏹ Stop Record";
-                btn.classList.remove('btn-danger');
-                btn.style.background = "#fbbf24"; // yellow
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop Record</span>`;
+                btn.className = "btn btn-warning";
 
-                // Start Timer
                 secondsPassed = 0;
                 timerDisplay.innerText = "00:00";
                 timerDisplay.classList.add('recording');
@@ -154,65 +299,192 @@
                     secondsPassed++;
                     timerDisplay.innerText = formatTime(secondsPassed);
                 }, 1000);
-
             } else {
-                // STOP RECORDING
                 mediaRecorder.stop();
                 isRecording = false;
-                btn.innerHTML = "🔴 Re-Record";
-                btn.classList.add('btn-danger');
-                btn.style.background = "";
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg><span>Record Again</span>`;
+                btn.className = "btn btn-danger";
 
-                // Stop Timer
                 clearInterval(timerInterval);
                 timerDisplay.classList.remove('recording');
             }
         }
 
         function downloadVideo() {
-            if(!videoBlob) return;
+            if (!videoBlob) return;
             const a = document.createElement('a');
             a.href = URL.createObjectURL(videoBlob);
-            a.download = `IELTS_Speaking_Part1_${new Date().getTime()}.webm`;
+            a.download = `IELTS_Speaking_Part1_${Date.now()}.webm`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
 
-        /* --- QUESTION LOGIC --- */
-        function addQuestion(text = "") {
-            const list = document.getElementById('q-list');
-            const card = document.createElement('div');
-            card.className = "q-card";
-            card.innerHTML = `
-                <textarea placeholder="e.g. Do you work or are you a student?" oninput="saveQuestions()">${text}</textarea>
-                <button class="btn btn-outline" style="padding: 5px; height: 35px; border:none;" onclick="this.parentElement.remove(); saveQuestions();">❌</button>
-            `;
-            list.appendChild(card);
+        /* --- TOPIC & QUESTION RENDERING --- */
+        function initTopics() {
+            const select = document.getElementById('topicSelect');
+            select.innerHTML = '';
+            TOPICS_DATA.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.title;
+                select.appendChild(opt);
+            });
+            renderCurrentTopic();
         }
 
-        function saveQuestions() {
-            const questions = [];
-            document.querySelectorAll('.q-card textarea').forEach(ta => questions.push(ta.value));
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(questions));
+        function renderCurrentTopic() {
+            const selectedId = document.getElementById('topicSelect').value;
+            const topic = TOPICS_DATA.find(t => t.id === selectedId);
+            const container = document.getElementById('qListContainer');
+            container.innerHTML = '';
+
+            topic.questions.forEach((qText, idx) => {
+                const uniqueKey = `${topic.id}_q${idx}`;
+                const savedText = savedAnswers[uniqueKey] || "";
+
+                const card = document.createElement('div');
+                card.className = "q-card";
+                card.id = `card_${uniqueKey}`;
+                card.innerHTML = `
+                    <div class="q-row">
+                        <span class="q-title">${idx + 1}. ${qText}</span>
+                        <div class="q-actions">
+                            <button class="btn-icon" title="Listen to Question" onclick="speakText('${qText.replace(/'/g, "\\'")}')">
+                                <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <textarea class="answer-draft" id="draft_${uniqueKey}" placeholder="Type your ideal answer notes / response here to test your pronunciation..." oninput="autoSave('${uniqueKey}', this.value)">${savedText}</textarea>
+
+                    <div class="practice-zone">
+                        <div class="practice-actions">
+                            <button class="btn btn-outline" style="font-size:0.8rem; padding: 5px 10px;" id="btnMic_${uniqueKey}" onclick="testPronunciation('${uniqueKey}')">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                                <span>Check Pronunciation</span>
+                            </button>
+                            <span class="accuracy-pill" id="score_${uniqueKey}" style="display:none;">Score: 0%</span>
+                        </div>
+                        <div class="speech-result" id="result_${uniqueKey}">Spoken transcript & accuracy comparison will appear here.</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        function loadQuestions() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const questions = JSON.parse(saved);
-                if(questions.length > 0) {
-                    questions.forEach(q => addQuestion(q));
-                    return;
-                }
+        /* --- SPEECH SYNTHESIS (EXAMINER AUDIO) --- */
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-GB'; // British standard for IELTS
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
             }
-            // Default empty box
-            addQuestion("");
+        }
+
+        /* --- SPEECH RECOGNITION & ACCURACY ANALYZER --- */
+        function testPronunciation(uniqueKey) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                Swal.fire('Not Supported', 'Speech recognition is optimal in Google Chrome or Microsoft Edge.', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById(`btnMic_${uniqueKey}`);
+            const resultBox = document.getElementById(`result_${uniqueKey}`);
+            const targetText = document.getElementById(`draft_${uniqueKey}`).value.trim();
+
+            if (!targetText) {
+                Swal.fire('Empty Script', 'Please type your target response draft before testing pronunciation.', 'info');
+                return;
+            }
+
+            if (activeRecognition) {
+                activeRecognition.stop();
+                activeRecognition = null;
+                btn.classList.remove('btn-danger');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.continuous = false;
+
+            recognition.onstart = () => {
+                activeRecognition = recognition;
+                btn.classList.add('btn-danger');
+                btn.querySelector('span').innerText = 'Listening... Speak now';
+                resultBox.innerHTML = '<span style="color: var(--primary);">Listening closely to your voice...</span>';
+            };
+
+            recognition.onresult = (event) => {
+                const spokenText = event.results[0][0].transcript;
+                analyzeAccuracy(uniqueKey, targetText, spokenText);
+            };
+
+            recognition.onerror = () => {
+                resultBox.innerText = 'Unable to recognize audio clearly. Try again.';
+            };
+
+            recognition.onend = () => {
+                activeRecognition = null;
+                btn.classList.remove('btn-danger');
+                btn.querySelector('span').innerText = 'Check Pronunciation';
+            };
+
+            recognition.start();
+        }
+
+        function analyzeAccuracy(uniqueKey, targetText, spokenText) {
+            const cleanTarget = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+            const cleanSpoken = spokenText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+            
+            let matchedCount = 0;
+            const diffHtml = cleanTarget.map(word => {
+                if (cleanSpoken.includes(word)) {
+                    matchedCount++;
+                    return `<span class="word-match">${word}</span>`;
+                } else {
+                    return `<span class="word-diff">${word}</span>`;
+                }
+            }).join(' ');
+
+            const score = Math.round((matchedCount / cleanTarget.length) * 100);
+            
+            const scoreBadge = document.getElementById(`score_${uniqueKey}`);
+            scoreBadge.style.display = 'inline-block';
+            scoreBadge.innerText = `Pronunciation Match: ${score}%`;
+            scoreBadge.style.color = score >= 75 ? 'var(--success)' : (score >= 50 ? 'var(--warning)' : 'var(--danger)');
+
+            const resultBox = document.getElementById(`result_${uniqueKey}`);
+            resultBox.innerHTML = `
+                <div><strong>Heard:</strong> "${spokenText}"</div>
+                <div style="margin-top: 4px;"><strong>Target Match:</strong> ${diffHtml}</div>
+            `;
+        }
+
+        /* --- STORAGE LOGIC --- */
+        function autoSave(key, text) {
+            savedAnswers[key] = text;
+        }
+
+        function saveUserAnswers() {
+            localStorage.setItem(STORAGE_KEY_ANSWERS, JSON.stringify(savedAnswers));
+            Swal.fire({
+                icon: 'success',
+                title: 'Saved',
+                text: 'Your drafted answers are stored locally!',
+                timer: 1500,
+                showConfirmButton: false
+            });
         }
 
         window.onload = () => {
             initCamera();
-            loadQuestions();
+            initTopics();
         };
     </script>
 </body>
