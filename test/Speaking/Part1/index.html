@@ -38,8 +38,10 @@
         .btn-warning { background: var(--warning); color: #000; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
         .btn-outline:hover { background: #f1f5f9; }
-        .btn-icon { padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); }
-        .btn-icon:hover { color: var(--text-main); background: #f1f5f9; }
+        .btn-icon { padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.15s; }
+        .btn-icon:hover { color: var(--text-main); background: #f1f5f9; border-color: #cbd5e1; }
+        .btn-hint { color: #d97706; background: #fef3c7; border-color: #fde68a; }
+        .btn-hint:hover { background: #fde68a; color: #b45309; }
 
         /* Workspace */
         .main-workspace { display: flex; flex-direction: column; flex-grow: 1; overflow: hidden; }
@@ -144,7 +146,6 @@
     </div>
 
     <script>
-        // Preset IELTS Speaking Part 1 Questions
         const TOPICS_DATA = [
             {
                 id: "work_study",
@@ -330,6 +331,14 @@
                 opt.textContent = t.title;
                 select.appendChild(opt);
             });
+
+            // Baca parameter URL jika ada navigasi balik dari Hint
+            const urlParams = new URLSearchParams(window.location.search);
+            const topicParam = urlParams.get('topic');
+            if (topicParam && TOPICS_DATA.some(t => t.id === topicParam)) {
+                select.value = topicParam;
+            }
+
             renderCurrentTopic();
         }
 
@@ -338,6 +347,9 @@
             const topic = TOPICS_DATA.find(t => t.id === selectedId);
             const container = document.getElementById('qListContainer');
             container.innerHTML = '';
+
+            // Update fresh values from localStorage
+            savedAnswers = JSON.parse(localStorage.getItem(STORAGE_KEY_ANSWERS) || '{}');
 
             topic.questions.forEach((qText, idx) => {
                 const uniqueKey = `${topic.id}_q${idx}`;
@@ -350,6 +362,9 @@
                     <div class="q-row">
                         <span class="q-title">${idx + 1}. ${qText}</span>
                         <div class="q-actions">
+                            <button class="btn-icon btn-hint" title="Band 9 Hint & Analysis" onclick="openHint('${topic.id}', ${idx})">
+                                <svg class="icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>
+                            </button>
                             <button class="btn-icon" title="Listen to Question" onclick="speakText('${qText.replace(/'/g, "\\'")}')">
                                 <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                             </button>
@@ -373,12 +388,17 @@
             });
         }
 
-        /* --- SPEECH SYNTHESIS (EXAMINER AUDIO) --- */
+        /* --- NAVIGASI KE HINT PAGE --- */
+        function openHint(topicId, questionIdx) {
+            window.location.href = `Hint/index.html?topic=${encodeURIComponent(topicId)}&q=${encodeURIComponent(questionIdx)}`;
+        }
+
+        /* --- SPEECH SYNTHESIS --- */
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-GB'; // British standard for IELTS
+                utterance.lang = 'en-GB';
                 utterance.rate = 0.95;
                 window.speechSynthesis.speak(utterance);
             }
