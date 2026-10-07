@@ -432,34 +432,55 @@
             if (rawHint) {
                 try {
                     const parsed = JSON.parse(rawHint);
-                    targetText = (parsed.full || "").trim();
-                    // FORMATTING: Ganti semua 'Enter' yang ngawur menjadi double 'Enter' yang rapi (memaksa paragraf ada jaraknya).
-                    targetText = targetText.replace(/\r\n/g, '\n').replace(/\n+/g, '\n\n'); 
+                    // Kita pakai load text persis seperti Level 1.
+                    // TANPA ada modifikasi regex/replace yang berpotensi merusak indeks
+                    targetText = (parsed.full || "").trim(); 
                 } catch(e) {}
             }
             if (!targetText) targetText = "Please go back to AI Hint and paste a Band 9 Model Answer first!";
         }
 
+        // GENERATE BLANKS - Murni dari Teks Mentah
         function generateBlanks() {
             blanks = [];
-            // Pisahkan secara pasti menggunakan double 'Enter' sesuai format di atas
-            const paragraphs = targetText.split('\n\n');
-            let currentOffset = 0;
+            let allWords = [];
+            const regex = /\b[a-zA-Z]{5,}\b/g;
+            let match;
+            
+            // 1. Dapatkan index SEMUA kata global di targetText
+            while ((match = regex.exec(targetText)) !== null) {
+                allWords.push({
+                    word: match[0],
+                    startIndex: match.index,
+                    endIndex: match.index + match[0].length
+                });
+            }
 
-            paragraphs.forEach((para, index) => {
-                let wordMatches = [];
-                const regex = /\b[a-zA-Z]{5,}\b/g;
-                let match;
-                while ((match = regex.exec(para)) !== null) {
-                    wordMatches.push({
-                        word: match[0],
-                        startIndex: currentOffset + match.index,
-                        endIndex: currentOffset + match.index + match[0].length
-                    });
-                }
+            // 2. Kelompokkan kata-kata berdasarkan paragraf (dicari dari adanya '\n' di antara dua kata)
+            let paragraphsWords = [];
+            let currentPara = [];
+            
+            for (let i = 0; i < allWords.length; i++) {
+                currentPara.push(allWords[i]);
                 
-                wordMatches.sort(() => 0.5 - Math.random());
-                const selectedWords = wordMatches.slice(0, wordsToHidePerParagraph);
+                // Cek teks antara kata saat ini dan kata berikutnya
+                if (i < allWords.length - 1) {
+                    let textBetween = targetText.substring(allWords[i].endIndex, allWords[i+1].startIndex);
+                    // Jika ada garis baru, berarti sudah beda paragraf
+                    if (textBetween.includes('\n')) {
+                        paragraphsWords.push(currentPara);
+                        currentPara = [];
+                    }
+                } else {
+                    // Akhir dari text
+                    paragraphsWords.push(currentPara);
+                }
+            }
+
+            // 3. Ambil kata acak untuk di-blank dari masing-masing paragraf
+            paragraphsWords.forEach(paraWords => {
+                paraWords.sort(() => 0.5 - Math.random());
+                let selectedWords = paraWords.slice(0, wordsToHidePerParagraph);
                 
                 selectedWords.forEach(sw => {
                     let opts = [sw.word];
@@ -470,10 +491,9 @@
                     
                     blanks.push({ startIndex: sw.startIndex, endIndex: sw.endIndex, word: sw.word, solved: false, options: opts });
                 });
-                
-                // Offset + 2 sesuai panjang persis dari "\n\n"
-                currentOffset += para.length + 2; 
             });
+
+            // Urutkan ulang secara kronologis dari atas ke bawah
             blanks.sort((a, b) => a.startIndex - b.startIndex);
         }
 
@@ -484,7 +504,10 @@
             
             try { if (!audioCtx) audioCtx = new AudioContext(); } catch(e){}
             
-            loadModelAnswer(); generateBlanks(); renderDisplay(); focusInput();
+            loadModelAnswer(); 
+            generateBlanks(); 
+            renderDisplay(); 
+            focusInput();
         }
 
         function renderDisplay() {
@@ -504,18 +527,17 @@
                 container.appendChild(caret);
             }
 
-            // Membangun sisa teks dengan metode per blok
-            // Cara ini sangat aman agar 'Enter (\n\n)' tidak pernah terpotong / tertelan.
+            // Teks BELUM diketik & Blanks
             let i = currentIndex;
             
             for (let b = 0; b < blanks.length; b++) {
                 let blank = blanks[b];
                 
-                // Lewati kalau blank ini sudah di-solve atau sudah dilewati kursor
+                // Lewati kalau blank sudah di-solve atau terlewat oleh index kursor
                 if (blank.solved || blank.endIndex <= i) continue;
                 
                 if (blank.startIndex >= i) {
-                    // Masukkan teks Normal SEBELUM blank
+                    // Masukkan teks mentah SEBELUM blank (termasuk \n asli)
                     let textBefore = targetText.substring(i, blank.startIndex);
                     if (textBefore) {
                         const rSpan = document.createElement('span'); 
@@ -534,7 +556,7 @@
                 }
             }
             
-            // Masukkan sisa teks paling akhir setelah blank terakhir
+            // Masukkan sisa teks mentah paling akhir
             if (i < targetText.length) {
                 const rSpan = document.createElement('span'); 
                 rSpan.className = 'char-ghost'; 
