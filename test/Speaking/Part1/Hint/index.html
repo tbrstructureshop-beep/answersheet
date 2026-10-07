@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Band 9 Hint & Criteria Analysis - IELTS Part 1</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --badge-bg: #eff6ff;
+            --badge-text: #1e40af;
+            --band9: #047857;
+            --band9-bg: #ecfdf5;
+            --band9-border: #a7f3d0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .icon { width: 18px; height: 18px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+        
+        /* Header */
+        .sticky-header { padding: 14px 24px; background: var(--card-bg); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .page-title { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        
+        .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 500; font-size: 0.875rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: white; background: var(--primary); transition: all 0.2s; text-decoration: none; }
+        .btn:hover { opacity: 0.95; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-success { background: var(--band9); color: white; }
+        .btn-success:hover { background: #065f46; }
+
+        /* Content Container */
+        .container { max-width: 860px; margin: 24px auto; padding: 0 16px; width: 100%; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+        
+        /* Question Card */
+        .card-question { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .meta-badges { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+        .badge { font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-topic { background: var(--badge-bg); color: var(--badge-text); }
+        .badge-band { background: var(--band9-bg); color: var(--band9); border: 1px solid var(--band9-border); }
+        .q-display { font-size: 1.25rem; font-weight: 700; line-height: 1.4; color: var(--text-main); }
+
+        /* Band 9 Response Card */
+        .card-model { background: var(--card-bg); border: 1px solid var(--band9-border); border-left: 5px solid var(--band9); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .model-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .model-title { font-weight: 700; font-size: 1rem; color: var(--band9); display: flex; align-items: center; gap: 6px; }
+        .model-text { font-size: 1.05rem; line-height: 1.7; color: #1e293b; background: #f8fafc; padding: 16px; border-radius: 8px; border: 1px solid var(--border); }
+
+        /* Criteria Breakdown Grid */
+        .criteria-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 680px) { .criteria-grid { grid-template-columns: repeat(2, 1fr); } }
+        
+        .crit-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .crit-header { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.9rem; }
+        .crit-fc { color: #2563eb; }
+        .crit-lr { color: #7c3aed; }
+        .crit-gra { color: #d97706; }
+        .crit-pr { color: #059669; }
+        .crit-desc { font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <div class="sticky-header">
+        <div class="header-left">
+            <button class="btn btn-outline" id="btnBackToPractice">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                <span>Back to Practice</span>
+            </button>
+            <div class="page-title">
+                <svg class="icon" style="color: #d97706;" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>
+                <span>Band 9 Model Answers</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <!-- Target Question -->
+        <div class="card-question">
+            <div class="meta-badges">
+                <span class="badge badge-topic" id="hintTopicTitle">Topic</span>
+                <span class="badge badge-band">Band 9 Standard</span>
+            </div>
+            <div class="q-display" id="hintQuestionText">Question text loading...</div>
+        </div>
+
+        <!-- Model Band 9 Answer -->
+        <div class="card-model">
+            <div class="model-header">
+                <div class="model-title">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    <span>Model Response (Native & Precise)</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-outline" style="font-size: 0.8rem; padding: 6px 12px;" onclick="listenModel()">
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                        <span>Listen Audio</span>
+                    </button>
+                    <button class="btn btn-success" style="font-size: 0.8rem; padding: 6px 12px;" onclick="useAsMyDraft()">
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span>Use As My Draft</span>
+                    </button>
+                </div>
+            </div>
+            <div class="model-text" id="hintModelAnswer">Sample response text...</div>
+        </div>
+
+        <!-- IELTS Rubric Criteria Justification -->
+        <div>
+            <h3 style="font-size: 1rem; margin-bottom: 12px; font-weight: 700;">Why does this answer qualify for Band 9?</h3>
+            <div class="criteria-grid">
+                
+                <div class="crit-card">
+                    <div class="crit-header crit-fc">
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        <span>Fluency & Coherence (FC)</span>
+                    </div>
+                    <div class="crit-desc" id="critFC">Analysis...</div>
+                </div>
+
+                <div class="crit-card">
+                    <div class="crit-header crit-lr">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        <span>Lexical Resource (LR)</span>
+                    </div>
+                    <div class="crit-desc" id="critLR">Analysis...</div>
+                </div>
+
+                <div class="crit-card">
+                    <div class="crit-header crit-gra">
+                        <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        <span>Grammatical Range & Accuracy (GRA)</span>
+                    </div>
+                    <div class="crit-desc" id="critGRA">Analysis...</div>
+                </div>
+
+                <div class="crit-card">
+                    <div class="crit-header crit-pr">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg>
+                        <span>Pronunciation (PR)</span>
+                    </div>
+                    <div class="crit-desc" id="critPR">Analysis...</div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Bank Data Hint Band 9 & Kriteria Penilaian
+        const HINTS_DATABASE = {
+            "work_study_q0": {
+                topic: "Work or Studies",
+                question: "Do you work or are you a student?",
+                answer: "At the moment, I'm working as a software developer for a digital agency in the capital. I've been in this role for roughly two years now, primarily architecting web applications and collaborating with cross-functional product teams.",
+                fc: "Immediate, natural response without robotic filler words. Seamlessly extends the answer with relevant context without digression.",
+                lr: "Employs high-level contextual collocations such as 'roughly two years', 'architecting web applications', and 'cross-functional product teams'.",
+                gra: "Effortlessly alternates between present continuous ('I'm working') and present perfect continuous ('I've been in this role') with zero syntactic flaws.",
+                pr: "Features natural rhythm with stress on content words ('developer', 'architecting', 'collaborating') and fluid connected speech."
+            },
+            "work_study_q1": {
+                topic: "Work or Studies",
+                question: "What do you like most about your job or studies?",
+                answer: "What appeals to me most is definitely the intellectual challenge. No two days are quite the same, so I'm constantly problem-solving and refining my technical skill set, which keeps me genuinely engaged.",
+                fc: "Uses a native cleft sentence structure ('What appeals to me most is...') to place focus naturally, maintaining smooth flow.",
+                lr: "Natural idiomatic phrase 'no two days are quite the same', alongside rich vocabulary like 'intellectual challenge' and 'genuinely engaged'.",
+                gra: "Complex multi-clause construction with subordinating conjunctions ('so', 'which keeps me') without losing structural control.",
+                pr: "Effective sentence stress placed on contrastive items ('most', 'intellectual', 'constantly')."
+            },
+            "work_study_q2": {
+                topic: "Work or Studies",
+                question: "Why did you choose that particular field or major?",
+                answer: "To be entirely honest, I've had a strong inclination toward technology since high school. When it came down to choosing a career path, software engineering seemed like a pragmatic yet creatively rewarding route to take.",
+                fc: "Employs natural conversational discourse markers ('To be entirely honest', 'When it came down to') characteristic of a native speaker.",
+                lr: "Sophisticated phrasing: 'strong inclination toward', 'career path', 'pragmatic yet creatively rewarding'.",
+                gra: "Seamless mix of present perfect for ongoing traits and past simple for historical decisions ('came down to', 'seemed').",
+                pr: "Smooth elision and linking between prepositional phrases ('toward technology', 'came down to')."
+            },
+            "work_study_q3": {
+                topic: "Work or Studies",
+                question: "Is there anything you would like to change about your work or studies?",
+                answer: "If I were given the opportunity, I'd probably adjust my working schedule to allow for more flexible hours. Occasionally, balancing tight deadlines with personal commitments can be slightly taxing, so a bit more autonomy would make a world of difference.",
+                fc: "Logical progression from a hypothetical scenario to real-world rationale and conclusive benefit.",
+                lr: "Idiomatic language used with complete precision: 'slightly taxing', 'autonomy', 'make a world of difference'.",
+                gra: "Masterful command of second conditional ('If I were given..., I'd probably adjust...') and gerund subjects ('balancing tight deadlines').",
+                pr: "Intonation rises gently on the conditional clause and resolves naturally on the main clause."
+            },
+
+            "hometown_q0": {
+                topic: "Hometown",
+                question: "Where is your hometown?",
+                answer: "I hail from Bandung, which is a bustling, picturesque city nestled in the mountainous region of West Java. It's renowned for its relatively cool climate and vibrant culinary scene.",
+                fc: "Fluent geographical introduction that enriches the bare location with vivid descriptive nuance.",
+                lr: "Topic-specific collocations: 'hail from', 'bustling, picturesque city nestled in', 'vibrant culinary scene'.",
+                gra: "Smooth relative clauses ('which is a...', 'It's renowned for') creating clean sentence cohesion.",
+                pr: "Crisp pronunciation of descriptive adjectives ('bustling', 'picturesque', 'mountainous')."
+            },
+            "hometown_q1": {
+                topic: "Hometown",
+                question: "What do you like most about your hometown?",
+                answer: "Undoubtedly, it's the laid-back atmosphere coupled with the breathtaking scenery. Despite being a modern urban hub, you're never more than a short drive away from lush green tea plantations.",
+                fc: "Strong introductory adverb ('Undoubtedly') followed by a cohesive contrast marker ('Despite being...').",
+                lr: "Sophisticated phrasing: 'laid-back atmosphere', 'coupled with', 'lush green tea plantations'.",
+                gra: "Participle clause ('Despite being a modern urban hub') followed by dependent spatial expressions.",
+                pr: "Expressive modulation and natural cadence across descriptive adjectives."
+            },
+            "hometown_q2": {
+                topic: "Hometown",
+                question: "Is there anything you dislike about it?",
+                answer: "The only real downside is the chronic traffic congestion, particularly on weekends when tourists flock into town. It can make getting from point A to point B quite a headache.",
+                fc: "Addresses the negative prompt directly and concisely without rambling.",
+                lr: "Natural idioms and collocations: 'chronic traffic congestion', 'tourists flock into town', 'quite a headache'.",
+                gra: "Complex structure balancing noun clauses and relative time adverbials ('particularly on weekends when...').",
+                pr: "Connected speech in idiomatic chunks ('point A to point B', 'flock into town')."
+            },
+            "hometown_q3": {
+                topic: "Hometown",
+                question: "Has your hometown changed much since you were a child?",
+                answer: "Tremendously, yes. Over the past decade or so, there's been rapid commercial development with high-rises and trendy cafes popping up everywhere, though in the process, it has lost a bit of its quiet old-world charm.",
+                fc: "Direct assessment ('Tremendously, yes') transitioned into a thoughtful comparison between past and present.",
+                lr: "Nuanced vocabulary: 'rapid commercial development', 'popping up', 'old-world charm'.",
+                gra: "Flawless present perfect forms ('there's been', 'has lost') to describe changes over time.",
+                pr: "Natural contrastive stress highlighting 'rapid commercial' versus 'quiet old-world charm'."
+            },
+
+            "accommodation_q0": {
+                topic: "Accommodation & Living Space",
+                question: "Do you live in a house or an apartment?",
+                answer: "Currently, I reside in a two-bedroom apartment on the fifth floor of a modern residential complex. It's fairly compact, but it's exceptionally functional and suits my everyday lifestyle down to the ground.",
+                fc: "Concise yet fully detailed answer that concludes with personal suitability.",
+                lr: "Refined vocabulary: 'reside in', 'compact', 'suits my lifestyle down to the ground'.",
+                gra: "Compound-complex coordination using contrastive connectors ('fairly compact, but... and suits...').",
+                pr: "Smooth reduction of unstressed syllables in compound qualifiers ('two-bedroom', 'residential complex')."
+            },
+            "accommodation_q1": {
+                topic: "Accommodation & Living Space",
+                question: "What is your favorite room in your home, and why?",
+                answer: "Without a doubt, my living room. It receives an abundance of natural sunlight throughout the morning, making it the perfect serene spot to unwind with a good book or catch up on work.",
+                fc: "Instant identification supported by clear sensorial reasons and practical benefits.",
+                lr: "Precise descriptive terms: 'abundance of natural sunlight', 'serene spot to unwind', 'catch up on work'.",
+                gra: "Participial clause ('making it the perfect serene spot...') functioning as a cohesive result clause.",
+                pr: "Rhythmic sentence stress on descriptive words ('abundance', 'sunlight', 'serene', 'unwind')."
+            },
+            "accommodation_q2": {
+                topic: "Accommodation & Living Space",
+                question: "Would you like to move to a different home in the future?",
+                answer: "Eventually, yes. While I appreciate the convenience of apartment living, I'd ultimately love to relocate to a standalone house with a private garden where I could enjoy a bit more privacy and open space.",
+                fc: "Nuanced comparison using concession ('While I appreciate... I'd ultimately love to...').",
+                lr: "Native collocations: 'standalone house', 'apartment living', 'relocate to', 'open space'.",
+                gra: "Subordinate clause of concession combined with hypothetical modal conditional ('where I could enjoy').",
+                pr: "Accurate weak vowel forms in auxiliary verbs ('would', 'could', 'to')."
+            },
+            "accommodation_q3": {
+                topic: "Accommodation & Living Space",
+                question: "How is the neighborhood around your living area?",
+                answer: "It's remarkably vibrant and convenient. Within walking distance, there are supermarkets, public transit links, and quiet green parks, so practically everything I need on a daily basis is right at my doorstep.",
+                fc: "Logical organization starting from general impression to concrete amenities.",
+                lr: "Idiomatic phrasing: 'within walking distance', 'public transit links', 'right at my doorstep'.",
+                gra: "Smooth syntactic flow using adverbial phrases of place and result clauses ('so practically everything...').",
+                pr: "Clear consonant clustering in 'transit links', 'doorstep', 'walking distance'."
+            },
+
+            "free_time_q0": {
+                topic: "Free Time & Hobbies",
+                question: "What do you usually do in your free time?",
+                answer: "Whenever I get some downtime, I gravitate toward reading non-fiction or doing light aerobic exercise like cycling. It serves as an effective way to recharge my batteries after a demanding workweek.",
+                fc: "Immediate flow of ideas avoiding generic words like 'I like playing' or 'I like watching'.",
+                lr: "High-level vocabulary: 'downtime', 'gravitate toward', 'recharge my batteries', 'demanding workweek'.",
+                gra: "Complex sentence introduced by a temporal clause ('Whenever I get...'), followed by purpose explanation.",
+                pr: "Natural intonation drop on completion of lists ('reading...', 'cycling')."
+            },
+            "free_time_q1": {
+                topic: "Free Time & Hobbies",
+                question: "Did you have different hobbies when you were younger?",
+                answer: "Very much so. As an adolescent, I was thoroughly obsessed with video games and spent hours playing with classmates. Over time, however, my interests naturally shifted toward more reflective and creative pursuits.",
+                fc: "Clear chronological contrast illustrating an evolution in taste.",
+                lr: "Sophisticated lexical range: 'as an adolescent', 'thoroughly obsessed with', 'reflective and creative pursuits'.",
+                gra: "Past continuous/habitual past followed by transition marker ('Over time, however, my interests shifted').",
+                pr: "Accurate word stress on multisyllabic terms ('adolescent', 'obsessed', 'reflective')."
+            },
+            "free_time_q2": {
+                topic: "Free Time & Hobbies",
+                question: "Do you prefer spending your free time alone or with other people?",
+                answer: "It honestly depends on my energy levels. If I've had a socially draining week, I cherish my solitude to reflect, but on other occasions, catching up with close friends is exactly what I need.",
+                fc: "Balanced perspective instead of a simplistic one-sided answer.",
+                lr: "Expressive lexical choices: 'socially draining', 'cherish my solitude', 'on other occasions'.",
+                gra: "First conditional combined with present perfect condition ('If I've had..., I cherish...').",
+                pr: "Contrastive stress highlighting 'alone / solitude' versus 'friends'."
+            },
+            "free_time_q3": {
+                topic: "Free Time & Hobbies",
+                question: "Is there a new hobby you would like to try in the future?",
+                answer: "I've been toying with the idea of taking up pottery. Working with clay seems therapeutic, and I like the thought of crafting tangible, decorative pieces entirely with my own hands.",
+                fc: "Engaging and spontaneous delivery using genuine aspirational phrasing.",
+                lr: "Authentic idioms: 'toying with the idea of', 'taking up [hobby]', 'therapeutic', 'tangible pieces'.",
+                gra: "Present perfect continuous ('I've been toying') coupled with gerunds ('Working with clay', 'crafting').",
+                pr: "Seamless linking between 'toying with' and 'taking up'."
+            },
+
+            "weather_q0": {
+                topic: "Weather & Seasons",
+                question: "What kind of weather do you like the most?",
+                answer: "I'm definitely fond of crisp, overcast days. There's something inherently calming about gentle breezes and mild temperatures without the oppressive heat of the midday sun.",
+                fc: "Vivid personal stance justified immediately by evocative sensory descriptors.",
+                lr: "Atmospheric vocabulary: 'crisp, overcast days', 'inherently calming', 'oppressive heat'.",
+                gra: "Existential 'there' structure combined with complex prepositional modifications.",
+                pr: "Soft, smooth delivery matching the mood ('crisp', 'calming', 'gentle breezes')."
+            },
+            "weather_q1": {
+                topic: "Weather & Seasons",
+                question: "Does the weather affect your mood or daily routine?",
+                answer: "Without question. Continuous gloomy, torrential downpours tend to make me feel sluggish and unmotivated, whereas a bright, sunlit morning immediately gives me a burst of positive energy.",
+                fc: "Effective juxtaposition illustrating the two opposite emotional states.",
+                lr: "Precise meteorological adjectives: 'gloomy, torrential downpours', 'sluggish', 'burst of positive energy'.",
+                gra: "Compound structure using contrastive subordinating conjunction 'whereas'.",
+                pr: "Clear vowel articulation in 'torrential', 'sluggish', 'unmotivated'."
+            },
+            "weather_q2": {
+                topic: "Weather & Seasons",
+                question: "Do you prefer rainy days or sunny days?",
+                answer: "If I'm staying indoors, I actually appreciate the soothing rhythm of rain against the window. That said, if I have outdoor errands or social plans, sunny weather is indisputably far more practical.",
+                fc: "Contextual qualification ('If I'm indoors... That said...') showing analytical depth.",
+                lr: "Refined imagery: 'soothing rhythm', 'outdoor errands', 'indisputably far more practical'.",
+                gra: "Conditionals with discourse markers of concession ('That said, if I have...').",
+                pr: "Natural rhythmic pauses after introductory dependent clauses."
+            },
+            "weather_q3": {
+                topic: "Weather & Seasons",
+                question: "What is the climate like in your country?",
+                answer: "Being a tropical archipelago, Indonesia has a climate that is predominantly warm and humid year-round, divided broadly into a dry spell and a monsoon season.",
+                fc: "Concise geographic summary that directly answers the inquiry.",
+                lr: "Geographical collocations: 'tropical archipelago', 'predominantly warm and humid', 'monsoon season'.",
+                gra: "Participial opening clause ('Being a tropical archipelago') anchoring the main clause.",
+                pr: "Accurate pronunciation of difficult loan terms ('archipelago' /ˌɑːkɪˈpeləɡəʊ/, 'monsoon')."
+            },
+
+            "tech_social_q0": {
+                topic: "Technology & Social Media",
+                question: "How often do you use social media?",
+                answer: "I'd say I log on several times throughout the day, mainly to stay abreast of current affairs and message close colleagues. However, I make a conscious effort to limit mindless scrolling before bedtime.",
+                fc: "Honest frequency estimation followed by intentional behavioral nuance.",
+                lr: "Idiomatic precision: 'stay abreast of current affairs', 'conscious effort', 'mindless scrolling'.",
+                gra: "Multi-clause sentence balancing infinitives of purpose and coordinate contrast.",
+                pr: "Natural reduction and contraction in 'I'd say', 'stay abreast of'."
+            },
+            "tech_social_q1": {
+                topic: "Technology & Social Media",
+                question: "Do you think people spend too much time on their phones nowadays?",
+                answer: "I certainly do. It has reached a stage where people are constantly glued to their screens, frequently sacrificing face-to-face interaction and their attention spans in favor of bite-sized digital entertainment.",
+                fc: "Emphatic opening followed by insightful sociological observation.",
+                lr: "Contemporary collocations: 'glued to their screens', 'face-to-face interaction', 'attention spans', 'bite-sized digital entertainment'.",
+                gra: "Relative clause with 'where' describing a societal stage, accompanied by participial phrases ('sacrificing...').",
+                pr: "Strong expressive emphasis on 'constantly glued' and 'sacrificing'."
+            },
+            "tech_social_q2": {
+                topic: "Technology & Social Media",
+                question: "What kind of apps do you use most frequently?",
+                answer: "Productivity tools and instant messaging platforms dominate my screen time. Applications like Notion keep my workflow organized, while WhatsApp is indispensable for daily communication.",
+                fc: "Categorical division supported by clear exemplification.",
+                lr: "High-level vocabulary: 'dominate my screen time', 'productivity tools', 'indispensable'.",
+                gra: "Compound structure connected by 'while' to balance two complementary examples.",
+                pr: "Accurate syllable stress in 'productivity', 'indispensable'."
+            },
+            "tech_social_q3": {
+                topic: "Technology & Social Media",
+                question: "Did you use the internet a lot when you were a child?",
+                answer: "Not nearly as much as kids do today. Back then, dial-up internet was quite sluggish and strictly rationed by my parents, so my childhood was dominated far more by outdoor games than digital screens.",
+                fc: "Immediate historical contrast comparing childhood with current trends.",
+                lr: "Generational terminology: 'dial-up internet', 'sluggish', 'strictly rationed', 'dominated far more by'.",
+                gra: "Comparative structures ('Not nearly as much as...', 'far more by... than...').",
+                pr: "Smooth pacing when delivering the temporal contrast ('Back then... so my childhood...')."
+            },
+
+            "food_cooking_q0": {
+                topic: "Food & Cooking",
+                question: "Do you like cooking? Why or why not?",
+                answer: "I find cooking quite rewarding, though I don't always have the luxury of time during the workweek. For me, experimenting with fresh herbs and spices in the kitchen is an immensely therapeutic creative outlet.",
+                fc: "Balanced perspective between personal interest and practical constraints.",
+                lr: "Rich descriptive phrases: 'luxury of time', 'therapeutic creative outlet', 'fresh herbs and spices'.",
+                gra: "Concessive conjunction 'though' paired with gerund subject ('experimenting with... is...').",
+                pr: "Cadence flows smoothly with proper emphasis on 'rewarding', 'therapeutic'."
+            },
+            "food_cooking_q1": {
+                topic: "Food & Cooking",
+                question: "What is your favorite type of food?",
+                answer: "I have a profound weakness for traditional Southeast Asian dishes, especially anything rich in coconut milk and aromatic spices, like slow-cooked beef rendang.",
+                fc: "Expressive answer going straight to flavor profiles and a signature dish.",
+                lr: "Idiomatic expression 'have a profound weakness for', paired with 'aromatic spices' and 'slow-cooked'.",
+                gra: "Complex noun phrase modification ('especially anything rich in... like...').",
+                pr: "Natural intonation emphasizing sensory adjectives."
+            },
+            "food_cooking_q2": {
+                topic: "Food & Cooking",
+                question: "Do you prefer eating at home or eating at a restaurant?",
+                answer: "Home-cooked meals take the prize for nutrition and cost-effectiveness. Nevertheless, dining out offers an unmatched sense of novelty and lets you sample cuisines that are far too complex to prepare yourself.",
+                fc: "Nuanced comparison weighing health/economics against convenience and culinary novelty.",
+                lr: "Native phrasing: 'take the prize for', 'cost-effectiveness', 'unmatched sense of novelty', 'sample cuisines'.",
+                gra: "Formal transitional adverb 'Nevertheless' introducing an infinitive of result.",
+                pr: "Clear contrast in vocal inflection between the merits of both options."
+            },
+            "food_cooking_q3": {
+                topic: "Food & Cooking",
+                question: "Did you learn how to cook when you were young?",
+                answer: "Only the fundamentals, to be fair. My mother taught me how to boil pasta and prepare basic stir-fries, but my genuine culinary skills didn't truly blossom until I moved out and had to fend for myself.",
+                fc: "Reflective answer charting personal culinary progression.",
+                lr: "Idioms & phrasal collocations: 'only the fundamentals', 'to be fair', 'truly blossom', 'fend for myself'.",
+                gra: "Temporal construction using 'didn't truly blossom until...' coordinating two past actions.",
+                pr: "Seamless connected speech in 'fend for myself' and 'moved out'."
+            },
+
+            "daily_routine_q0": {
+                topic: "Daily Routine",
+                question: "What is the first thing you do when you wake up in the morning?",
+                answer: "The very first thing I do is drink a large glass of warm water to rehydrate, followed by a quick five-minute stretching session to shake off any morning grogginess before looking at my smartphone.",
+                fc: "Step-by-step clarity without hesitation.",
+                lr: "Precise lifestyle collocations: 'rehydrate', 'stretching session', 'shake off morning grogginess'.",
+                gra: "Participial phrases ('followed by...') and prepositional time clauses ('before looking at...').",
+                pr: "Smooth linking between consonants and vowels ('shake off', 'glass of warm water')."
+            },
+            "daily_routine_q1": {
+                topic: "Daily Routine",
+                question: "Are your mornings usually busy or relaxed?",
+                answer: "On weekdays, they tend to be rather hectic as I have to get ready and navigate the commute. Weekends, by stark contrast, are gloriously unhurried and allow for a leisurely breakfast.",
+                fc: "Explicit division between weekday routine and weekend leisure.",
+                lr: "Sophisticated vocabulary: 'rather hectic', 'navigate the commute', 'by stark contrast', 'gloriously unhurried'.",
+                gra: "Balanced compound sentences demonstrating lexical and structural contrast.",
+                pr: "Natural melodic lift on 'gloriously unhurried' and 'leisurely breakfast'."
+            },
+            "daily_routine_q2": {
+                topic: "Daily Routine",
+                question: "Do you prefer getting up early or staying up late?",
+                answer: "I'm definitely an early bird by nature. My cognitive focus peaks during the early morning hours, whereas my energy levels plummet significantly once the sun goes down.",
+                fc: "Clear position backed up by biological reasoning.",
+                lr: "Idiomatic mastery: 'early bird by nature', 'cognitive focus peaks', 'energy levels plummet'.",
+                gra: "Subordinate clause of contrast ('whereas...') with precise present simple verb tenses.",
+                pr: "Strong, crisp articulation of consonant endings in 'peaks' and 'plummet'."
+            },
+            "daily_routine_q3": {
+                topic: "Daily Routine",
+                question: "Has your daily routine changed much over the last few years?",
+                answer: "Substantially. Ever since I transitioned to a hybrid work model, I've regained two hours of daily commute time, allowing me to establish a much healthier balance between professional duties and self-care.",
+                fc: "Decisive answer illustrating a major lifestyle transition.",
+                lr: "Professional terminology: 'hybrid work model', 'regained commute time', 'healthy balance', 'self-care'.",
+                gra: "Complex structure starting with 'Ever since I transitioned...', balancing present perfect result.",
+                pr: "Expressive sentence stress on 'Substantially' and 'healthier balance'."
+            }
+        };
+
+        /* --- PARSE URL PARAMS & POPULATE --- */
+        const urlParams = new URLSearchParams(window.location.search);
+        const topicParam = urlParams.get('topic') || 'work_study';
+        const qIndexParam = urlParams.get('q') || '0';
+        const targetKey = `${topicParam}_q${qIndexParam}`;
+
+        const data = HINTS_DATABASE[targetKey] || {
+            topic: "IELTS Speaking Part 1",
+            question: "Sample Question",
+            answer: "No specific sample answer found for this index.",
+            fc: "Maintain natural, unhesitating flow with direct answers.",
+            lr: "Use precise idioms and natural collocation.",
+            gra: "Use complex and accurate sentence structures.",
+            pr: "Speak with natural rhythm, correct stress, and intonation."
+        };
+
+        document.getElementById('hintTopicTitle').innerText = data.topic;
+        document.getElementById('hintQuestionText').innerText = data.question;
+        document.getElementById('hintModelAnswer').innerText = data.answer;
+        document.getElementById('critFC').innerText = data.fc;
+        document.getElementById('critLR').innerText = data.lr;
+        document.getElementById('critGRA').innerText = data.gra;
+        document.getElementById('critPR').innerText = data.pr;
+
+        // Tombol kembali langsung membawa user ke topik yang sedang dipelajari
+        document.getElementById('btnBackToPractice').onclick = () => {
+            window.location.href = `../index.html?topic=${encodeURIComponent(topicParam)}`;
+        };
+
+        /* --- ACTIONS --- */
+        function listenModel() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(data.answer);
+                utterance.lang = 'en-GB';
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function useAsMyDraft() {
+            const STORAGE_KEY_ANSWERS = 'ielts_p1_saved_answers';
+            let savedAnswers = JSON.parse(localStorage.getItem(STORAGE_KEY_ANSWERS) || '{}');
+            savedAnswers[targetKey] = data.answer;
+            localStorage.setItem(STORAGE_KEY_ANSWERS, JSON.stringify(savedAnswers));
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Draft Copied!',
+                text: 'This Band 9 sample answer has been placed into your practice workspace.',
+                confirmButtonColor: '#2563eb',
+                confirmButtonText: 'Return to Practice'
+            }).then(() => {
+                window.location.href = `../index.html?topic=${encodeURIComponent(topicParam)}`;
+            });
+        }
+    </script>
+</body>
+</html>
