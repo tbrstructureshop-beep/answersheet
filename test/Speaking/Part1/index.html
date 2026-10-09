@@ -279,7 +279,12 @@
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: facingMode },
-                    audio: true
+                    // PENINGKATAN: Auto Gain Control aktif & Noise Suppression dimatikan agar suara kecil tertangkap
+                    audio: {
+                        autoGainControl: true,
+                        echoCancellation: true,
+                        noiseSuppression: false
+                    }
                 });
                 document.getElementById('liveVideo').srcObject = currentStream;
                 document.getElementById('liveVideo').style.display = "block";
@@ -490,6 +495,9 @@
             recognition.lang = 'en-US';
             recognition.interimResults = true; // Essential for instant karaoke reaction
             recognition.continuous = true;
+            
+            // PENINGKATAN: Ambil hingga 5 opsi alternatif tebakan AI untuk mengatasi suara pelan
+            recognition.maxAlternatives = 5;
 
             recognition.onstart = () => {
                 activeRecognition = recognition;
@@ -502,14 +510,21 @@
             };
 
             recognition.onresult = (event) => {
-                let streamTranscript = '';
+                let displayTranscript = '';
+                let superMatchTranscript = '';
+
                 for (let i = 0; i < event.results.length; i++) {
-                    streamTranscript += event.results[i][0].transcript + ' ';
+                    displayTranscript += event.results[i][0].transcript + ' ';
+                    
+                    // Menggabungkan seluruh alternatif teks dari AI untuk memaksimalkan kecocokan kata
+                    for (let j = 0; j < event.results[i].length; j++) {
+                        superMatchTranscript += event.results[i][j].transcript + ' ';
+                    }
                 }
 
-                // Process Karaoke Word Matching
-                updateKaraokeHighlights(karaokeEl, streamTranscript, scorePill);
-                resultBox.innerHTML = `<strong>Heard:</strong> "${streamTranscript.trim()}"`;
+                // Process Karaoke Word Matching menggunakan transkrip gabungan alternatif
+                updateKaraokeHighlights(karaokeEl, superMatchTranscript, scorePill);
+                resultBox.innerHTML = `<strong>Heard:</strong> "${displayTranscript.trim()}"`;
             };
 
             recognition.onerror = (e) => {
