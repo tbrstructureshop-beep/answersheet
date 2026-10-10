@@ -8,8 +8,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- Load SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Load Reading Custom Options & Handwritten Note Scripts -->
-    <script src="option.js"></script>
+    <!-- Load Handwritten Note Scripts (option.js REMOVED) -->
     <script src="myNote.js" defer></script>
     <style>
         :root {
@@ -29,7 +28,7 @@
         html, body { height: 100%; overflow: hidden; background-color: var(--bg-color); color: var(--text-main); display: flex; flex-direction: column; }
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
 
-        /* --- STICKY TOP ZONE (Mobile: Atas, Desktop: Kiri) --- */
+        /* --- STICKY TOP ZONE --- */
         .sticky-zone {
             flex-shrink: 0; background-color: var(--bg-color); padding-top: 15px; padding-bottom: 10px;
             border-bottom: 2px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); z-index: 100;
@@ -37,7 +36,7 @@
         header h1 { text-align: center; font-size: 1.5rem; margin-bottom: 15px; }
         .top-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px; }
 
-        /* --- SCROLLABLE WORKSPACE (Mobile: Bawah, Desktop: Kanan) --- */
+        /* --- SCROLLABLE WORKSPACE --- */
         .main-scroll-area { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-top: 20px; padding-bottom: 200px; }
 
         /* --- DESKTOP SPLIT VIEW --- */
@@ -85,6 +84,21 @@
         .btn-warning:hover { background: #d97706; }
         .btn-note { background: #8b5cf6; color: white; }
         .btn-note:hover { background: #7c3aed; }
+
+        /* --- Option Modal Styles --- */
+        .swal-opt-group { margin-bottom: 20px; text-align: left; }
+        .swal-opt-title { display: block; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .swal-opt-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .swal-opt-btn {
+            background: #ffffff; border: 2px solid #e2e8f0; border-radius: 8px;
+            padding: 10px 14px; font-size: 15px; font-weight: 600; color: #1e293b;
+            cursor: pointer; transition: all 0.2s; text-align: center; min-width: 48px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; justify-content: center; align-items: center;
+        }
+        .swal-opt-btn:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+        .swal-opt-btn:active { transform: scale(0.95); }
+        .swal-opt-btn.clear { border-color: #fca5a5; color: #ef4444; width: auto; padding: 10px 20px; margin-left: auto; }
+        .swal-opt-btn.clear:hover { background: #fef2f2; }
 
         /* --- VIDEO WRAPPER & ZOOM CONTROLS --- */
         .video-wrapper { position: relative; background: #000; border-radius: 8px; display: none; overflow: hidden; margin-bottom: 10px; touch-action: none; }
@@ -172,10 +186,11 @@
             html, body { height: auto !important; overflow: visible !important; display: block !important; }
             .sticky-zone { display: none !important; }
             .main-scroll-area { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; width: 100% !important; flex: none !important; }
-            .section-nav-bar, .global-actions, button, #custom-keyboard, .time-marks-area, .zoom-controls { display: none !important; }
+            .section-nav-bar, .global-actions, button:not(.mcq-value-trigger):not(.mcq-correct-value-trigger), #custom-keyboard, .time-marks-area, .zoom-controls { display: none !important; }
             .section-card { display: block !important; box-shadow: none; border: none; border-bottom: 2px solid #000; margin-bottom: 10px; padding: 0 !important; }
             .answer-row { background: transparent !important; border: none !important; padding: 5px 0; }
             .answer-input, .reason-input, .mcq-desc, .mcq-correct-desc { border-bottom: 1px solid #000; color: black; }
+            .mcq-value-trigger, .mcq-correct-value-trigger { display: inline-block !important; border: 1px solid #000 !important; color: #000 !important; background: transparent !important; padding: 2px 6px !important; }
         }
     </style>
 </head>
@@ -295,12 +310,76 @@
     let activeInputTarget = null;
     let audioCtx = null;
     let isAppLoaded = false;
+    let currentOptionTriggerBtn = null; // Menyelaraskan SweetAlert dengan tombol pemicu
 
     const LOCAL_STORAGE_KEY = 'ielts_reading_pro_v2';
 
     let ytPlayer = null;
     let localPlayer = null;
 
+    // --- SWEETALERT OPTION MODAL ---
+    function showSweetModal(btn) {
+        currentOptionTriggerBtn = btn;
+        
+        const htmlContent = `
+            <div class="swal-opt-group">
+                <span class="swal-opt-title" style="color: #2563eb;">Letters (A - J)</span>
+                <div class="swal-opt-grid">
+                    ${['A','B','C','D','E','F','G','H','I','J'].map(opt => 
+                        `<button type="button" class="swal-opt-btn" onclick="selectOption('${opt}')">${opt}</button>`
+                    ).join('')}
+                </div>
+            </div>
+            <div class="swal-opt-group">
+                <span class="swal-opt-title" style="color: #10b981;">Yes / No / Not Given</span>
+                <div class="swal-opt-grid">
+                    ${['Yes','No','Not Given'].map(opt => 
+                        `<button type="button" class="swal-opt-btn" onclick="selectOption('${opt}')">${opt}</button>`
+                    ).join('')}
+                </div>
+            </div>
+            <div class="swal-opt-group">
+                <span class="swal-opt-title" style="color: #f59e0b;">True / False / Not Given</span>
+                <div class="swal-opt-grid">
+                    ${['True','False','Not Given'].map(opt => 
+                        `<button type="button" class="swal-opt-btn" onclick="selectOption('${opt}')">${opt}</button>`
+                    ).join('')}
+                </div>
+            </div>
+            <div class="swal-opt-group" style="margin-bottom: 0; display: flex; border-top: 1px dashed #cbd5e1; padding-top: 15px;">
+                <button type="button" class="swal-opt-btn clear" onclick="selectOption('')">Clear Selection</button>
+            </div>
+        `;
+
+        Swal.fire({
+            title: 'Select Answer',
+            html: htmlContent,
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: '500px'
+        });
+    }
+
+    function selectOption(val) {
+        if (!currentOptionTriggerBtn) return;
+        const btn = currentOptionTriggerBtn;
+        
+        btn.textContent = val ? val : (btn.classList.contains('mcq-correct-value-trigger') ? 'Correct Opt' : 'Select Opt');
+        btn.dataset.value = val;
+        
+        if (val) {
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline');
+        } else {
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline');
+        }
+
+        saveData();
+        Swal.close();
+    }
+
+    // --- VIDEO PLAYERS ---
     function loadYouTube() {
         const url = document.getElementById('yt-link').value;
         const videoId = extractYouTubeID(url);
@@ -423,6 +502,7 @@
     window.addEventListener('touchmove', handleDragMove, { passive: false });
     window.addEventListener('touchend', handleDragEnd);
 
+    // --- WORKSPACE & ANSWERS ---
     function addSection(title = null, skipSave = false) {
         sectionCount++;
         const workspace = document.getElementById('workspace');
@@ -505,7 +585,8 @@
         });
     }
 
-    function addAnswer(btn, data = {type: "essay", text: "", mcqType: "A-J", mcqOpt: "", mcqDesc: "", correct: "null", correctType: "A-J", correctOpt: "", correctDesc: "", reason: ""}) {
+    // --- REBUILT ADD ANSWER UNTUK MENAMPILKAN TOMBOL SWEET MODAL SECARA LANGSUNG ---
+    function addAnswer(btn, data = {type: "essay", text: "", mcqOpt: "", mcqDesc: "", correct: "null", correctOpt: "", correctDesc: "", reason: ""}) {
         const sectionCard = btn.closest('.section-card');
         const container = sectionCard ? sectionCard.querySelector('.answers-container') : document.querySelector('.answers-container');
         if (!container) return;
@@ -513,11 +594,22 @@
         const row = document.createElement('div');
         row.className = 'answer-row'; 
         row.dataset.correct = data.correct;
-        row.dataset.type = data.type;
+        row.dataset.type = data.type || "essay"; // Default jatuh ke essay
 
-        // AMAN: Memanggil generator melalui instance modular optionManager dari option.js
-        const mcqHtml = window.optionManager.renderOptionsHtml(data.mcqType || "A-J", data.mcqOpt || "");
-        const correctWrapperHtml = window.optionManager.renderCorrectOptionsHtml(data.correctType || "A-J", data.correctOpt || "");
+        const optVal = data.mcqOpt || '';
+        const correctOptVal = data.correctOpt || '';
+
+        // Generate langsung layout simple untuk Modal di UI utama
+        const mcqHtml = `
+            <button type="button" class="${optVal ? 'btn-success' : 'btn-outline'} mcq-value-trigger" data-value="${optVal}" onclick="showSweetModal(this)">
+                ${optVal || 'Select Opt'}
+            </button>
+        `;
+        const correctWrapperHtml = `
+            <button type="button" class="${correctOptVal ? 'btn-success' : 'btn-outline'} mcq-correct-value-trigger" data-value="${correctOptVal}" onclick="showSweetModal(this)">
+                ${correctOptVal || 'Correct Opt'}
+            </button>
+        `;
 
         row.innerHTML = `
             <div class="answer-main">
@@ -587,6 +679,7 @@
         document.getElementById('score-banner').textContent = `Current Score: ${correctCount} / ${rows.length}`;
     }
 
+    // --- UTILITIES ---
     function toggleSoundMode() {
         soundEnabled = !soundEnabled;
         const btn = document.getElementById('btn-sound-mode');
@@ -739,6 +832,7 @@
         else if(!e.target.closest('#custom-keyboard')) { hideKeyboard(); }
     });
 
+    // --- DATA MANAGEMENT ---
     function saveData(showAlert = false) {
         const data = [];
         document.querySelectorAll('.section-card').forEach(sec => {
@@ -747,19 +841,15 @@
 
             const answers = [];
             sec.querySelectorAll('.answer-row').forEach(row => {
-                const optWrapper = row.querySelector('.advanced-option-wrapper');
-                const correctWrapper = row.querySelector('.advanced-correct-wrapper');
                 const mcqValBtn = row.querySelector('.mcq-value-trigger');
                 const correctValBtn = row.querySelector('.mcq-correct-value-trigger');
 
                 answers.push({
                     type: row.dataset.type,
                     text: row.querySelector('.answer-input').value,
-                    mcqType: optWrapper ? optWrapper.dataset.optType : 'A-J',
                     mcqOpt: mcqValBtn ? mcqValBtn.dataset.value : '',
                     mcqDesc: row.querySelector('.mcq-desc').value,
                     correct: row.dataset.correct,
-                    correctType: correctWrapper ? correctWrapper.dataset.optType : 'A-J',
                     correctOpt: correctValBtn ? correctValBtn.dataset.value : '',
                     correctDesc: row.querySelector('.mcq-correct-desc').value,
                     reason: row.querySelector('.reason-input').value
