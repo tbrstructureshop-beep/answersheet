@@ -138,10 +138,53 @@
         /* Multiple Choice & Options UI Toggles */
         .answer-row[data-type="essay"] .mcq-ui { display: none !important; }
         .answer-row[data-type="mcq"] .essay-ui { display: none !important; }
-        .mcq-ui { display: flex; gap: 6px; flex: 1; align-items: center; width: 100%; }
-        .mcq-select, .mcq-type-select, .mcq-correct-type-select, .mcq-correct-select { padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: white; font-size: 14px; outline: none; cursor: pointer; }
+        .mcq-ui { display: flex; gap: 8px; flex: 1; align-items: center; width: 100%; }
 
-        .advanced-option-wrapper { display: flex; gap: 6px; align-items: center; flex: 1; }
+        /* --- STYLED ROOT ON-SCREEN UNTUK DROPDOWN PRO --- */
+        .advanced-option-wrapper, .advanced-correct-wrapper {
+            display: inline-flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        .advanced-option-wrapper:hover, .advanced-correct-wrapper:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .advanced-option-wrapper:focus-within, .advanced-correct-wrapper:focus-within {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .mcq-type-select, .mcq-correct-type-select {
+            background: #f8fafc !important;
+            color: #475569 !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+            border: none !important;
+            border-right: 1px solid #e2e8f0 !important;
+            padding: 8px 10px !important;
+            outline: none !important;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .mcq-type-select:hover, .mcq-correct-type-select:hover {
+            background: #f1f5f9 !important;
+            color: #1e293b !important;
+        }
+        .mcq-select, .mcq-correct-select {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            border: none !important;
+            padding: 8px 12px !important;
+            outline: none !important;
+            cursor: pointer;
+        }
 
         .input-active { border-bottom: 2px solid var(--primary) !important; background-color: #eff6ff !important; border-radius: 4px; outline: none; }
 
@@ -506,15 +549,16 @@
 
         const mcqHtml = generateOptionsHtml(data.mcqType || "A-J", data.mcqOpt || "");
         
-        // Correct Option Dropdown builder
+        // Correct Option Dropdown builder with Styled Root
         let cTypes = ["A-J", "YES-NO", "TRUE-FALSE"];
-        let cTypeSelectHtml = `<select class="mcq-correct-type-select" onchange="changeCorrectOptionType(this)">` +
+        let cTypeSelectHtml = `<select class="mcq-correct-type-select" onchange="changeCorrectOptionType(this)" title="Pilih Format Kunci">` +
             cTypes.map(t => `<option value="${t}" ${(data.correctType || "A-J") === t ? 'selected' : ''}>${t}</option>`).join('') +
             `</select>`;
         let cItems = READING_OPTIONS[data.correctType || "A-J"] || READING_OPTIONS["A-J"];
-        let cOptionsHtml = `<option value="">Key</option>` + 
+        let cOptionsHtml = `<option value="">-- Kunci --</option>` + 
             cItems.map(item => `<option value="${item}" ${(data.correctOpt || "") === item ? 'selected' : ''}>${item}</option>`).join('');
         let correctDropdownHtml = `<select class="mcq-correct-select" onchange="saveData()">${cOptionsHtml}</select>`;
+        let correctWrapperHtml = `<div class="advanced-option-wrapper advanced-correct-wrapper" data-opt-type="${data.correctType || 'A-J'}">${cTypeSelectHtml}${correctDropdownHtml}</div>`;
 
         row.innerHTML = `
             <div class="answer-main">
@@ -533,10 +577,7 @@
                     <button class="btn-icon cross" onclick="markCorrect(this, 'false')">${ICON_CROSS}</button>
                 </div>
                 <div class="mcq-ui" style="margin-top: 5px;">
-                    <div class="advanced-correct-wrapper" data-opt-type="${data.correctType || 'A-J'}">
-                        ${cTypeSelectHtml}
-                        ${correctDropdownHtml}
-                    </div>
+                    ${correctWrapperHtml}
                     <input type="text" class="mcq-correct-desc target-input" value="${data.correctDesc || ''}" placeholder="Correct option desc..." oninput="saveData()">
                 </div>
                 <input type="text" class="reason-input target-input" value="${data.reason || ''}" placeholder="Reason / Correct Answer (Optional)..." oninput="saveData()">
@@ -547,17 +588,7 @@
     }
 
     function changeCorrectOptionType(selectElem) {
-        const wrapper = selectElem.closest('.advanced-correct-wrapper');
-        const newType = selectElem.value;
-        wrapper.dataset.optType = newType;
-        
-        const targetSelect = wrapper.querySelector('.mcq-correct-select');
-        const items = READING_OPTIONS[newType] || READING_OPTIONS["A-J"];
-        
-        targetSelect.innerHTML = `<option value="">Key</option>` + 
-            items.map(item => `<option value="${item}">${item}</option>`).join('');
-        
-        saveData();
+        changeReadingOptionType(selectElem);
     }
 
     function toggleAnswerType(btn) {
