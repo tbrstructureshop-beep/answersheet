@@ -28,7 +28,7 @@ const READING_OPTIONS = {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         
-        /* Tombol Pemicu Modal Pop-up (Pengganti Select Plain Bawaan) */
+        /* Tombol Pemicu Jenis Opsi (A-J, Yes-No, dll) */
         .mcq-type-trigger, .mcq-correct-type-trigger {
             background: #f8fafc !important;
             color: #334155 !important;
@@ -50,7 +50,8 @@ const READING_OPTIONS = {
             color: #0f172a !important;
         }
 
-        .mcq-select, .mcq-correct-select {
+        /* Tombol Pemicu Nilai Jawaban (Pengganti Select Katrok) */
+        .mcq-value-trigger, .mcq-correct-value-trigger {
             background: #ffffff !important;
             color: #0f172a !important;
             font-weight: 600 !important;
@@ -60,6 +61,13 @@ const READING_OPTIONS = {
             outline: none !important;
             flex: 1;
             cursor: pointer;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .mcq-value-trigger:hover, .mcq-correct-value-trigger:hover {
+            background: #f8f9fa;
         }
 
         /* --- STYLING MODAL POP-UP CUSTOM --- */
@@ -78,6 +86,7 @@ const READING_OPTIONS = {
             background: #ffffff; width: 90%; max-width: 380px; border-radius: 16px;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             overflow: hidden; display: flex; flex-direction: column; border: 1px solid #e2e8f0;
+            max-height: 80vh;
         }
         .option-modal-header {
             padding: 16px 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
@@ -89,7 +98,7 @@ const READING_OPTIONS = {
             padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
         }
         .option-modal-close:hover { background: #e2e8f0; color: #0f172a; }
-        .option-modal-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+        .option-modal-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
         .option-modal-item {
             padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
             font-weight: 600; font-size: 14px; color: #334155; cursor: pointer; transition: all 0.2s;
@@ -108,7 +117,7 @@ const READING_OPTIONS = {
         modalContainer.innerHTML = `
             <div class="option-modal-card">
                 <div class="option-modal-header">
-                    <h4>Pilih Format Opsi Soal</h4>
+                    <h4 id="option-modal-title">Pilih Opsi</h4>
                     <button class="option-modal-close" onclick="closeOptionModal()">&times;</button>
                 </div>
                 <div class="option-modal-body" id="option-modal-list">
@@ -121,27 +130,34 @@ const READING_OPTIONS = {
 })();
 
 let currentActiveWrapper = null;
+let modalTargetMode = 'type'; // 'type' atau 'value'
 
+// 1. Render HTML untuk Pilihan Opsi (Menggunakan Tombol Pop-up, Bukan Select)
 function generateOptionsHtml(selectedType = "A-J", selectedVal = "") {
-    let items = READING_OPTIONS[selectedType] || READING_OPTIONS["A-J"];
-    let optionsHtml = `<option value="">-- Pilih --</option>` + 
-        items.map(item => `<option value="${item}" ${selectedVal === item ? 'selected' : ''}>${item}</option>`).join('');
+    let displayVal = selectedVal ? selectedVal : "-- Pilih --";
     
-    let dropdownHtml = `<select class="mcq-select" onchange="saveData()">${optionsHtml}</select>`;
-    
-    // Tombol pemicu modal pop-up dengan gaya pro (menggantikan <select> tipe plain)
-    let triggerBtnHtml = `<button type="button" class="mcq-type-trigger" onclick="openOptionModal(this)" data-current-type="${selectedType}">
+    // Tombol Ubah Tipe (A-J / Yes-No / True-False)
+    let triggerBtnHtml = `<button type="button" class="mcq-type-trigger" onclick="openTypeModal(this)" data-current-type="${selectedType}">
         <span>${selectedType}</span> 
         <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
     </button>`;
 
-    return `<div class="advanced-option-wrapper" data-opt-type="${selectedType}">${triggerBtnHtml}${dropdownHtml}</div>`;
+    // Tombol Pilih Nilai Jawaban (Pengganti Dropdown Select Katrok)
+    let valueBtnHtml = `<button type="button" class="mcq-value-trigger" onclick="openValueModal(this)" data-value="${selectedVal}">
+        <span class="val-text">${displayVal}</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="#64748b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </button>`;
+
+    return `<div class="advanced-option-wrapper" data-opt-type="${selectedType}">${triggerBtnHtml}${valueBtnHtml}</div>`;
 }
 
-// Fungsi Membuka Modal Pop-up Custom
-function openOptionModal(btn) {
+// 2. Modal untuk Memilih Tipe Soal (A-J, YES-NO, TRUE-FALSE)
+function openTypeModal(btn) {
     currentActiveWrapper = btn.closest('.advanced-option-wrapper') || btn.closest('.advanced-correct-wrapper');
     const currentType = currentActiveWrapper.dataset.optType || "A-J";
+    modalTargetMode = 'type';
+    
+    document.getElementById('option-modal-title').textContent = "Pilih Format Opsi Soal";
     
     const types = [
         { id: "A-J", label: "A - J (Multiple Options)" },
@@ -160,33 +176,72 @@ function openOptionModal(btn) {
     document.getElementById('custom-option-modal').classList.add('active');
 }
 
+// 3. Modal untuk Memilih Nilai Jawaban (Popup Pilihan A, B, C, Yes, True, dll)
+function openValueModal(btn) {
+    currentActiveWrapper = btn.closest('.advanced-option-wrapper') || btn.closest('.advanced-correct-wrapper');
+    const currentType = currentActiveWrapper.dataset.optType || "A-J";
+    const currentValue = btn.dataset.value || "";
+    modalTargetMode = 'value';
+    
+    document.getElementById('option-modal-title').textContent = `Pilih Jawaban (${currentType})`;
+    
+    const items = READING_OPTIONS[currentType] || READING_OPTIONS["A-J"];
+    
+    let html = `<button type="button" class="option-modal-item ${currentValue === "" ? 'selected' : ''}" onclick="selectOptionValue('')">
+        <span>-- Reset / Kosongkan --</span>
+    </button>`;
+
+    html += items.map(item => `
+        <button type="button" class="option-modal-item ${currentValue === item ? 'selected' : ''}" onclick="selectOptionValue('${item}')">
+            <span>${item}</span>
+            ${currentValue === item ? '<svg viewBox="0 0 24 24" width="16" height="16" stroke="#2563eb" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
+        </button>
+    `).join('');
+
+    document.getElementById('option-modal-list').innerHTML = html;
+    document.getElementById('custom-option-modal').classList.add('active');
+}
+
 function closeOptionModal() {
     document.getElementById('custom-option-modal').classList.remove('active');
     currentActiveWrapper = null;
 }
 
-// Fungsi saat tipe opsi dipilih dari dalam modal pop-up
+// Aksi ketika Tipe Opsi diganti dari Modal
 function selectOptionType(newType) {
     if (!currentActiveWrapper) return;
     
     currentActiveWrapper.dataset.optType = newType;
     
-    // Update teks pada tombol trigger di baris soal
+    // Update teks pada tombol trigger tipe
     const triggerSpan = currentActiveWrapper.querySelector('.mcq-type-trigger span') || currentActiveWrapper.querySelector('.mcq-correct-type-trigger span');
     if (triggerSpan) triggerSpan.textContent = newType;
     
-    const triggerBtn = currentActiveWrapper.querySelector('.mcq-type-trigger') || currentActiveWrapper.querySelector('.mcq-correct-type-trigger');
-    if (triggerBtn) triggerBtn.dataset.currentType = newType;
-
-    // Update isi dropdown pilihan jawaban sesuai tipe baru
-    const targetSelect = currentActiveWrapper.querySelector('.mcq-select') || currentActiveWrapper.querySelector('.mcq-correct-select');
-    const items = READING_OPTIONS[newType] || READING_OPTIONS["A-J"];
-    
-    targetSelect.innerHTML = `<option value="">-- Pilih --</option>` + 
-        items.map(item => `<option value="${item}">${item}</option>`).join('');
+    // Reset nilai pilihan jawaban karena tipe berubah
+    const valBtn = currentActiveWrapper.querySelector('.mcq-value-trigger') || currentActiveWrapper.querySelector('.mcq-correct-value-trigger');
+    if (valBtn) {
+        valBtn.dataset.value = "";
+        const valSpan = valBtn.querySelector('.val-text');
+        if (valSpan) valSpan.textContent = "-- Pilih --";
+    }
 
     closeOptionModal();
-    saveData();
+    if (typeof saveData === 'function') saveData();
+}
+
+// Aksi ketika Nilai Jawaban dipilih dari Modal
+function selectOptionValue(val) {
+    if (!currentActiveWrapper) return;
+
+    const valBtn = currentActiveWrapper.querySelector('.mcq-value-trigger') || currentActiveWrapper.querySelector('.mcq-correct-value-trigger');
+    if (valBtn) {
+        valBtn.dataset.value = val;
+        const valSpan = valBtn.querySelector('.val-text');
+        if (valSpan) valSpan.textContent = val ? val : "-- Pilih --";
+    }
+
+    closeOptionModal();
+    if (typeof saveData === 'function') saveData();
 }
 
 // Listener global untuk menutup modal jika klik area luar card
@@ -196,8 +251,3 @@ window.addEventListener('click', (e) => {
         closeOptionModal();
     }
 });
-
-// Handler untuk kompatibilitas jika dipanggil dari tempat lain
-function changeReadingOptionType(selectElem) {
-    // Fungsi cadangan jika dibutuhkan
-}
