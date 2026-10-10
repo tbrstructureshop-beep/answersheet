@@ -195,7 +195,7 @@
             </button>
             <div class="header-title">
                 <span>Speaking Part 1 Studio</span>
-                <span class="badge">Natural Voice & Karaoke</span>
+                <span class="badge">Continuous Karaoke</span>
             </div>
         </div>
         <button class="btn btn-outline" onclick="saveUserAnswers()">
@@ -333,8 +333,11 @@
         /* --- STATE MANAGEMENT --- */
         const STORAGE_KEY_ANSWERS = 'ielts_p1_saved_answers';
         let savedAnswers = JSON.parse(localStorage.getItem(STORAGE_KEY_ANSWERS) || '{}');
-        let activeRecognition = null;
-        let activeUniqueKey = null;
+        
+        // Praktik Pronunciation State (Keepalive Loop)
+        let isPracticing = false;
+        let activePracticeKey = null;
+        let globalRecognition = null;
         let activeTtsKey = null;
 
         /* --- WEBRTC RECORDER --- */
@@ -379,7 +382,7 @@
             const timerDisplay = document.getElementById('timerDisplay');
             
             if (!isRecording) {
-                if (activeRecognition) activeRecognition.stop();
+                stopPracticeSession();
                 stopNaturalReading();
 
                 try {
@@ -454,13 +457,11 @@
 
         function getBestNaturalVoice() {
             if (availableVoices.length === 0) loadVoices();
-            
             const naturalVoice = availableVoices.find(v => 
                 (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Online')) && 
                 (v.lang.startsWith('en-GB') || v.lang.startsWith('en-US'))
             );
             if (naturalVoice) return naturalVoice;
-
             return availableVoices.find(v => v.lang.startsWith('en-GB') || v.lang.startsWith('en-US')) || null;
         }
 
@@ -486,7 +487,7 @@
 
         function renderCurrentTopic() {
             stopNaturalReading();
-            if (activeRecognition) activeRecognition.stop();
+            stopPracticeSession();
 
             const selectedId = document.getElementById('topicSelect').value;
             const topic = TOPICS_DATA.find(t => t.id === selectedId);
@@ -536,14 +537,13 @@
                             <span class="accuracy-pill" id="score_${uniqueKey}" style="display:none;">Score: 0%</span>
                         </div>
 
-                        <!-- Slider Kecepatan Membaca Alami (Speed Rate) -->
                         <div class="tts-speed-bar" id="ttsBar_${uniqueKey}">
                             <span>🎧 Reading Pace:</span>
                             <input type="range" id="speedSlider_${uniqueKey}" min="0.6" max="1.1" step="0.05" value="0.85" oninput="document.getElementById('speedVal_${uniqueKey}').innerText = this.value + 'x'">
                             <span class="speed-val-badge" id="speedVal_${uniqueKey}">0.85x</span>
                         </div>
 
-                        <div class="speech-result" id="result_${uniqueKey}">Speak clearly into your mic, or click "Human Guide" to hear natural native pronunciation.</div>
+                        <div class="speech-result" id="result_${uniqueKey}">Mic will keep listening continuously until all words are completed!</div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -621,7 +621,7 @@
             }
 
             karaokeEl.onclick = () => {
-                if (activeTtsKey || activeRecognition) return;
+                if (activeTtsKey || isPracticing) return;
                 karaokeEl.style.display = 'none';
                 const draftEl = document.getElementById(`draft_${uniqueKey}`);
                 draftEl.style.display = 'block';
@@ -642,7 +642,7 @@
             }
 
             stopNaturalReading();
-            if (activeRecognition) activeRecognition.stop();
+            stopPracticeSession();
 
             const draftEl = document.getElementById(`draft_${uniqueKey}`);
             const karaokeEl = document.getElementById(`karaoke_${uniqueKey}`);
@@ -718,7 +718,7 @@
             activeTtsKey = null;
         }
 
-        /* --- SMART DE-DUPLICATOR (MENGATASI BUG KATA BERTUMPUK CHROME/ANDROID) --- */
+        /* --- SMART DE-DUPLICATOR --- */
         function getCleanTranscript(results) {
             let combined = "";
 
@@ -734,18 +734,15 @@
                 const combLower = combined.toLowerCase();
                 const currLower = current.toLowerCase();
 
-                // 1. Android/Chrome Cumulative Bug: kalimat baru adalah versi lengkap dari sebelumnya
                 if (currLower.startsWith(combLower)) {
                     combined = current;
                     continue;
                 }
 
-                // 2. Kalimat sudah ada di akhir rekaman
                 if (combLower.endsWith(currLower)) {
                     continue;
                 }
 
-                // 3. Deteksi overlap kata (jika ada overlap 1 atau beberapa kata di sambungan jeda)
                 const combWords = combined.split(/\s+/);
                 const currWords = current.split(/\s+/);
                 let overlapCount = 0;
@@ -769,7 +766,7 @@
             return combined;
         }
 
-        /* --- SPEECH RECOGNITION (DENGAN DE-DUPLIKASI DAN PERSISTENT WORD HIT) --- */
+        /* --- CONTINUOUS KEEPALIVE SPEECH RECOGNITION (TIDAK BERHENTI SEBELUM SELESAI) --- */
         function testPronunciation(uniqueKey) {
             stopNaturalReading();
 
@@ -783,6 +780,15 @@
                 return;
             }
 
+            // Jika tombol Stop & Done ditekan manual saat sesi sedang aktif
+            if (isPracticing && activePracticeKey === uniqueKey) {
+                stopPracticeSession();
+                return;
+            }
+
+            // Hentikan sesi lama jika berpindah ke pertanyaan lain
+            stopPracticeSession();
+
             const btn = document.getElementById(`btnMic_${uniqueKey}`);
             const draftEl = document.getElementById(`draft_${uniqueKey}`);
             const karaokeEl = document.getElementById(`karaoke_${uniqueKey}`);
@@ -795,39 +801,44 @@
                 return;
             }
 
-            if (activeRecognition) {
-                activeRecognition.stop();
-                return;
-            }
-
             prepareKaraokeDisplay(uniqueKey, targetText);
             draftEl.style.display = 'none';
             karaokeEl.style.display = 'block';
 
+            // Tandai sesi aktif
+            isPracticing = true;
+            activePracticeKey = uniqueKey;
+
+            btn.className = 'btn btn-danger';
+            btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop & Done</span>`;
+            resultBox.innerHTML = '<span style="color: var(--primary); font-weight: 600;">● Listening continuously... Speak at your own pace!</span>';
+            scorePill.style.display = 'inline-block';
+            scorePill.innerText = 'Listening...';
+
+            startRecognitionLoop();
+        }
+
+        function startRecognitionLoop() {
+            if (!isPracticing || !activePracticeKey) return;
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
             recognition.interimResults = true;
             recognition.continuous = true;
             recognition.maxAlternatives = 3;
 
-            recognition.onstart = () => {
-                activeRecognition = recognition;
-                activeUniqueKey = uniqueKey;
-                btn.className = 'btn btn-danger';
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop & Done</span>`;
-                resultBox.innerHTML = '<span style="color: var(--primary); font-weight: 600;">● Listening live... Speak out loud clearly!</span>';
-                scorePill.style.display = 'inline-block';
-                scorePill.innerText = 'Listening...';
-            };
+            const uniqueKey = activePracticeKey;
+            const karaokeEl = document.getElementById(`karaoke_${uniqueKey}`);
+            const resultBox = document.getElementById(`result_${uniqueKey}`);
+            const scorePill = document.getElementById(`score_${uniqueKey}`);
 
             recognition.onresult = (event) => {
-                // Bersihkan transkrip dari duplikasi akumulatif Chrome/Android
-                const cleanSentence = getCleanTranscript(event.results);
+                if (!isPracticing) return;
 
-                // Buat daftar token kata dari hasil bersih
+                const cleanSentence = getCleanTranscript(event.results);
                 let matchTokens = cleanSentence.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
 
-                // Tambahkan alternatif kata dari hasil terbaru untuk toleransi aksen
                 const latestResult = event.results[event.results.length - 1];
                 if (latestResult) {
                     for (let j = 0; j < latestResult.length; j++) {
@@ -838,35 +849,85 @@
                     }
                 }
 
-                // Update highlight kata (kata yang sudah hit akan tetap tersimpan)
-                updateKaraokeHighlights(karaokeEl, matchTokens, scorePill);
+                // Cek pencocokan kata
+                const isAllCompleted = updateKaraokeHighlights(karaokeEl, matchTokens, scorePill);
                 resultBox.innerHTML = `<strong>Heard:</strong> "${cleanSentence}"`;
+
+                // JIKA SEMUA KATA SELESAI (100%): Berhenti otomatis dan beri apresiasi!
+                if (isAllCompleted) {
+                    stopPracticeSession();
+                    Swal.fire({
+                        title: '🎉 Perfect! 100% Completed!',
+                        text: 'Semua kata berhasil diucapkan dengan tepat dan lancar!',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    resultBox.innerHTML = '<span style="color: var(--success); font-weight: 700;">🎉 Selesai! Semua kata berhasil diucapkan 100%!</span>';
+                }
             };
 
             recognition.onerror = (e) => {
                 if (e.error === 'not-allowed') {
-                    Swal.fire('Microphone Blocked', 'Izin mikrofon ditolak oleh browser. Klik ikon gembok di URL bar Vercel dan izinkan Microphone.', 'error');
-                } else if (e.error !== 'no-speech') {
-                    resultBox.innerText = `Microphone notice: ${e.error}`;
+                    Swal.fire('Microphone Blocked', 'Izin mikrofon ditolak oleh browser. Mohon izinkan akses mic di ikon gembok URL.', 'error');
+                    stopPracticeSession();
+                }
+                // Jika "no-speech" (hening saat jeda nafas), jangan panik atau berhenti!
+            };
+
+            // KEEPALIVE LOOP: Jika Chrome mematikan mic karena jeda nafas, nyalakan kembali otomatis!
+            recognition.onend = () => {
+                if (isPracticing && activePracticeKey === uniqueKey) {
+                    setTimeout(() => {
+                        if (isPracticing && activePracticeKey === uniqueKey) {
+                            try {
+                                recognition.start();
+                            } catch (err) {
+                                // Tunggu sedikit lagi jika browser masih sibuk
+                                setTimeout(() => {
+                                    if (isPracticing) startRecognitionLoop();
+                                }, 150);
+                            }
+                        }
+                    }, 50);
                 }
             };
 
-            recognition.onend = () => {
-                activeRecognition = null;
-                activeUniqueKey = null;
-                btn.className = 'btn btn-outline';
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg><span>Check Pronunciation</span>`;
-                resultBox.innerHTML += ' <span style="color:#64748b;">(Click background to edit draft text)</span>';
-            };
+            globalRecognition = recognition;
 
             try {
                 recognition.start();
             } catch (err) {
-                console.error("Speech recognition start error:", err);
+                console.warn("Recognition loop start notice:", err);
             }
         }
 
-        // Persistent Matcher: Kata yang sudah berhasil diucapkan TETAP BIRU (.hit)
+        function stopPracticeSession() {
+            if (!isPracticing && !activePracticeKey) return;
+
+            const key = activePracticeKey;
+            isPracticing = false;
+            activePracticeKey = null;
+
+            if (globalRecognition) {
+                try { globalRecognition.stop(); } catch (e) {}
+                globalRecognition = null;
+            }
+
+            if (key) {
+                const btn = document.getElementById(`btnMic_${key}`);
+                const resultBox = document.getElementById(`result_${key}`);
+                if (btn) {
+                    btn.className = 'btn btn-outline';
+                    btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg><span>Check Pronunciation</span>`;
+                }
+                if (resultBox && !resultBox.innerText.includes('100%')) {
+                    resultBox.innerHTML += ' <span style="color:#64748b;">(Practice stopped. Click background to edit text)</span>';
+                }
+            }
+        }
+
+        // Persistent Matcher: Mengembalikan TRUE jika semua kata sudah terucap 100%
         function updateKaraokeHighlights(karaokeContainer, spokenTokenArray, scoreBadge) {
             const wordElements = karaokeContainer.querySelectorAll('.karaoke-word');
             
@@ -878,7 +939,6 @@
                 if (!cleanWord) return;
                 totalWords++;
 
-                // Jika kata sudah pernah cocok sebelumnya ATAU ada di rekaman suara saat ini
                 if (span.classList.contains('hit') || spokenTokenArray.includes(cleanWord)) {
                     span.classList.add('hit');
                     matchCount++;
@@ -891,7 +951,12 @@
                 scoreBadge.style.background = score >= 80 ? '#ecfdf5' : '#eff6ff';
                 scoreBadge.style.color = score >= 80 ? '#047857' : '#1d4ed8';
                 scoreBadge.style.borderColor = score >= 80 ? '#a7f3d0' : '#bfdbfe';
+
+                // Jika semua kata dalam draft sudah terpenuhi (100%)
+                return matchCount >= totalWords;
             }
+
+            return false;
         }
 
         /* --- STORAGE LOGIC --- */
