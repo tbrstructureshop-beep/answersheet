@@ -194,7 +194,7 @@
                 Correction
             </button>
 
-            <!-- TOMBOL NOTE PAD (CATATAN TULISAN TANGAN) -->
+            <!-- TOMBOL NOTE PAD -->
             <button class="btn-note" onclick="noteModal.toggleModal()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                 NotePad
@@ -501,21 +501,9 @@
         row.dataset.correct = data.correct;
         row.dataset.type = data.type;
 
-        // Panggil fungsi pembuat opsi dari option.js (menggunakan modal popup interaktif)
+        // Render UI Pop-up Modal Options (Bebas dari Select Katrok)
         const mcqHtml = generateOptionsHtml(data.mcqType || "A-J", data.mcqOpt || "");
-        
-        // Correct Option Dropdown builder with Modal Popup Trigger
-        let cTypes = ["A-J", "YES-NO", "TRUE-FALSE"];
-        let cCurrentType = data.correctType || "A-J";
-        let cTypeTriggerHtml = `<button type="button" class="mcq-correct-type-trigger" onclick="openOptionModal(this)" data-current-type="${cCurrentType}">
-            <span>${cCurrentType}</span> 
-            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>`;
-        let cItems = READING_OPTIONS[cCurrentType] || READING_OPTIONS["A-J"];
-        let cOptionsHtml = `<option value="">-- Kunci --</option>` + 
-            cItems.map(item => `<option value="${item}" ${(data.correctOpt || "") === item ? 'selected' : ''}>${item}</option>`).join('');
-        let correctDropdownHtml = `<select class="mcq-correct-select" onchange="saveData()">${cOptionsHtml}</select>`;
-        let correctWrapperHtml = `<div class="advanced-option-wrapper advanced-correct-wrapper" data-opt-type="${cCurrentType}">${cTypeTriggerHtml}${correctDropdownHtml}</div>`;
+        const correctWrapperHtml = generateCorrectOptionsHtml(data.correctType || "A-J", data.correctOpt || "");
 
         row.innerHTML = `
             <div class="answer-main">
@@ -741,6 +729,7 @@
         else if(!e.target.closest('#custom-keyboard')) { hideKeyboard(); }
     });
 
+    // Mengambil data pilihan dari dataset tombol modal pop-up kustom
     function saveData(showAlert = false) {
         const data = [];
         document.querySelectorAll('.section-card').forEach(sec => {
@@ -751,15 +740,19 @@
             sec.querySelectorAll('.answer-row').forEach(row => {
                 const optWrapper = row.querySelector('.advanced-option-wrapper');
                 const correctWrapper = row.querySelector('.advanced-correct-wrapper');
+                
+                const mcqValBtn = row.querySelector('.mcq-value-trigger');
+                const correctValBtn = row.querySelector('.mcq-correct-value-trigger');
+
                 answers.push({
                     type: row.dataset.type,
                     text: row.querySelector('.answer-input').value,
                     mcqType: optWrapper ? optWrapper.dataset.optType : 'A-J',
-                    mcqOpt: row.querySelector('.mcq-select').value,
+                    mcqOpt: mcqValBtn ? mcqValBtn.dataset.value : '',
                     mcqDesc: row.querySelector('.mcq-desc').value,
                     correct: row.dataset.correct,
                     correctType: correctWrapper ? correctWrapper.dataset.optType : 'A-J',
-                    correctOpt: row.querySelector('.mcq-correct-select') ? row.querySelector('.mcq-correct-select').value : '',
+                    correctOpt: correctValBtn ? correctValBtn.dataset.value : '',
                     correctDesc: row.querySelector('.mcq-correct-desc').value,
                     reason: row.querySelector('.reason-input').value
                 });
