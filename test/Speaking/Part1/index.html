@@ -175,7 +175,13 @@
             text-align: right;
         }
 
-        .speech-result { min-height: 24px; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
+        .speech-result { 
+            min-height: 24px; 
+            font-size: 0.85rem; 
+            line-height: 1.5; 
+            color: var(--text-muted); 
+            word-break: break-word;
+        }
         .accuracy-pill { font-size: 0.75rem; padding: 3px 10px; border-radius: 999px; background: #e0e7ff; color: #1e40af; font-weight: bold; border: 1px solid #c7d2fe; }
     </style>
 </head>
@@ -341,14 +347,12 @@
         let timerInterval;
         let secondsPassed = 0;
 
-        // PERBAIKAN: Hanya minta video di awal. Jangan kunci mic sebelum rekaman dimulai
-        // agar Speech Recognition tidak terblokir / tabrakan!
         async function initCamera() {
             if (currentStream) currentStream.getTracks().forEach(t => t.stop());
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: facingMode },
-                    audio: false // Jangan kunci mic di awal
+                    audio: false
                 });
                 document.getElementById('liveVideo').srcObject = currentStream;
                 document.getElementById('liveVideo').style.display = "block";
@@ -375,12 +379,10 @@
             const timerDisplay = document.getElementById('timerDisplay');
             
             if (!isRecording) {
-                // Hentikan pengenalan suara & TTS jika masih aktif saat rekaman dimulai
                 if (activeRecognition) activeRecognition.stop();
                 stopNaturalReading();
 
                 try {
-                    // Ambil audio khusus untuk proses rekaman video
                     const recordStream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: facingMode },
                         audio: true
@@ -424,7 +426,6 @@
                 clearInterval(timerInterval);
                 timerDisplay.classList.remove('recording');
 
-                // Kembalikan ke mode video tanpa mengunci mic agar speech recognition bebas digunakan
                 initCamera();
             }
         }
@@ -451,18 +452,15 @@
             window.speechSynthesis.onvoiceschanged = loadVoices;
         }
 
-        // Memilih suara penutur asli paling humanis (Natural/Google/Premium)
         function getBestNaturalVoice() {
             if (availableVoices.length === 0) loadVoices();
             
-            // Prioritas: Suara online natural berkualitas tinggi
             const naturalVoice = availableVoices.find(v => 
                 (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Online')) && 
                 (v.lang.startsWith('en-GB') || v.lang.startsWith('en-US'))
             );
             if (naturalVoice) return naturalVoice;
 
-            // Cadangan: Suara English apa saja yang tersedia
             return availableVoices.find(v => v.lang.startsWith('en-GB') || v.lang.startsWith('en-US')) || null;
         }
 
@@ -590,13 +588,11 @@
             karaokeEl.innerHTML = '';
             wordTokenMap = [];
 
-            // Tokenisasi dengan melacak index karakter untuk sinkronisasi onboundary
             const regex = /\S+/g;
             let match;
             let lastIndex = 0;
 
             while ((match = regex.exec(targetText)) !== null) {
-                // Teks spasi sebelum kata
                 if (match.index > lastIndex) {
                     const space = targetText.substring(lastIndex, match.index);
                     karaokeEl.appendChild(document.createTextNode(space));
@@ -670,13 +666,11 @@
             const speedSlider = document.getElementById(`speedSlider_${uniqueKey}`);
             const chosenRate = speedSlider ? parseFloat(speedSlider.value) : 0.85;
 
-            // Baca kalimat utuh agar intonasinya alami seperti penutur asli
             const utterance = new SpeechSynthesisUtterance(targetText);
             const naturalVoice = getBestNaturalVoice();
             if (naturalVoice) utterance.voice = naturalVoice;
             utterance.rate = chosenRate;
 
-            // Sinkronisasi kata secara real-time saat suara mengalir alami
             utterance.onboundary = (event) => {
                 if (event.name === 'word') {
                     const charIdx = event.charIndex;
@@ -724,7 +718,58 @@
             activeTtsKey = null;
         }
 
-        /* --- SPEECH RECOGNITION (OPTIMASI VERCEL & CHROME) --- */
+        /* --- SMART DE-DUPLICATOR (MENGATASI BUG KATA BERTUMPUK CHROME/ANDROID) --- */
+        function getCleanTranscript(results) {
+            let combined = "";
+
+            for (let i = 0; i < results.length; i++) {
+                const current = results[i][0].transcript.trim();
+                if (!current) continue;
+
+                if (!combined) {
+                    combined = current;
+                    continue;
+                }
+
+                const combLower = combined.toLowerCase();
+                const currLower = current.toLowerCase();
+
+                // 1. Android/Chrome Cumulative Bug: kalimat baru adalah versi lengkap dari sebelumnya
+                if (currLower.startsWith(combLower)) {
+                    combined = current;
+                    continue;
+                }
+
+                // 2. Kalimat sudah ada di akhir rekaman
+                if (combLower.endsWith(currLower)) {
+                    continue;
+                }
+
+                // 3. Deteksi overlap kata (jika ada overlap 1 atau beberapa kata di sambungan jeda)
+                const combWords = combined.split(/\s+/);
+                const currWords = current.split(/\s+/);
+                let overlapCount = 0;
+
+                for (let k = 1; k <= Math.min(combWords.length, currWords.length); k++) {
+                    const combSlice = combWords.slice(combWords.length - k).join(" ").toLowerCase();
+                    const currSlice = currWords.slice(0, k).join(" ").toLowerCase();
+                    if (combSlice === currSlice) {
+                        overlapCount = k;
+                    }
+                }
+
+                if (overlapCount > 0) {
+                    const remainingWords = currWords.slice(overlapCount).join(" ");
+                    if (remainingWords) combined += " " + remainingWords;
+                } else {
+                    combined += " " + current;
+                }
+            }
+
+            return combined;
+        }
+
+        /* --- SPEECH RECOGNITION (DENGAN DE-DUPLIKASI DAN PERSISTENT WORD HIT) --- */
         function testPronunciation(uniqueKey) {
             stopNaturalReading();
 
@@ -763,7 +808,7 @@
             recognition.lang = 'en-US';
             recognition.interimResults = true;
             recognition.continuous = true;
-            recognition.maxAlternatives = 5;
+            recognition.maxAlternatives = 3;
 
             recognition.onstart = () => {
                 activeRecognition = recognition;
@@ -776,19 +821,26 @@
             };
 
             recognition.onresult = (event) => {
-                let displayTranscript = '';
-                let superMatchTranscript = '';
+                // Bersihkan transkrip dari duplikasi akumulatif Chrome/Android
+                const cleanSentence = getCleanTranscript(event.results);
 
-                for (let i = 0; i < event.results.length; i++) {
-                    displayTranscript += event.results[i][0].transcript + ' ';
-                    
-                    for (let j = 0; j < event.results[i].length; j++) {
-                        superMatchTranscript += event.results[i][j].transcript + ' ';
+                // Buat daftar token kata dari hasil bersih
+                let matchTokens = cleanSentence.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+
+                // Tambahkan alternatif kata dari hasil terbaru untuk toleransi aksen
+                const latestResult = event.results[event.results.length - 1];
+                if (latestResult) {
+                    for (let j = 0; j < latestResult.length; j++) {
+                        const altWords = latestResult[j].transcript.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+                        altWords.forEach(w => {
+                            if (!matchTokens.includes(w)) matchTokens.push(w);
+                        });
                     }
                 }
 
-                updateKaraokeHighlights(karaokeEl, superMatchTranscript, scorePill);
-                resultBox.innerHTML = `<strong>Heard:</strong> "${displayTranscript.trim()}"`;
+                // Update highlight kata (kata yang sudah hit akan tetap tersimpan)
+                updateKaraokeHighlights(karaokeEl, matchTokens, scorePill);
+                resultBox.innerHTML = `<strong>Heard:</strong> "${cleanSentence}"`;
             };
 
             recognition.onerror = (e) => {
@@ -814,8 +866,8 @@
             }
         }
 
-        function updateKaraokeHighlights(karaokeContainer, streamText, scoreBadge) {
-            const spokenTokens = streamText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+        // Persistent Matcher: Kata yang sudah berhasil diucapkan TETAP BIRU (.hit)
+        function updateKaraokeHighlights(karaokeContainer, spokenTokenArray, scoreBadge) {
             const wordElements = karaokeContainer.querySelectorAll('.karaoke-word');
             
             let matchCount = 0;
@@ -826,11 +878,10 @@
                 if (!cleanWord) return;
                 totalWords++;
 
-                if (spokenTokens.includes(cleanWord)) {
+                // Jika kata sudah pernah cocok sebelumnya ATAU ada di rekaman suara saat ini
+                if (span.classList.contains('hit') || spokenTokenArray.includes(cleanWord)) {
                     span.classList.add('hit');
                     matchCount++;
-                } else {
-                    span.classList.remove('hit');
                 }
             });
 
