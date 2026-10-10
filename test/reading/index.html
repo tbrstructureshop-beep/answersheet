@@ -501,7 +501,7 @@
         row.dataset.correct = data.correct;
         row.dataset.type = data.type;
 
-        // Render UI Pop-up Modal Options (Bebas dari Select Katrok)
+        // Render UI Pop-up Modal Options Utama & Kunci Jawaban
         const mcqHtml = generateOptionsHtml(data.mcqType || "A-J", data.mcqOpt || "");
         const correctWrapperHtml = generateCorrectOptionsHtml(data.correctType || "A-J", data.correctOpt || "");
 
@@ -729,7 +729,7 @@
         else if(!e.target.closest('#custom-keyboard')) { hideKeyboard(); }
     });
 
-    // Mengambil data pilihan dari dataset tombol modal pop-up kustom
+    // Mengambil data pilihan dari dataset tombol modal pop-up kustom (Termasuk Correction)
     function saveData(showAlert = false) {
         const data = [];
         document.querySelectorAll('.section-card').forEach(sec => {
