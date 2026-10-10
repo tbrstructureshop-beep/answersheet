@@ -22,7 +22,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         html, body { height: 100%; display: flex; flex-direction: column; background: var(--bg-color); color: var(--text-main); overflow: hidden; }
         
-        /* Icons */
         .icon { width: 18px; height: 18px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
         
         /* Header */
@@ -33,7 +32,6 @@
         /* Buttons */
         .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 500; font-size: 0.875rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: white; background: var(--primary); transition: all 0.2s; }
         .btn:hover { opacity: 0.95; }
-        .btn-back { background: #64748b; }
         .btn-danger { background: var(--danger); }
         .btn-warning { background: var(--warning); color: #000; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
@@ -92,19 +90,19 @@
         }
         .karaoke-word { 
             color: #94a3b8; 
-            transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease; 
+            transition: all 0.15s ease; 
             display: inline-block; 
-            margin: 0 3px; 
+            margin: 0 2px; 
             border-radius: 4px;
             padding: 0 3px;
             cursor: pointer;
         }
         .karaoke-word:hover {
             background-color: #e2e8f0;
-            color: #334155;
+            color: #1e293b;
         }
 
-        /* Word Hit Karaoke (Matched via Mic) - Biru Cerah & Jelas */
+        /* Kata yang diucapkan user dengan benar */
         .karaoke-word.hit { 
             color: #1d4ed8 !important; 
             background-color: #dbeafe; 
@@ -112,7 +110,7 @@
             transform: scale(1.05); 
         }
 
-        /* Word Active Reading (TTS Word-by-Word Guide) - Kuning/Emas Elegan */
+        /* Kata yang sedang dibacakan oleh Natural TTS */
         .karaoke-word.reading {
             color: #b45309 !important;
             background-color: #fef3c7 !important;
@@ -147,8 +145,8 @@
             flex-wrap: wrap;
         }
 
-        /* Slider Jeda Antar Kata */
-        .tts-delay-bar {
+        /* Slider Kecepatan Membaca Alami */
+        .tts-speed-bar {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -160,7 +158,7 @@
             color: var(--text-muted);
         }
 
-        .tts-delay-bar input[type=range] {
+        .tts-speed-bar input[type=range] {
             flex: 1;
             height: 5px;
             background: #e2e8f0;
@@ -170,10 +168,10 @@
             cursor: pointer;
         }
 
-        .delay-val-badge {
+        .speed-val-badge {
             color: var(--primary);
             font-weight: 700;
-            min-width: 55px;
+            min-width: 45px;
             text-align: right;
         }
 
@@ -191,7 +189,7 @@
             </button>
             <div class="header-title">
                 <span>Speaking Part 1 Studio</span>
-                <span class="badge">Karaoke & Speech Guide</span>
+                <span class="badge">Natural Voice & Karaoke</span>
             </div>
         </div>
         <button class="btn btn-outline" onclick="saveUserAnswers()">
@@ -331,37 +329,33 @@
         let savedAnswers = JSON.parse(localStorage.getItem(STORAGE_KEY_ANSWERS) || '{}');
         let activeRecognition = null;
         let activeUniqueKey = null;
-
-        // TTS Sequential Reading State
-        let activeTtsReading = null;
+        let activeTtsKey = null;
 
         /* --- WEBRTC RECORDER --- */
         let mediaRecorder;
         let recordedChunks = [];
-        let currentStream;
+        let currentStream = null;
         let isRecording = false;
         let facingMode = "user";
         let videoBlob = null;
         let timerInterval;
         let secondsPassed = 0;
 
+        // PERBAIKAN: Hanya minta video di awal. Jangan kunci mic sebelum rekaman dimulai
+        // agar Speech Recognition tidak terblokir / tabrakan!
         async function initCamera() {
             if (currentStream) currentStream.getTracks().forEach(t => t.stop());
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: facingMode },
-                    audio: {
-                        autoGainControl: true,
-                        echoCancellation: true,
-                        noiseSuppression: false
-                    }
+                    audio: false // Jangan kunci mic di awal
                 });
                 document.getElementById('liveVideo').srcObject = currentStream;
                 document.getElementById('liveVideo').style.display = "block";
                 document.getElementById('playbackVideo').style.display = "none";
                 document.getElementById('btnDownload').style.display = "none";
             } catch (err) {
-                Swal.fire('Camera Error', 'Cannot access webcam/microphone. Ensure HTTPS/permissions are active.', 'error');
+                console.warn('Camera preview notice:', err);
             }
         }
 
@@ -376,35 +370,51 @@
             return `${m}:${s}`;
         }
 
-        function toggleRecording() {
+        async function toggleRecording() {
             const btn = document.getElementById('btnRecord');
             const timerDisplay = document.getElementById('timerDisplay');
             
             if (!isRecording) {
-                recordedChunks = [];
-                mediaRecorder = new MediaRecorder(currentStream);
-                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
-                mediaRecorder.onstop = () => {
-                    videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const playback = document.getElementById('playbackVideo');
-                    playback.src = URL.createObjectURL(videoBlob);
-                    playback.style.display = "block";
-                    document.getElementById('liveVideo').style.display = "none";
-                    document.getElementById('btnDownload').style.display = "inline-flex";
-                };
+                // Hentikan pengenalan suara & TTS jika masih aktif saat rekaman dimulai
+                if (activeRecognition) activeRecognition.stop();
+                stopNaturalReading();
 
-                mediaRecorder.start();
-                isRecording = true;
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop Record</span>`;
-                btn.className = "btn btn-warning";
+                try {
+                    // Ambil audio khusus untuk proses rekaman video
+                    const recordStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: facingMode },
+                        audio: true
+                    });
+                    currentStream = recordStream;
+                    document.getElementById('liveVideo').srcObject = recordStream;
 
-                secondsPassed = 0;
-                timerDisplay.innerText = "00:00";
-                timerDisplay.classList.add('recording');
-                timerInterval = setInterval(() => {
-                    secondsPassed++;
-                    timerDisplay.innerText = formatTime(secondsPassed);
-                }, 1000);
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(recordStream);
+                    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                    mediaRecorder.onstop = () => {
+                        videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                        const playback = document.getElementById('playbackVideo');
+                        playback.src = URL.createObjectURL(videoBlob);
+                        playback.style.display = "block";
+                        document.getElementById('liveVideo').style.display = "none";
+                        document.getElementById('btnDownload').style.display = "inline-flex";
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop Record</span>`;
+                    btn.className = "btn btn-warning";
+
+                    secondsPassed = 0;
+                    timerDisplay.innerText = "00:00";
+                    timerDisplay.classList.add('recording');
+                    timerInterval = setInterval(() => {
+                        secondsPassed++;
+                        timerDisplay.innerText = formatTime(secondsPassed);
+                    }, 1000);
+                } catch (err) {
+                    Swal.fire('Microphone Permission', 'Mohon izinkan akses mikrofon untuk merekam jawaban.', 'warning');
+                }
             } else {
                 mediaRecorder.stop();
                 isRecording = false;
@@ -413,6 +423,9 @@
 
                 clearInterval(timerInterval);
                 timerDisplay.classList.remove('recording');
+
+                // Kembalikan ke mode video tanpa mengunci mic agar speech recognition bebas digunakan
+                initCamera();
             }
         }
 
@@ -424,6 +437,33 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+        }
+
+        /* --- NATURAL HUMAN-LIKE VOICE SELECTION --- */
+        let availableVoices = [];
+        function loadVoices() {
+            if ('speechSynthesis' in window) {
+                availableVoices = window.speechSynthesis.getVoices();
+            }
+        }
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // Memilih suara penutur asli paling humanis (Natural/Google/Premium)
+        function getBestNaturalVoice() {
+            if (availableVoices.length === 0) loadVoices();
+            
+            // Prioritas: Suara online natural berkualitas tinggi
+            const naturalVoice = availableVoices.find(v => 
+                (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Online')) && 
+                (v.lang.startsWith('en-GB') || v.lang.startsWith('en-US'))
+            );
+            if (naturalVoice) return naturalVoice;
+
+            // Cadangan: Suara English apa saja yang tersedia
+            return availableVoices.find(v => v.lang.startsWith('en-GB') || v.lang.startsWith('en-US')) || null;
         }
 
         /* --- TOPIC & QUESTION RENDERING --- */
@@ -447,7 +487,7 @@
         }
 
         function renderCurrentTopic() {
-            stopTtsRead();
+            stopNaturalReading();
             if (activeRecognition) activeRecognition.stop();
 
             const selectedId = document.getElementById('topicSelect').value;
@@ -471,17 +511,15 @@
                             <button class="btn-icon btn-hint" title="Band 9 Hint & Analysis" onclick="openHint('${topic.id}', ${idx})">
                                 <svg class="icon" viewBox="0 0 24 24"><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path></svg>
                             </button>
-                            <button class="btn-icon" title="Listen to Question" onclick="speakText('${qText.replace(/'/g, "\\'")}')">
+                            <button class="btn-icon" title="Listen to Question" onclick="speakQuestion('${qText.replace(/'/g, "\\'")}')">
                                 <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                             </button>
                         </div>
                     </div>
 
                     <div class="draft-container">
-                        <!-- Editable Input Area -->
                         <textarea class="answer-draft" id="draft_${uniqueKey}" placeholder="Type your response draft here, or click Hint to use a Band 9 example..." oninput="autoSave('${uniqueKey}', this.value)">${savedText}</textarea>
                         
-                        <!-- Real-time Karaoke Teleprompter Overlay -->
                         <div class="karaoke-display" id="karaoke_${uniqueKey}" title="Click background to edit draft text"></div>
                     </div>
 
@@ -492,88 +530,102 @@
                                     <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                                     <span>Check Pronunciation</span>
                                 </button>
-                                <button class="btn btn-outline" style="font-size:0.8rem; padding: 6px 12px;" id="btnTts_${uniqueKey}" onclick="toggleTtsRead('${uniqueKey}')">
+                                <button class="btn btn-outline" style="font-size:0.8rem; padding: 6px 12px;" id="btnTts_${uniqueKey}" onclick="toggleNaturalReading('${uniqueKey}')">
                                     <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-                                    <span>Listen Draft</span>
+                                    <span>Human Guide</span>
                                 </button>
                             </div>
                             <span class="accuracy-pill" id="score_${uniqueKey}" style="display:none;">Score: 0%</span>
                         </div>
 
-                        <!-- Slider Jeda Antar Kata untuk Pembacaan Audio Panduan -->
-                        <div class="tts-delay-bar" id="ttsBar_${uniqueKey}">
-                            <span>⏱️ Word pause:</span>
-                            <input type="range" id="delaySlider_${uniqueKey}" min="0" max="1500" step="50" value="400" oninput="document.getElementById('delayVal_${uniqueKey}').innerText = this.value + ' ms'">
-                            <span class="delay-val-badge" id="delayVal_${uniqueKey}">400 ms</span>
+                        <!-- Slider Kecepatan Membaca Alami (Speed Rate) -->
+                        <div class="tts-speed-bar" id="ttsBar_${uniqueKey}">
+                            <span>🎧 Reading Pace:</span>
+                            <input type="range" id="speedSlider_${uniqueKey}" min="0.6" max="1.1" step="0.05" value="0.85" oninput="document.getElementById('speedVal_${uniqueKey}').innerText = this.value + 'x'">
+                            <span class="speed-val-badge" id="speedVal_${uniqueKey}">0.85x</span>
                         </div>
 
-                        <div class="speech-result" id="result_${uniqueKey}">Speak into your mic to test accuracy, or click "Listen Draft" / any word to hear pronunciation.</div>
+                        <div class="speech-result" id="result_${uniqueKey}">Speak clearly into your mic, or click "Human Guide" to hear natural native pronunciation.</div>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        /* --- NAVIGASI KE HINT PAGE --- */
         function openHint(topicId, questionIdx) {
             window.location.href = `Hint/index.html?topic=${encodeURIComponent(topicId)}&q=${encodeURIComponent(questionIdx)}`;
         }
 
-        /* --- SPEECH SYNTHESIS ENGINE --- */
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                stopTtsRead();
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-GB';
-                utterance.rate = 0.95;
-                window.speechSynthesis.speak(utterance);
-            }
+        /* --- HUMAN-LIKE SPEECH SYNTHESIS --- */
+        function speakQuestion(text) {
+            if (!('speechSynthesis' in window)) return;
+            stopNaturalReading();
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            const bestVoice = getBestNaturalVoice();
+            if (bestVoice) utterance.voice = bestVoice;
+            utterance.rate = 0.95;
+            window.speechSynthesis.speak(utterance);
         }
 
-        // Lafalkan satu kata yang diklik oleh pengguna
         function speakSingleWord(word) {
             if (!('speechSynthesis' in window)) return;
-            stopTtsRead();
+            stopNaturalReading();
             window.speechSynthesis.cancel();
             const clean = word.replace(/[^a-zA-Z0-9'-]/g, '');
             if (!clean) return;
 
             const utterance = new SpeechSynthesisUtterance(clean);
-            utterance.lang = 'en-GB';
+            const bestVoice = getBestNaturalVoice();
+            if (bestVoice) utterance.voice = bestVoice;
             utterance.rate = 0.85;
             window.speechSynthesis.speak(utterance);
         }
 
-        /* --- TELEPROMPTER BUILDER WITH CLICK-TO-HEAR --- */
+        /* --- PREPARE KARAOKE SPANS WITH WORD OFFSETS --- */
+        let wordTokenMap = [];
         function prepareKaraokeDisplay(uniqueKey, targetText) {
             const karaokeEl = document.getElementById(`karaoke_${uniqueKey}`);
-            const rawTokens = targetText.split(/(\s+)/);
             karaokeEl.innerHTML = '';
-            
-            rawTokens.forEach(token => {
-                if (token.trim() === '') {
-                    karaokeEl.appendChild(document.createTextNode(token));
-                } else {
-                    const span = document.createElement('span');
-                    span.className = 'karaoke-word';
-                    span.innerText = token;
-                    span.title = "Click to hear pronunciation";
-                    span.dataset.clean = token.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    
-                    // Klik kata apa saja untuk mendengarkan lafalnya
-                    span.onclick = (e) => {
-                        e.stopPropagation();
-                        speakSingleWord(token);
-                    };
+            wordTokenMap = [];
 
-                    karaokeEl.appendChild(span);
+            // Tokenisasi dengan melacak index karakter untuk sinkronisasi onboundary
+            const regex = /\S+/g;
+            let match;
+            let lastIndex = 0;
+
+            while ((match = regex.exec(targetText)) !== null) {
+                // Teks spasi sebelum kata
+                if (match.index > lastIndex) {
+                    const space = targetText.substring(lastIndex, match.index);
+                    karaokeEl.appendChild(document.createTextNode(space));
                 }
-            });
 
-            // Klik latar teleprompter untuk kembali ke mode edit textarea
+                const word = match[0];
+                const span = document.createElement('span');
+                span.className = 'karaoke-word';
+                span.innerText = word;
+                span.title = "Click to hear pronunciation";
+                span.dataset.clean = word.toLowerCase().replace(/[^a-z0-9]/g, '');
+                span.dataset.charIndex = match.index;
+
+                span.onclick = (e) => {
+                    e.stopPropagation();
+                    speakSingleWord(word);
+                };
+
+                karaokeEl.appendChild(span);
+                wordTokenMap.push({ charIndex: match.index, length: word.length, element: span });
+                lastIndex = regex.lastIndex;
+            }
+
+            if (lastIndex < targetText.length) {
+                karaokeEl.appendChild(document.createTextNode(targetText.substring(lastIndex)));
+            }
+
             karaokeEl.onclick = () => {
-                if (activeTtsReading || activeRecognition) return;
+                if (activeTtsKey || activeRecognition) return;
                 karaokeEl.style.display = 'none';
                 const draftEl = document.getElementById(`draft_${uniqueKey}`);
                 draftEl.style.display = 'block';
@@ -581,20 +633,19 @@
             };
         }
 
-        /* --- SEQUENTIAL TTS READING WITH PAUSE SLIDER --- */
-        function toggleTtsRead(uniqueKey) {
+        /* --- NATURAL READING MENGGUNAKAN EVENT ONBOUNDARY --- */
+        function toggleNaturalReading(uniqueKey) {
             if (!('speechSynthesis' in window)) {
                 Swal.fire('Not Supported', 'Text-to-Speech is not supported in this browser.', 'warning');
                 return;
             }
 
-            // Jika sedang membaca pertanyaan yang sama, hentikan
-            if (activeTtsReading && activeTtsReading.uniqueKey === uniqueKey) {
-                stopTtsRead();
+            if (activeTtsKey === uniqueKey) {
+                stopNaturalReading();
                 return;
             }
 
-            stopTtsRead();
+            stopNaturalReading();
             if (activeRecognition) activeRecognition.stop();
 
             const draftEl = document.getElementById(`draft_${uniqueKey}`);
@@ -603,7 +654,7 @@
             const targetText = draftEl.value.trim();
 
             if (!targetText) {
-                Swal.fire('Draft is Empty', 'Please write or paste your response text first, or import one from the Band 9 Hint.', 'info');
+                Swal.fire('Draft is Empty', 'Please write or paste your response text first.', 'info');
                 return;
             }
 
@@ -611,75 +662,58 @@
             draftEl.style.display = 'none';
             karaokeEl.style.display = 'block';
 
-            const wordSpans = Array.from(karaokeEl.querySelectorAll('.karaoke-word'));
-            if (wordSpans.length === 0) return;
-
             const btnTts = document.getElementById(`btnTts_${uniqueKey}`);
             btnTts.className = 'btn btn-warning';
             btnTts.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop Reading</span>`;
-            resultBox.innerHTML = '<span style="color: var(--warning); font-weight: 600;">🎧 Reading aloud word-by-word with your custom pause. Listen and follow!</span>';
+            resultBox.innerHTML = '<span style="color: var(--warning); font-weight: 600;">🎧 Natural native pronunciation playing... Follow the rhythm!</span>';
 
-            activeTtsReading = {
-                uniqueKey: uniqueKey,
-                wordSpans: wordSpans,
-                timer: null
+            const speedSlider = document.getElementById(`speedSlider_${uniqueKey}`);
+            const chosenRate = speedSlider ? parseFloat(speedSlider.value) : 0.85;
+
+            // Baca kalimat utuh agar intonasinya alami seperti penutur asli
+            const utterance = new SpeechSynthesisUtterance(targetText);
+            const naturalVoice = getBestNaturalVoice();
+            if (naturalVoice) utterance.voice = naturalVoice;
+            utterance.rate = chosenRate;
+
+            // Sinkronisasi kata secara real-time saat suara mengalir alami
+            utterance.onboundary = (event) => {
+                if (event.name === 'word') {
+                    const charIdx = event.charIndex;
+                    const matchedToken = wordTokenMap.find(item => 
+                        charIdx >= item.charIndex && charIdx < (item.charIndex + item.length + 1)
+                    );
+
+                    if (matchedToken) {
+                        karaokeEl.querySelectorAll('.karaoke-word').forEach(s => s.classList.remove('reading'));
+                        matchedToken.element.classList.add('reading');
+                        matchedToken.element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
             };
 
-            function readWordAt(index) {
-                if (!activeTtsReading || activeTtsReading.uniqueKey !== uniqueKey) return;
-                
-                if (index >= wordSpans.length) {
-                    stopTtsRead();
-                    resultBox.innerHTML = '<span>✅ Audio guide completed! You can now click "Check Pronunciation" to try it yourself.</span>';
-                    return;
-                }
+            utterance.onend = () => {
+                stopNaturalReading();
+                resultBox.innerHTML = '<span>✅ Audio guide completed! You can now test your own pronunciation.</span>';
+            };
 
-                // Beri highlight kuning pada kata yang sedang dibacakan
-                wordSpans.forEach(s => s.classList.remove('reading'));
-                const currentSpan = wordSpans[index];
-                currentSpan.classList.add('reading');
-                currentSpan.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            utterance.onerror = () => stopNaturalReading();
 
-                const rawWord = currentSpan.innerText.replace(/[^a-zA-Z0-9'-]/g, '');
-                const utterance = new SpeechSynthesisUtterance(rawWord);
-                utterance.lang = 'en-GB';
-                utterance.rate = 0.9;
-
-                utterance.onend = () => {
-                    if (!activeTtsReading || activeTtsReading.uniqueKey !== uniqueKey) return;
-                    
-                    // Ambil durasi jeda dari slider kata
-                    const delaySlider = document.getElementById(`delaySlider_${uniqueKey}`);
-                    const delay = delaySlider ? parseInt(delaySlider.value, 10) : 400;
-
-                    activeTtsReading.timer = setTimeout(() => {
-                        readWordAt(index + 1);
-                    }, delay);
-                };
-
-                utterance.onerror = () => {
-                    stopTtsRead();
-                };
-
-                window.speechSynthesis.speak(utterance);
-            }
-
-            readWordAt(0);
+            activeTtsKey = uniqueKey;
+            window.speechSynthesis.speak(utterance);
         }
 
-        function stopTtsRead() {
-            if (!activeTtsReading) return;
-            const key = activeTtsReading.uniqueKey;
-
-            if (activeTtsReading.timer) clearTimeout(activeTtsReading.timer);
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        function stopNaturalReading() {
+            if (!activeTtsKey) return;
+            const key = activeTtsKey;
+            window.speechSynthesis.cancel();
 
             const btnTts = document.getElementById(`btnTts_${key}`);
             if (btnTts) {
                 btnTts.className = 'btn btn-outline';
                 btnTts.style.fontSize = '0.8rem';
                 btnTts.style.padding = '6px 12px';
-                btnTts.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg><span>Listen Draft</span>`;
+                btnTts.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg><span>Human Guide</span>`;
             }
 
             const karaokeEl = document.getElementById(`karaoke_${key}`);
@@ -687,16 +721,20 @@
                 karaokeEl.querySelectorAll('.karaoke-word').forEach(s => s.classList.remove('reading'));
             }
 
-            activeTtsReading = null;
+            activeTtsKey = null;
         }
 
-        /* --- REAL-TIME KARAOKE PRONUNCIATION ENGINE --- */
+        /* --- SPEECH RECOGNITION (OPTIMASI VERCEL & CHROME) --- */
         function testPronunciation(uniqueKey) {
-            stopTtsRead();
+            stopNaturalReading();
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                Swal.fire('Not Supported', 'Live voice recognition requires Google Chrome or Microsoft Edge.', 'warning');
+                Swal.fire({
+                    title: 'Browser Not Supported',
+                    html: 'Web Speech API memerlukan <b>Google Chrome</b> atau <b>Microsoft Edge</b>.<br><small>(Jika menggunakan Brave, aktifkan Google Services for Speech di pengaturan privasi).</small>',
+                    icon: 'warning'
+                });
                 return;
             }
 
@@ -712,19 +750,15 @@
                 return;
             }
 
-            // If user clicks the active recording button, stop it safely
             if (activeRecognition) {
                 activeRecognition.stop();
                 return;
             }
 
             prepareKaraokeDisplay(uniqueKey, targetText);
-
-            // Switch view to Karaoke Display
             draftEl.style.display = 'none';
             karaokeEl.style.display = 'block';
 
-            // Initialize Streaming Speech Recognition
             const recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
             recognition.interimResults = true;
@@ -736,7 +770,7 @@
                 activeUniqueKey = uniqueKey;
                 btn.className = 'btn btn-danger';
                 btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop & Done</span>`;
-                resultBox.innerHTML = '<span style="color: var(--primary); font-weight: 600;">Listening live... Speak out loud!</span>';
+                resultBox.innerHTML = '<span style="color: var(--primary); font-weight: 600;">● Listening live... Speak out loud clearly!</span>';
                 scorePill.style.display = 'inline-block';
                 scorePill.innerText = 'Listening...';
             };
@@ -758,7 +792,9 @@
             };
 
             recognition.onerror = (e) => {
-                if (e.error !== 'no-speech') {
+                if (e.error === 'not-allowed') {
+                    Swal.fire('Microphone Blocked', 'Izin mikrofon ditolak oleh browser. Klik ikon gembok di URL bar Vercel dan izinkan Microphone.', 'error');
+                } else if (e.error !== 'no-speech') {
                     resultBox.innerText = `Microphone notice: ${e.error}`;
                 }
             };
@@ -771,10 +807,13 @@
                 resultBox.innerHTML += ' <span style="color:#64748b;">(Click background to edit draft text)</span>';
             };
 
-            recognition.start();
+            try {
+                recognition.start();
+            } catch (err) {
+                console.error("Speech recognition start error:", err);
+            }
         }
 
-        // Live Matcher: turns pronounced words BLUE
         function updateKaraokeHighlights(karaokeContainer, streamText, scoreBadge) {
             const spokenTokens = streamText.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
             const wordElements = karaokeContainer.querySelectorAll('.karaoke-word');
