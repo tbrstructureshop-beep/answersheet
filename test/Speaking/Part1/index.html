@@ -97,8 +97,14 @@
             margin: 0 3px; 
             border-radius: 4px;
             padding: 0 3px;
+            cursor: pointer;
         }
-        /* Word Hit Karaoke - Biru Cerah & Jelas */
+        .karaoke-word:hover {
+            background-color: #e2e8f0;
+            color: #334155;
+        }
+
+        /* Word Hit Karaoke (Matched via Mic) - Biru Cerah & Jelas */
         .karaoke-word.hit { 
             color: #1d4ed8 !important; 
             background-color: #dbeafe; 
@@ -106,10 +112,72 @@
             transform: scale(1.05); 
         }
 
-        .practice-zone { background: #f8fafc; border: 1px dashed var(--border); border-radius: 8px; padding: 10px 12px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; }
-        .practice-actions { display: flex; align-items: center; justify-content: space-between; }
-        .speech-result { min-height: 24px; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
+        /* Word Active Reading (TTS Word-by-Word Guide) - Kuning/Emas Elegan */
+        .karaoke-word.reading {
+            color: #b45309 !important;
+            background-color: #fef3c7 !important;
+            font-weight: 700;
+            transform: scale(1.08);
+            box-shadow: 0 0 0 1px #fde68a;
+        }
+
+        .practice-zone { 
+            background: #f8fafc; 
+            border: 1px dashed var(--border); 
+            border-radius: 8px; 
+            padding: 10px 12px; 
+            font-size: 0.85rem; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
         
+        .practice-actions { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Slider Jeda Antar Kata */
+        .tts-delay-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .tts-delay-bar input[type=range] {
+            flex: 1;
+            height: 5px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .delay-val-badge {
+            color: var(--primary);
+            font-weight: 700;
+            min-width: 55px;
+            text-align: right;
+        }
+
+        .speech-result { min-height: 24px; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
         .accuracy-pill { font-size: 0.75rem; padding: 3px 10px; border-radius: 999px; background: #e0e7ff; color: #1e40af; font-weight: bold; border: 1px solid #c7d2fe; }
     </style>
 </head>
@@ -123,7 +191,7 @@
             </button>
             <div class="header-title">
                 <span>Speaking Part 1 Studio</span>
-                <span class="badge">Karaoke Pronunciation</span>
+                <span class="badge">Karaoke & Speech Guide</span>
             </div>
         </div>
         <button class="btn btn-outline" onclick="saveUserAnswers()">
@@ -264,6 +332,9 @@
         let activeRecognition = null;
         let activeUniqueKey = null;
 
+        // TTS Sequential Reading State
+        let activeTtsReading = null;
+
         /* --- WEBRTC RECORDER --- */
         let mediaRecorder;
         let recordedChunks = [];
@@ -279,7 +350,6 @@
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: facingMode },
-                    // PENINGKATAN: Auto Gain Control aktif & Noise Suppression dimatikan agar suara kecil tertangkap
                     audio: {
                         autoGainControl: true,
                         echoCancellation: true,
@@ -377,6 +447,9 @@
         }
 
         function renderCurrentTopic() {
+            stopTtsRead();
+            if (activeRecognition) activeRecognition.stop();
+
             const selectedId = document.getElementById('topicSelect').value;
             const topic = TOPICS_DATA.find(t => t.id === selectedId);
             const container = document.getElementById('qListContainer');
@@ -409,18 +482,32 @@
                         <textarea class="answer-draft" id="draft_${uniqueKey}" placeholder="Type your response draft here, or click Hint to use a Band 9 example..." oninput="autoSave('${uniqueKey}', this.value)">${savedText}</textarea>
                         
                         <!-- Real-time Karaoke Teleprompter Overlay -->
-                        <div class="karaoke-display" id="karaoke_${uniqueKey}"></div>
+                        <div class="karaoke-display" id="karaoke_${uniqueKey}" title="Click background to edit draft text"></div>
                     </div>
 
                     <div class="practice-zone">
                         <div class="practice-actions">
-                            <button class="btn btn-outline" style="font-size:0.8rem; padding: 6px 12px;" id="btnMic_${uniqueKey}" onclick="testPronunciation('${uniqueKey}')">
-                                <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                                <span>Check Pronunciation</span>
-                            </button>
+                            <div class="action-buttons-group">
+                                <button class="btn btn-outline" style="font-size:0.8rem; padding: 6px 12px;" id="btnMic_${uniqueKey}" onclick="testPronunciation('${uniqueKey}')">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                                    <span>Check Pronunciation</span>
+                                </button>
+                                <button class="btn btn-outline" style="font-size:0.8rem; padding: 6px 12px;" id="btnTts_${uniqueKey}" onclick="toggleTtsRead('${uniqueKey}')">
+                                    <svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                    <span>Listen Draft</span>
+                                </button>
+                            </div>
                             <span class="accuracy-pill" id="score_${uniqueKey}" style="display:none;">Score: 0%</span>
                         </div>
-                        <div class="speech-result" id="result_${uniqueKey}">Speak clearly into your mic. Correct words turn blue instantly!</div>
+
+                        <!-- Slider Jeda Antar Kata untuk Pembacaan Audio Panduan -->
+                        <div class="tts-delay-bar" id="ttsBar_${uniqueKey}">
+                            <span>⏱️ Word pause:</span>
+                            <input type="range" id="delaySlider_${uniqueKey}" min="0" max="1500" step="50" value="400" oninput="document.getElementById('delayVal_${uniqueKey}').innerText = this.value + ' ms'">
+                            <span class="delay-val-badge" id="delayVal_${uniqueKey}">400 ms</span>
+                        </div>
+
+                        <div class="speech-result" id="result_${uniqueKey}">Speak into your mic to test accuracy, or click "Listen Draft" / any word to hear pronunciation.</div>
                     </div>
                 `;
                 container.appendChild(card);
@@ -432,9 +519,10 @@
             window.location.href = `Hint/index.html?topic=${encodeURIComponent(topicId)}&q=${encodeURIComponent(questionIdx)}`;
         }
 
-        /* --- SPEECH SYNTHESIS --- */
+        /* --- SPEECH SYNTHESIS ENGINE --- */
         function speakText(text) {
             if ('speechSynthesis' in window) {
+                stopTtsRead();
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'en-GB';
@@ -443,8 +531,169 @@
             }
         }
 
+        // Lafalkan satu kata yang diklik oleh pengguna
+        function speakSingleWord(word) {
+            if (!('speechSynthesis' in window)) return;
+            stopTtsRead();
+            window.speechSynthesis.cancel();
+            const clean = word.replace(/[^a-zA-Z0-9'-]/g, '');
+            if (!clean) return;
+
+            const utterance = new SpeechSynthesisUtterance(clean);
+            utterance.lang = 'en-GB';
+            utterance.rate = 0.85;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        /* --- TELEPROMPTER BUILDER WITH CLICK-TO-HEAR --- */
+        function prepareKaraokeDisplay(uniqueKey, targetText) {
+            const karaokeEl = document.getElementById(`karaoke_${uniqueKey}`);
+            const rawTokens = targetText.split(/(\s+)/);
+            karaokeEl.innerHTML = '';
+            
+            rawTokens.forEach(token => {
+                if (token.trim() === '') {
+                    karaokeEl.appendChild(document.createTextNode(token));
+                } else {
+                    const span = document.createElement('span');
+                    span.className = 'karaoke-word';
+                    span.innerText = token;
+                    span.title = "Click to hear pronunciation";
+                    span.dataset.clean = token.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    
+                    // Klik kata apa saja untuk mendengarkan lafalnya
+                    span.onclick = (e) => {
+                        e.stopPropagation();
+                        speakSingleWord(token);
+                    };
+
+                    karaokeEl.appendChild(span);
+                }
+            });
+
+            // Klik latar teleprompter untuk kembali ke mode edit textarea
+            karaokeEl.onclick = () => {
+                if (activeTtsReading || activeRecognition) return;
+                karaokeEl.style.display = 'none';
+                const draftEl = document.getElementById(`draft_${uniqueKey}`);
+                draftEl.style.display = 'block';
+                draftEl.focus();
+            };
+        }
+
+        /* --- SEQUENTIAL TTS READING WITH PAUSE SLIDER --- */
+        function toggleTtsRead(uniqueKey) {
+            if (!('speechSynthesis' in window)) {
+                Swal.fire('Not Supported', 'Text-to-Speech is not supported in this browser.', 'warning');
+                return;
+            }
+
+            // Jika sedang membaca pertanyaan yang sama, hentikan
+            if (activeTtsReading && activeTtsReading.uniqueKey === uniqueKey) {
+                stopTtsRead();
+                return;
+            }
+
+            stopTtsRead();
+            if (activeRecognition) activeRecognition.stop();
+
+            const draftEl = document.getElementById(`draft_${uniqueKey}`);
+            const karaokeEl = document.getElementById(`karaoke_${uniqueKey}`);
+            const resultBox = document.getElementById(`result_${uniqueKey}`);
+            const targetText = draftEl.value.trim();
+
+            if (!targetText) {
+                Swal.fire('Draft is Empty', 'Please write or paste your response text first, or import one from the Band 9 Hint.', 'info');
+                return;
+            }
+
+            prepareKaraokeDisplay(uniqueKey, targetText);
+            draftEl.style.display = 'none';
+            karaokeEl.style.display = 'block';
+
+            const wordSpans = Array.from(karaokeEl.querySelectorAll('.karaoke-word'));
+            if (wordSpans.length === 0) return;
+
+            const btnTts = document.getElementById(`btnTts_${uniqueKey}`);
+            btnTts.className = 'btn btn-warning';
+            btnTts.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg><span>Stop Reading</span>`;
+            resultBox.innerHTML = '<span style="color: var(--warning); font-weight: 600;">🎧 Reading aloud word-by-word with your custom pause. Listen and follow!</span>';
+
+            activeTtsReading = {
+                uniqueKey: uniqueKey,
+                wordSpans: wordSpans,
+                timer: null
+            };
+
+            function readWordAt(index) {
+                if (!activeTtsReading || activeTtsReading.uniqueKey !== uniqueKey) return;
+                
+                if (index >= wordSpans.length) {
+                    stopTtsRead();
+                    resultBox.innerHTML = '<span>✅ Audio guide completed! You can now click "Check Pronunciation" to try it yourself.</span>';
+                    return;
+                }
+
+                // Beri highlight kuning pada kata yang sedang dibacakan
+                wordSpans.forEach(s => s.classList.remove('reading'));
+                const currentSpan = wordSpans[index];
+                currentSpan.classList.add('reading');
+                currentSpan.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                const rawWord = currentSpan.innerText.replace(/[^a-zA-Z0-9'-]/g, '');
+                const utterance = new SpeechSynthesisUtterance(rawWord);
+                utterance.lang = 'en-GB';
+                utterance.rate = 0.9;
+
+                utterance.onend = () => {
+                    if (!activeTtsReading || activeTtsReading.uniqueKey !== uniqueKey) return;
+                    
+                    // Ambil durasi jeda dari slider kata
+                    const delaySlider = document.getElementById(`delaySlider_${uniqueKey}`);
+                    const delay = delaySlider ? parseInt(delaySlider.value, 10) : 400;
+
+                    activeTtsReading.timer = setTimeout(() => {
+                        readWordAt(index + 1);
+                    }, delay);
+                };
+
+                utterance.onerror = () => {
+                    stopTtsRead();
+                };
+
+                window.speechSynthesis.speak(utterance);
+            }
+
+            readWordAt(0);
+        }
+
+        function stopTtsRead() {
+            if (!activeTtsReading) return;
+            const key = activeTtsReading.uniqueKey;
+
+            if (activeTtsReading.timer) clearTimeout(activeTtsReading.timer);
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+            const btnTts = document.getElementById(`btnTts_${key}`);
+            if (btnTts) {
+                btnTts.className = 'btn btn-outline';
+                btnTts.style.fontSize = '0.8rem';
+                btnTts.style.padding = '6px 12px';
+                btnTts.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg><span>Listen Draft</span>`;
+            }
+
+            const karaokeEl = document.getElementById(`karaoke_${key}`);
+            if (karaokeEl) {
+                karaokeEl.querySelectorAll('.karaoke-word').forEach(s => s.classList.remove('reading'));
+            }
+
+            activeTtsReading = null;
+        }
+
         /* --- REAL-TIME KARAOKE PRONUNCIATION ENGINE --- */
         function testPronunciation(uniqueKey) {
+            stopTtsRead();
+
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 Swal.fire('Not Supported', 'Live voice recognition requires Google Chrome or Microsoft Edge.', 'warning');
@@ -469,34 +718,17 @@
                 return;
             }
 
-            // 1. Setup the Karaoke Teleprompter Elements
-            const rawTokens = targetText.split(/(\s+)/); // Preserves spacing
-            karaokeEl.innerHTML = '';
-            
-            rawTokens.forEach(token => {
-                if (token.trim() === '') {
-                    karaokeEl.appendChild(document.createTextNode(token));
-                } else {
-                    const span = document.createElement('span');
-                    span.className = 'karaoke-word';
-                    span.innerText = token;
-                    // Normalized alphanumeric representation
-                    span.dataset.clean = token.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    karaokeEl.appendChild(span);
-                }
-            });
+            prepareKaraokeDisplay(uniqueKey, targetText);
 
             // Switch view to Karaoke Display
             draftEl.style.display = 'none';
             karaokeEl.style.display = 'block';
 
-            // 2. Initialize Real-Time Streaming Speech Recognition
+            // Initialize Streaming Speech Recognition
             const recognition = new SpeechRecognition();
             recognition.lang = 'en-US';
-            recognition.interimResults = true; // Essential for instant karaoke reaction
+            recognition.interimResults = true;
             recognition.continuous = true;
-            
-            // PENINGKATAN: Ambil hingga 5 opsi alternatif tebakan AI untuk mengatasi suara pelan
             recognition.maxAlternatives = 5;
 
             recognition.onstart = () => {
@@ -516,13 +748,11 @@
                 for (let i = 0; i < event.results.length; i++) {
                     displayTranscript += event.results[i][0].transcript + ' ';
                     
-                    // Menggabungkan seluruh alternatif teks dari AI untuk memaksimalkan kecocokan kata
                     for (let j = 0; j < event.results[i].length; j++) {
                         superMatchTranscript += event.results[i][j].transcript + ' ';
                     }
                 }
 
-                // Process Karaoke Word Matching menggunakan transkrip gabungan alternatif
                 updateKaraokeHighlights(karaokeEl, superMatchTranscript, scorePill);
                 resultBox.innerHTML = `<strong>Heard:</strong> "${displayTranscript.trim()}"`;
             };
@@ -537,15 +767,8 @@
                 activeRecognition = null;
                 activeUniqueKey = null;
                 btn.className = 'btn btn-outline';
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg><span>Practice Again</span>`;
-                
-                // Allow user to click back into text mode
-                karaokeEl.onclick = () => {
-                    karaokeEl.style.display = 'none';
-                    draftEl.style.display = 'block';
-                    draftEl.focus();
-                };
-                resultBox.innerHTML += ' <span style="color:#64748b;">(Click text area anytime to edit again)</span>';
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg><span>Check Pronunciation</span>`;
+                resultBox.innerHTML += ' <span style="color:#64748b;">(Click background to edit draft text)</span>';
             };
 
             recognition.start();
@@ -564,7 +787,6 @@
                 if (!cleanWord) return;
                 totalWords++;
 
-                // Check if spoken text contains the word
                 if (spokenTokens.includes(cleanWord)) {
                     span.classList.add('hit');
                     matchCount++;
