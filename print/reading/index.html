@@ -306,25 +306,42 @@
 
     <!-- SCRIPTS -->
     <script>
+        // 1. PASTIKAN KEY INI SAMA DENGAN index.html (Ubah v1 menjadi v2)
         const LOCAL_STORAGE_KEY = 'ielts_reading_pro_v2';
         
         function getDetailedAnswers() {
-            const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+            // Ambil dari v2 (atau fallback ke v1 jika ada data lama)
+            const saved = localStorage.getItem(LOCAL_STORAGE_KEY) || localStorage.getItem('ielts_reading_pro_v1');
             let result = [];
+            
             if (saved) {
-                const data = JSON.parse(saved);
-                data.forEach(section => {
-                    section.answers.forEach(ans => {
-                        let finalAnswer = ans.type === 'mcq' ? ans.mcqOpt : ans.text;
-                        let trueAnswer = ans.type === 'mcq' ? ans.correctOpt : ans.reason;
-                        
-                        result.push({
-                            userAnswer: finalAnswer || "",
-                            correctStatus: ans.correct,
-                            trueAnswerText: trueAnswer || ""
-                        });
+                try {
+                    const data = JSON.parse(saved);
+                    data.forEach(section => {
+                        if (section.answers && Array.isArray(section.answers)) {
+                            section.answers.forEach(ans => {
+                                // Ambil jawaban user: jika tipe mcq pakai mcqOpt, jika essay pakai text
+                                let finalAnswer = (ans.type === 'mcq') ? (ans.mcqOpt || "") : (ans.text || "");
+                                
+                                // Jika ada deskripsi tambahan di MCQ dan ingin ditampilkan juga (opsional):
+                                if (ans.type === 'mcq' && ans.mcqDesc) {
+                                    finalAnswer += (finalAnswer ? ` - ${ans.mcqDesc}` : ans.mcqDesc);
+                                }
+
+                                // Kunci jawaban / pembetulan saat salah
+                                let trueAnswer = (ans.type === 'mcq') ? (ans.correctOpt || ans.correctDesc || "") : (ans.reason || "");
+                                
+                                result.push({
+                                    userAnswer: finalAnswer || "",
+                                    correctStatus: ans.correct,
+                                    trueAnswerText: trueAnswer || ""
+                                });
+                            });
+                        }
                     });
-                });
+                } catch(e) {
+                    console.error("Gagal membaca data storage:", e);
+                }
             }
             return result;
         }
@@ -367,6 +384,10 @@
             const col1 = document.getElementById('col-1-20');
             const col2 = document.getElementById('col-21-40');
             
+            // Bersihkan dulu isi kolom sebelum mengisi ulang
+            col1.innerHTML = '';
+            col2.innerHTML = '';
+
             let totalScore = 0;
             let totalGraded = 0;
 
