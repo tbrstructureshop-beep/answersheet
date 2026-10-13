@@ -1,19 +1,24 @@
 /**
  * byPdf.js - IELTS Listening Practice PDF & Audio Engine
- * Fitur: PDF.js Viewer (Zoom, Pan Drag, Bookmark) + Audio Player terintegrasi Time Mark
+ * Features: PDF.js Viewer (Zoom, Touch/Mouse Pan, Bookmarks) + Audio Controller with Time Mark Sync
  */
 
 const ByPdf = (function() {
     let pdfDoc = null;
     let currentPage = 1;
     let totalPages = 0;
-    let currentScale = 1.2;
+    let currentScale = 1.0;
     let renderTask = null;
     let isRendering = false;
     let audioElem = null;
     const BOOKMARK_STORAGE_KEY = 'ielts_listening_pdf_bookmarks';
 
-    // Inisialisasi library worker PDF.js
+    // SVG Icon Constants
+    const ICON_PLAY = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+    const ICON_PAUSE = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+    const ICON_BOOKMARK = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`;
+
+    // Inisialisasi PDF.js Worker
     if (window.pdfjsLib) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
@@ -25,7 +30,7 @@ const ByPdf = (function() {
         updateBookmarkBadge();
     }
 
-    // --- AUDIO CONTROLLER & TIME SYNC ---
+    // --- AUDIO CONTROLLER ---
     function setupAudioEvents() {
         if (!audioElem) return;
         const progress = document.getElementById('pdf-audio-progress');
@@ -42,15 +47,15 @@ const ByPdf = (function() {
         });
 
         audioElem.addEventListener('play', () => {
-            if (playBtn) playBtn.innerHTML = '⏸ Pause';
+            if (playBtn) playBtn.innerHTML = `${ICON_PAUSE} Pause`;
         });
 
         audioElem.addEventListener('pause', () => {
-            if (playBtn) playBtn.innerHTML = '▶ Play';
+            if (playBtn) playBtn.innerHTML = `${ICON_PLAY} Play`;
         });
 
         audioElem.addEventListener('ended', () => {
-            if (playBtn) playBtn.innerHTML = '▶ Play';
+            if (playBtn) playBtn.innerHTML = `${ICON_PLAY} Play`;
         });
 
         if (progress) {
@@ -68,11 +73,16 @@ const ByPdf = (function() {
         audioElem.src = URL.createObjectURL(file);
         audioElem.play().catch(() => {});
         document.getElementById('pdf-audio-bar').style.display = 'flex';
+        
+        // Compact setup card di HP setelah file terpilih
+        const setupCard = document.getElementById('pdf-setup-card');
+        if (setupCard) setupCard.classList.add('has-audio');
+
         Swal.fire({
             icon: 'success',
-            title: 'Audio Loaded!',
+            title: 'Audio Loaded',
             text: file.name,
-            timer: 1500,
+            timer: 1400,
             showConfirmButton: false
         });
     }
@@ -93,10 +103,7 @@ const ByPdf = (function() {
     }
 
     function getAudioTime() {
-        if (audioElem && !audioElem.paused && !isNaN(audioElem.currentTime)) {
-            return audioElem.currentTime;
-        }
-        if (audioElem && audioElem.src && !isNaN(audioElem.currentTime)) {
+        if (audioElem && !isNaN(audioElem.currentTime)) {
             return audioElem.currentTime;
         }
         return null;
@@ -137,7 +144,12 @@ const ByPdf = (function() {
                 document.getElementById('pdf-total-pages').textContent = totalPages;
                 document.getElementById('pdf-viewport-container').style.display = 'block';
                 document.getElementById('pdf-toolbar').style.display = 'flex';
-                renderPage(currentPage);
+                
+                // Compact setup card
+                const setupCard = document.getElementById('pdf-setup-card');
+                if (setupCard) setupCard.classList.add('has-pdf');
+
+                fitWidth();
             }).catch(err => {
                 Swal.fire({ icon: 'error', title: 'Failed to load PDF', text: err.message });
             });
@@ -155,7 +167,6 @@ const ByPdf = (function() {
             const ctx = canvas.getContext('2d');
             const viewport = page.getViewport({ scale: currentScale });
 
-            // Resolusi tajam untuk Retina / High DPI Display
             const outputScale = window.devicePixelRatio || 1;
             canvas.width = Math.floor(viewport.width * outputScale);
             canvas.height = Math.floor(viewport.height * outputScale);
@@ -210,13 +221,14 @@ const ByPdf = (function() {
         const container = document.getElementById('pdf-viewport-container');
         pdfDoc.getPage(currentPage).then(page => {
             const defaultViewport = page.getViewport({ scale: 1.0 });
-            const availableWidth = container.clientWidth - 30;
-            currentScale = Math.max(0.6, Math.min(3.0, availableWidth / defaultViewport.width));
+            const padding = window.innerWidth < 600 ? 16 : 30;
+            const availableWidth = (container.clientWidth || window.innerWidth) - padding;
+            currentScale = Math.max(0.6, Math.min(2.5, availableWidth / defaultViewport.width));
             renderPage(currentPage);
         });
     }
 
-    // --- PANNING / DRAG SYSTEM (GESER PDF DENGAN MOUSE & TOUCH) ---
+    // --- PANNING / DRAG SYSTEM (MOUSE & TOUCH SUPPORT) ---
     function setupViewerPanning() {
         const viewer = document.getElementById('pdf-viewport-container');
         if (!viewer) return;
@@ -224,7 +236,7 @@ const ByPdf = (function() {
         let isDown = false;
         let startX, startY, scrollLeft, scrollTop;
 
-        // Mouse Drag to Pan
+        // Desktop Mouse Drag
         viewer.addEventListener('mousedown', (e) => {
             if (e.target.tagName === 'BUTTON') return;
             isDown = true;
@@ -253,9 +265,29 @@ const ByPdf = (function() {
             viewer.scrollLeft = scrollLeft - (x - startX);
             viewer.scrollTop = scrollTop - (y - startY);
         });
+
+        // Mobile Touch Pan
+        let touchStartX, touchStartY, touchScrollLeft, touchScrollTop;
+        viewer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                touchStartX = e.touches[0].pageX - viewer.offsetLeft;
+                touchStartY = e.touches[0].pageY - viewer.offsetTop;
+                touchScrollLeft = viewer.scrollLeft;
+                touchScrollTop = viewer.scrollTop;
+            }
+        }, { passive: true });
+
+        viewer.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 1) {
+                const x = e.touches[0].pageX - viewer.offsetLeft;
+                const y = e.touches[0].pageY - viewer.offsetTop;
+                viewer.scrollLeft = touchScrollLeft - (x - touchStartX);
+                viewer.scrollTop = touchScrollTop - (y - touchStartY);
+            }
+        }, { passive: true });
     }
 
-    // --- BOOKMARK SYSTEM DENGAN SWEETALERT2 ---
+    // --- BOOKMARK SYSTEM ---
     function getBookmarks() {
         try {
             return JSON.parse(localStorage.getItem(BOOKMARK_STORAGE_KEY)) || [];
@@ -268,21 +300,21 @@ const ByPdf = (function() {
         const btn = document.getElementById('pdf-btn-view-bm');
         if (!btn) return;
         const list = getBookmarks();
-        btn.innerHTML = `📑 Bookmarks (${list.length})`;
+        btn.innerHTML = `${ICON_BOOKMARK} Bookmarks (${list.length})`;
     }
 
     function addBookmark() {
         if (!pdfDoc) {
-            return Swal.fire({ icon: 'warning', title: 'Belum ada PDF', text: 'Silakan load file PDF terlebih dahulu.' });
+            return Swal.fire({ icon: 'warning', title: 'PDF Not Loaded', text: 'Please load a PDF document first.' });
         }
 
         Swal.fire({
-            title: `Bookmark Halaman ${currentPage}`,
+            title: `Bookmark Page ${currentPage}`,
             input: 'text',
-            inputLabel: 'Beri Catatan / Nama Bagian:',
-            inputValue: `Part on Page ${currentPage}`,
+            inputLabel: 'Description / Section Title:',
+            inputValue: `Section on Page ${currentPage}`,
             showCancelButton: true,
-            confirmButtonText: 'Simpan',
+            confirmButtonText: 'Save',
             confirmButtonColor: '#2563eb'
         }).then((result) => {
             if (result.isConfirmed && result.value) {
@@ -295,7 +327,7 @@ const ByPdf = (function() {
                 });
                 localStorage.setItem(BOOKMARK_STORAGE_KEY, JSON.stringify(list));
                 updateBookmarkBadge();
-                Swal.fire({ icon: 'success', title: 'Tersimpan!', timer: 1200, showConfirmButton: false });
+                Swal.fire({ icon: 'success', title: 'Bookmark Saved', timer: 1200, showConfirmButton: false });
             }
         });
     }
@@ -305,23 +337,23 @@ const ByPdf = (function() {
         if (list.length === 0) {
             return Swal.fire({
                 icon: 'info',
-                title: 'Belum Ada Bookmark',
-                text: 'Gunakan tombol ⭐ Bookmark untuk menandai halaman soal penting.'
+                title: 'No Bookmarks Yet',
+                text: 'Use the Bookmark button to save important question pages.'
             });
         }
 
-        const itemsHtml = list.map((bm, index) => `
+        const itemsHtml = list.map((bm) => `
             <div style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; text-align: left;">
                 <div style="cursor: pointer; flex: 1;" onclick="ByPdf.jumpToBookmark(${bm.page})">
-                    <div style="font-weight: 700; color: #2563eb; font-size: 0.95rem;">Hal. ${bm.page} - ${bm.label}</div>
-                    <div style="font-size: 0.75rem; color: #94a3b8;">Disimpan jam ${bm.created}</div>
+                    <div style="font-weight: 700; color: #2563eb; font-size: 0.95rem;">Page ${bm.page} &ndash; ${bm.label}</div>
+                    <div style="font-size: 0.75rem; color: #94a3b8;">Recorded at ${bm.created}</div>
                 </div>
                 <button type="button" onclick="ByPdf.removeBookmark(${bm.id})" style="background: none; border: none; color: #ef4444; font-size: 1.1rem; cursor: pointer; padding: 4px 8px;">✕</button>
             </div>
         `).join('');
 
         Swal.fire({
-            title: 'Daftar Bookmark PDF',
+            title: 'PDF Bookmarks',
             html: `
                 <div style="max-height: 280px; overflow-y: auto; margin-top: 10px;">
                     ${itemsHtml}
@@ -329,7 +361,7 @@ const ByPdf = (function() {
             `,
             showConfirmButton: false,
             showCloseButton: true,
-            width: 420
+            width: 400
         });
     }
 
