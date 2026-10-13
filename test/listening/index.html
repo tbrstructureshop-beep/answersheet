@@ -146,8 +146,42 @@
         /* Multiple Choice UI Toggles */
         .answer-row[data-type="essay"] .mcq-ui { display: none !important; }
         .answer-row[data-type="mcq"] .essay-ui { display: none !important; }
-        .mcq-ui { display: flex; gap: 6px; flex: 1; align-items: center; width: 100%; }
-        .mcq-select { padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: white; font-size: 14px; outline: none; cursor: pointer; }
+        .mcq-ui { display: flex; gap: 8px; flex: 1; align-items: center; width: 100%; }
+
+        /* SweetAlert Option Selector Trigger Buttons */
+        .mcq-select, .mcq-correct-select {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #ffffff;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 62px;
+            height: 36px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .mcq-select:hover, .mcq-correct-select:hover {
+            border-color: var(--primary);
+            background: #f8fafc;
+        }
+        .mcq-select.has-value {
+            background: #eff6ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .mcq-correct-select.has-value {
+            background: #ecfdf5;
+            border-color: #10b981;
+            color: #059669;
+        }
 
         .input-active { border-bottom: 2px solid var(--primary) !important; background-color: #eff6ff !important; border-radius: 4px; outline: none; }
 
@@ -181,10 +215,11 @@
             html, body { height: auto !important; overflow: visible !important; display: block !important; }
             .sticky-zone { display: none !important; }
             .main-scroll-area { height: auto !important; overflow: visible !important; display: block !important; padding: 0 !important; width: 100% !important; flex: none !important; }
-            .section-nav-bar, .global-actions, button, #custom-keyboard, .time-marks-area { display: none !important; }
+            .section-nav-bar, .global-actions, button:not(.mcq-select):not(.mcq-correct-select), #custom-keyboard, .time-marks-area { display: none !important; }
             .section-card { display: block !important; box-shadow: none; border: none; border-bottom: 2px solid #000; margin-bottom: 10px; padding: 0 !important; }
             .answer-row { background: transparent !important; border: none !important; padding: 5px 0; }
             .answer-input, .reason-input, .mcq-desc, .mcq-correct-desc { border-bottom: 1px solid #000; color: black; }
+            .mcq-select, .mcq-correct-select { display: inline-flex !important; border: 1px solid #000 !important; color: black !important; background: transparent !important; box-shadow: none !important; }
         }
     </style>
 </head>
@@ -414,6 +449,118 @@
         });
     }
 
+    // --- SWEETALERT MODAL FOR MCQ OPTIONS ---
+    function openOptionModal(btn, type) {
+        const isKey = type === 'key';
+        const currentValue = btn.value || '';
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        
+        const buttonsGrid = letters.map(l => {
+            const isSelected = currentValue === l;
+            const activeBg = isKey ? '#10b981' : '#2563eb';
+            return `
+                <button type="button" class="swal-opt-choice ${isSelected ? 'selected' : ''}" data-val="${l}" style="
+                    padding: 12px 0;
+                    font-size: 1.15rem;
+                    font-weight: 700;
+                    border-radius: 8px;
+                    border: 2px solid ${isSelected ? activeBg : '#e2e8f0'};
+                    background: ${isSelected ? activeBg : '#ffffff'};
+                    color: ${isSelected ? '#ffffff' : '#1e293b'};
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                ">
+                    ${l}
+                </button>
+            `;
+        }).join('');
+
+        Swal.fire({
+            title: isKey ? 'Select Answer Key' : 'Select Option Answer',
+            html: `
+                <div style="margin: 10px 0 5px 0;">
+                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 14px;">Choose the appropriate option for this item:</p>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px;">
+                        ${buttonsGrid}
+                    </div>
+                    <button type="button" id="swal-opt-clear" style="
+                        width: 100%;
+                        padding: 9px;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        border-radius: 6px;
+                        border: 1px dashed #cbd5e1;
+                        background: #f8fafc;
+                        color: #64748b;
+                        cursor: pointer;
+                        transition: 0.15s;
+                    ">
+                        Clear Selection
+                    </button>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: 360,
+            didOpen: () => {
+                const popup = Swal.getPopup();
+                popup.querySelectorAll('.swal-opt-choice').forEach(choiceBtn => {
+                    choiceBtn.onmouseenter = () => {
+                        if (!choiceBtn.classList.contains('selected')) {
+                            choiceBtn.style.borderColor = isKey ? '#10b981' : '#2563eb';
+                            choiceBtn.style.background = isKey ? '#ecfdf5' : '#eff6ff';
+                        }
+                    };
+                    choiceBtn.onmouseleave = () => {
+                        if (!choiceBtn.classList.contains('selected')) {
+                            choiceBtn.style.borderColor = '#e2e8f0';
+                            choiceBtn.style.background = '#ffffff';
+                        }
+                    };
+                    choiceBtn.onclick = () => {
+                        playClickSound();
+                        setOptionValue(btn, choiceBtn.dataset.val, isKey);
+                        Swal.close();
+                    };
+                });
+
+                const clearBtn = popup.querySelector('#swal-opt-clear');
+                if (clearBtn) {
+                    clearBtn.onmouseenter = () => {
+                        clearBtn.style.borderColor = '#ef4444';
+                        clearBtn.style.color = '#ef4444';
+                        clearBtn.style.background = '#fef2f2';
+                    };
+                    clearBtn.onmouseleave = () => {
+                        clearBtn.style.borderColor = '#cbd5e1';
+                        clearBtn.style.color = '#64748b';
+                        clearBtn.style.background = '#f8fafc';
+                    };
+                    clearBtn.onclick = () => {
+                        playClickSound();
+                        setOptionValue(btn, '', isKey);
+                        Swal.close();
+                    };
+                }
+            }
+        });
+    }
+
+    function setOptionValue(btn, val, isKey) {
+        btn.value = val;
+        btn.setAttribute('value', val);
+        const arrow = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+        
+        if (val) {
+            btn.innerHTML = `${isKey ? 'Key: ' + val : val} ${arrow}`;
+            btn.classList.add('has-value');
+        } else {
+            btn.innerHTML = `${isKey ? 'Key' : 'Opt'} ${arrow}`;
+            btn.classList.remove('has-value');
+        }
+        saveData();
+    }
+
     // --- ANSWERS (ESSAY & MCQ) ---
     function addAnswer(btn, data = {type: "essay", text: "", mcqOpt: "", mcqDesc: "", correct: "null", correctOpt: "", correctDesc: "", reason: ""}) {
         const container = btn.closest('.section-card').querySelector('.answers-container');
@@ -422,15 +569,18 @@
         row.dataset.correct = data.correct;
         row.dataset.type = data.type;
 
-        const optionsHtml = `<option value="">Opt</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.mcqOpt===l?'selected':''}>${l}</option>`).join('');
-        const correctOptionsHtml = `<option value="">Key</option>` + "ABCDEFGH".split('').map(l => `<option value="${l}" ${data.correctOpt===l?'selected':''}>${l}</option>`).join('');
+        const arrowSvg = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 2px;"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+        const mcqOpt = data.mcqOpt || "";
+        const correctOpt = data.correctOpt || "";
 
         row.innerHTML = `
             <div class="answer-main">
                 <span class="answer-num"></span>
                 <input type="text" class="answer-input essay-ui target-input" value="${data.text}" placeholder="Write answer..." oninput="saveData()">
                 <div class="mcq-ui">
-                    <select class="mcq-select" onchange="saveData()">${optionsHtml}</select>
+                    <button type="button" class="mcq-select ${mcqOpt ? 'has-value' : ''}" value="${mcqOpt}" onclick="openOptionModal(this, 'opt')">
+                        ${mcqOpt ? mcqOpt : 'Opt'} ${arrowSvg}
+                    </button>
                     <input type="text" class="mcq-desc target-input" value="${data.mcqDesc}" placeholder="Option desc..." oninput="saveData()">
                 </div>
                 <button class="btn-outline btn-sm" onclick="toggleAnswerType(this)" title="Switch Type">${ICON_SWITCH}</button>
@@ -442,7 +592,9 @@
                     <button class="btn-icon cross" onclick="markCorrect(this, 'false')">${ICON_CROSS}</button>
                 </div>
                 <div class="mcq-ui" style="margin-top: 5px;">
-                    <select class="mcq-correct-select" onchange="saveData()">${correctOptionsHtml}</select>
+                    <button type="button" class="mcq-correct-select ${correctOpt ? 'has-value' : ''}" value="${correctOpt}" onclick="openOptionModal(this, 'key')">
+                        ${correctOpt ? 'Key: ' + correctOpt : 'Key'} ${arrowSvg}
+                    </button>
                     <input type="text" class="mcq-correct-desc target-input" value="${data.correctDesc}" placeholder="Correct option desc..." oninput="saveData()">
                 </div>
                 <input type="text" class="reason-input target-input" value="${data.reason}" placeholder="Reason / Correct Answer (Optional)..." oninput="saveData()">
