@@ -84,8 +84,8 @@
             .mobile-view-tabs { display: flex; }
             
             body[data-mobile-view="split"] .pdf-viewport {
-                height: 24vh !important;
-                max-height: 24vh !important;
+                height: 25vh !important;
+                max-height: 25vh !important;
                 display: block !important;
             }
 
@@ -152,7 +152,7 @@
 
         .pdf-toolbar { display: none; background: #e2e8f0; padding: 6px 10px; border-radius: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 12px; font-weight: 600; }
         .pdf-tool-group { display: flex; align-items: center; gap: 4px; }
-        .pdf-tool-group button { padding: 3px 6px; font-size: 11px; }
+        .pdf-tool-group button { padding: 4px 8px; font-size: 12px; }
 
         .pdf-viewport {
             display: none; height: 260px; overflow: auto; background: #475569;
@@ -160,7 +160,7 @@
             cursor: grab; user-select: none; -webkit-overflow-scrolling: touch;
         }
         .pdf-viewport.grabbing { cursor: grabbing; }
-        #pdf-canvas { margin: 8px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background: white; display: inline-block; }
+        #pdf-canvas { margin: 8px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3); background: white; display: inline-block; transition: transform 0.05s linear; }
 
         /* Workspace */
         .section-nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card-bg); padding: 8px 12px; border-radius: 8px; }
@@ -345,24 +345,32 @@
                 <audio id="pdf-audio-player" style="display: none;"></audio>
             </div>
 
-            <!-- PDF Toolbar -->
+            <!-- Enhanced PDF Toolbar (Interactive Page Jump, Reset View, Zoom Controls) -->
             <div class="pdf-toolbar" id="pdf-toolbar">
                 <div class="pdf-tool-group">
-                    <button class="btn-outline btn-sm" onclick="ByPdf.changePage(-1)">
+                    <button class="btn-outline btn-sm" onclick="ByPdf.changePage(-1)" title="Previous Page">
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                         Prev
                     </button>
-                    <span><span id="pdf-current-page">1</span> / <span id="pdf-total-pages">1</span></span>
-                    <button class="btn-outline btn-sm" onclick="ByPdf.changePage(1)">
+                    <span style="display: inline-flex; align-items: center; gap: 3px;">
+                        Page
+                        <input type="number" id="pdf-page-input" min="1" value="1" onchange="ByPdf.goToPage(this.value)" onkeydown="if(event.key==='Enter')ByPdf.goToPage(this.value)" style="width: 44px; text-align: center; padding: 2px 4px; font-weight: bold; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; background: white;">
+                        / <span id="pdf-total-pages">1</span>
+                    </span>
+                    <button class="btn-outline btn-sm" onclick="ByPdf.changePage(1)" title="Next Page">
                         Next
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
+                    <button class="btn-outline btn-sm" onclick="ByPdf.resetView()" title="Reset to Page 1 & Fit Width">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                        Reset
+                    </button>
                 </div>
                 <div class="pdf-tool-group">
-                    <button class="btn-outline btn-sm" onclick="ByPdf.zoom(-0.2)">−</button>
+                    <button class="btn-outline btn-sm" onclick="ByPdf.zoom(-0.2)" title="Zoom Out">−</button>
                     <span id="pdf-zoom-val" style="font-family: monospace;">100%</span>
-                    <button class="btn-outline btn-sm" onclick="ByPdf.zoom(0.2)">+</button>
-                    <button class="btn-outline btn-sm" onclick="ByPdf.fitWidth()">Fit</button>
+                    <button class="btn-outline btn-sm" onclick="ByPdf.zoom(0.2)" title="Zoom In">+</button>
+                    <button class="btn-outline btn-sm" onclick="ByPdf.fitWidth()" title="Fit Width">Fit</button>
                 </div>
                 <div class="pdf-tool-group">
                     <button class="btn-outline btn-sm" onclick="ByPdf.addBookmark()">
@@ -373,6 +381,7 @@
                 </div>
             </div>
 
+            <!-- Interactive Viewport: Touch Pan, Touch Pinch-to-Zoom, Ctrl+Wheel Zoom -->
             <div class="pdf-viewport" id="pdf-viewport-container">
                 <canvas id="pdf-canvas"></canvas>
             </div>
@@ -434,7 +443,6 @@
     const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
     const SAVED_YT_URL_KEY = 'ielts_saved_yt_url';
 
-    // IndexedDB for media mode
     const MEDIA_DB_NAME = 'IeltsListeningStorage';
     const MEDIA_STORE_NAME = 'media_files';
 
@@ -504,15 +512,15 @@
         return url.match(regex)?.[1] || null;
     }
 
-    async function loadLocalFile(input) {
-        const file = input.files[0];
+    function loadLocalFile(input) {
+        const file = input.files && input.files[0];
         if (!file) return;
 
-        // Save file to IndexedDB for automatic reload
         try {
             const dbReq = indexedDB.open(MEDIA_DB_NAME, 1);
             dbReq.onsuccess = (e) => {
                 const db = e.target.result;
+                if (!db.objectStoreNames.contains(MEDIA_STORE_NAME)) return;
                 const tx = db.transaction(MEDIA_STORE_NAME, 'readwrite');
                 tx.objectStore(MEDIA_STORE_NAME).put({ blob: file, name: file.name, type: file.type }, 'cached_media_file');
             };
@@ -552,12 +560,10 @@
         document.getElementById('media-restore-bar').style.display = 'none';
     }
 
-    // Restore cached media on startup
     function restoreMediaMode() {
         const savedUrl = localStorage.getItem(SAVED_YT_URL_KEY);
         if (savedUrl) {
             document.getElementById('yt-link').value = savedUrl;
-            // Load if YouTube API ready
             if (window.YT && window.YT.Player) {
                 loadYouTube(savedUrl);
             } else {
@@ -565,7 +571,6 @@
             }
         }
 
-        // Check for cached local file
         try {
             const req = indexedDB.open(MEDIA_DB_NAME, 1);
             req.onsuccess = (e) => {
@@ -755,7 +760,7 @@
         saveData();
     }
 
-    // --- ANSWERS (ESSAY & MCQ) ---
+    // --- ANSWERS ---
     function addAnswer(btn, data = {type: "essay", text: "", mcqOpt: "", mcqDesc: "", correct: "null", correctOpt: "", correctDesc: "", reason: ""}) {
         const container = btn.closest('.section-card').querySelector('.answers-container');
         const row = document.createElement('div');
@@ -839,7 +844,6 @@
         document.getElementById('score-banner').textContent = `Score: ${correctCount} / ${rows.length}`;
     }
 
-    // --- SOUND EFFECT ---
     function toggleSoundMode() {
         soundEnabled = !soundEnabled;
         const btn = document.getElementById('btn-sound-mode');
