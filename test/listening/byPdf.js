@@ -1,6 +1,6 @@
 /**
- * byPdf.js - IELTS Listening Practice PDF & Audio Engine
- * Features: PDF.js Viewer (Zoom, Touch/Mouse Pan, Bookmarks) + Audio Controller with Time Mark Sync
+ * byPdf.js - IELTS Listening Practice PDF & Audio Engine with Offline Auto-Persistence
+ * Features: IndexedDB File Cache, PDF.js Viewer (Zoom, Touch/Mouse Pan, Bookmarks), Audio Sync
  */
 
 const ByPdf = (function() {
@@ -12,22 +12,91 @@ const ByPdf = (function() {
     let isRendering = false;
     let audioElem = null;
     const BOOKMARK_STORAGE_KEY = 'ielts_listening_pdf_bookmarks';
+    const DB_NAME = 'IeltsListeningStorage';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'media_files';
 
     // SVG Icon Constants
     const ICON_PLAY = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
     const ICON_PAUSE = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
     const ICON_BOOKMARK = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`;
 
-    // Inisialisasi PDF.js Worker
+    // --- INDEXEDDB HELPER ---
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open(DB_NAME, DB_VERSION);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    }
+
+    async function saveToDB(key, data) {
+        try {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                tx.objectStore(STORE_NAME).put(data, key);
+                tx.oncomplete = () => resolve(true);
+                tx.onerror = () => reject(tx.error);
+            });
+        } catch(e) {
+            console.error('IndexedDB Save Error:', e);
+        }
+    }
+
+    async function getFromDB(key) {
+        try {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const req = tx.objectStore(STORE_NAME).get(key);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        } catch(e) {
+            console.error('IndexedDB Read Error:', e);
+            return null;
+        }
+    }
+
+    async function removeFromDB(key) {
+        try {
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).delete(key);
+        } catch(e) {}
+    }
+
+    // PDF.js Worker
     if (window.pdfjsLib) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
 
-    function init() {
+    async function init() {
         audioElem = document.getElementById('pdf-audio-player');
         setupViewerPanning();
         setupAudioEvents();
         updateBookmarkBadge();
+        await restoreCachedFiles();
+    }
+
+    // Restore cached PDF and Audio when browser reopens
+    async function restoreCachedFiles() {
+        const cachedPdf = await getFromDB('cached_pdf');
+        if (cachedPdf && cachedPdf.buffer) {
+            renderPdfBuffer(cachedPdf.buffer, cachedPdf.name, false);
+        }
+
+        const cachedAudio = await getFromDB('cached_audio');
+        if (cachedAudio && cachedAudio.blob) {
+            applyAudioBlob(cachedAudio.blob, cachedAudio.name, false);
+        }
     }
 
     // --- AUDIO CONTROLLER ---
@@ -66,25 +135,34 @@ const ByPdf = (function() {
         }
     }
 
-    function loadAudioFile(input) {
+    async function loadAudioFile(input) {
         const file = input.files[0];
         if (!file) return;
-        if (!audioElem) audioElem = document.getElementById('pdf-audio-player');
-        audioElem.src = URL.createObjectURL(file);
-        audioElem.play().catch(() => {});
-        document.getElementById('pdf-audio-bar').style.display = 'flex';
-        
-        // Compact setup card di HP setelah file terpilih
-        const setupCard = document.getElementById('pdf-setup-card');
-        if (setupCard) setupCard.classList.add('has-audio');
+        await saveToDB('cached_audio', { blob: file, name: file.name });
+        applyAudioBlob(file, file.name, true);
+    }
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Audio Loaded',
-            text: file.name,
-            timer: 1400,
-            showConfirmButton: false
-        });
+    function applyAudioBlob(blob, fileName, notify = false) {
+        if (!audioElem) audioElem = document.getElementById('pdf-audio-player');
+        if (audioElem.src) URL.revokeObjectURL(audioElem.src);
+        audioElem.src = URL.createObjectURL(blob);
+
+        document.getElementById('pdf-audio-bar').style.display = 'flex';
+        const label = document.getElementById('pdf-audio-status-name');
+        if (label) {
+            label.textContent = fileName;
+            label.style.display = 'inline-block';
+        }
+
+        if (notify) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Audio Saved Locally',
+                text: `${fileName} will remain available on next visit.`,
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
     }
 
     function togglePlay() {
@@ -131,30 +209,48 @@ const ByPdf = (function() {
         if (!file) return;
 
         const fileReader = new FileReader();
-        fileReader.onload = function() {
-            const typedarray = new Uint8Array(this.result);
-            if (!window.pdfjsLib) {
-                return Swal.fire({ icon: 'error', title: 'Error', text: 'PDF.js library not loaded yet.' });
-            }
-
-            pdfjsLib.getDocument(typedarray).promise.then(pdf => {
-                pdfDoc = pdf;
-                totalPages = pdf.numPages;
-                currentPage = 1;
-                document.getElementById('pdf-total-pages').textContent = totalPages;
-                document.getElementById('pdf-viewport-container').style.display = 'block';
-                document.getElementById('pdf-toolbar').style.display = 'flex';
-                
-                // Compact setup card
-                const setupCard = document.getElementById('pdf-setup-card');
-                if (setupCard) setupCard.classList.add('has-pdf');
-
-                fitWidth();
-            }).catch(err => {
-                Swal.fire({ icon: 'error', title: 'Failed to load PDF', text: err.message });
-            });
+        fileReader.onload = async function() {
+            const buffer = this.result;
+            await saveToDB('cached_pdf', { buffer: buffer, name: file.name });
+            renderPdfBuffer(buffer, file.name, true);
         };
         fileReader.readAsArrayBuffer(file);
+    }
+
+    function renderPdfBuffer(arrayBuffer, fileName, notify = false) {
+        if (!window.pdfjsLib) {
+            return Swal.fire({ icon: 'error', title: 'Error', text: 'PDF.js library is not ready.' });
+        }
+
+        const typedarray = new Uint8Array(arrayBuffer);
+        pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+            pdfDoc = pdf;
+            totalPages = pdf.numPages;
+            currentPage = 1;
+            document.getElementById('pdf-total-pages').textContent = totalPages;
+            document.getElementById('pdf-viewport-container').style.display = 'block';
+            document.getElementById('pdf-toolbar').style.display = 'flex';
+
+            const status = document.getElementById('pdf-doc-status-name');
+            if (status) {
+                status.textContent = fileName;
+                status.style.display = 'inline-block';
+            }
+
+            fitWidth();
+
+            if (notify) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'PDF Saved Locally',
+                    text: `${fileName} will be remembered automatically.`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }).catch(err => {
+            console.error('PDF Load Error:', err);
+        });
     }
 
     function renderPage(pageNum) {
@@ -228,7 +324,7 @@ const ByPdf = (function() {
         });
     }
 
-    // --- PANNING / DRAG SYSTEM (MOUSE & TOUCH SUPPORT) ---
+    // --- PANNING / DRAG SYSTEM ---
     function setupViewerPanning() {
         const viewer = document.getElementById('pdf-viewport-container');
         if (!viewer) return;
@@ -236,7 +332,6 @@ const ByPdf = (function() {
         let isDown = false;
         let startX, startY, scrollLeft, scrollTop;
 
-        // Desktop Mouse Drag
         viewer.addEventListener('mousedown', (e) => {
             if (e.target.tagName === 'BUTTON') return;
             isDown = true;
@@ -247,16 +342,8 @@ const ByPdf = (function() {
             scrollTop = viewer.scrollTop;
         });
 
-        viewer.addEventListener('mouseleave', () => {
-            isDown = false;
-            viewer.classList.remove('grabbing');
-        });
-
-        viewer.addEventListener('mouseup', () => {
-            isDown = false;
-            viewer.classList.remove('grabbing');
-        });
-
+        viewer.addEventListener('mouseleave', () => { isDown = false; viewer.classList.remove('grabbing'); });
+        viewer.addEventListener('mouseup', () => { isDown = false; viewer.classList.remove('grabbing'); });
         viewer.addEventListener('mousemove', (e) => {
             if (!isDown) return;
             e.preventDefault();
@@ -266,7 +353,7 @@ const ByPdf = (function() {
             viewer.scrollTop = scrollTop - (y - startY);
         });
 
-        // Mobile Touch Pan
+        // Touch Pan
         let touchStartX, touchStartY, touchScrollLeft, touchScrollTop;
         viewer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 1) {
@@ -287,7 +374,7 @@ const ByPdf = (function() {
         }, { passive: true });
     }
 
-    // --- BOOKMARK SYSTEM ---
+    // --- BOOKMARKS ---
     function getBookmarks() {
         try {
             return JSON.parse(localStorage.getItem(BOOKMARK_STORAGE_KEY)) || [];
@@ -354,11 +441,7 @@ const ByPdf = (function() {
 
         Swal.fire({
             title: 'PDF Bookmarks',
-            html: `
-                <div style="max-height: 280px; overflow-y: auto; margin-top: 10px;">
-                    ${itemsHtml}
-                </div>
-            `,
+            html: `<div style="max-height: 280px; overflow-y: auto; margin-top: 10px;">${itemsHtml}</div>`,
             showConfirmButton: false,
             showCloseButton: true,
             width: 400
