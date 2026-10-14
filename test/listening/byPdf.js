@@ -231,7 +231,6 @@ const ByPdf = (function() {
 
         const typedarray = new Uint8Array(arrayBuffer);
 
-        // Modern PDF.js requires { data: typedarray } parameter object
         pdfjsLib.getDocument({ data: typedarray }).promise.then(pdf => {
             pdfDoc = pdf;
             totalPages = pdf.numPages;
@@ -365,7 +364,7 @@ const ByPdf = (function() {
         fitWidth();
     }
 
-    // --- MOUSE PAN, TOUCH PAN, TOUCH PINCH-TO-ZOOM, CTRL+WHEEL ZOOM ---
+    // --- MOUSE & TOUCH INTERACTIONS ---
     function setupViewerInteractions() {
         const viewer = document.getElementById('pdf-viewport-container');
         if (!viewer) return;
@@ -373,7 +372,6 @@ const ByPdf = (function() {
         let isDown = false;
         let startX, startY, scrollLeft, scrollTop;
 
-        // Desktop Mouse Drag to Pan
         viewer.addEventListener('mousedown', (e) => {
             if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
             isDown = true;
@@ -395,7 +393,7 @@ const ByPdf = (function() {
             viewer.scrollTop = scrollTop - (y - startY);
         });
 
-        // Ctrl + Mouse Wheel (or Trackpad Pinch) Zoom
+        // Ctrl + Wheel Zoom
         viewer.addEventListener('wheel', (e) => {
             if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
@@ -404,7 +402,7 @@ const ByPdf = (function() {
             }
         }, { passive: false });
 
-        // Touch Interaction: Single Finger Pan & Two-Finger Pinch-to-Zoom
+        // Touch Single Pan & Two-Finger Pinch
         let touchStartX = 0, touchStartY = 0, touchScrollLeft = 0, touchScrollTop = 0;
         let isPinching = false;
         let initialPinchDist = 0;
@@ -465,7 +463,7 @@ const ByPdf = (function() {
         }, { passive: true });
     }
 
-    // --- BOOKMARK SYSTEM ---
+    // --- BOOKMARKS ---
     function getBookmarks() {
         try {
             return JSON.parse(localStorage.getItem(BOOKMARK_STORAGE_KEY)) || [];
