@@ -1,6 +1,11 @@
 /**
- * byPdf.js - IELTS Listening Practice PDF & Audio Engine with Offline Auto-Persistence
- * Features: IndexedDB File Cache, PDF.js Viewer (Zoom, Touch/Mouse Pan, Bookmarks), Audio Sync
+ * byPdf.js - IELTS Listening Practice PDF & Audio Engine
+ * Features:
+ *  - PDF.js Viewer with Touch Pinch-to-Zoom & Ctrl+Wheel Zoom
+ *  - Interactive Page Jump ("Page X of Y") & Page/View Reset
+ *  - Touch & Mouse Drag Panning
+ *  - SweetAlert2 Bookmarks
+ *  - Synchronized Audio Controller & Background IndexedDB Persistence
  */
 
 const ByPdf = (function() {
@@ -11,6 +16,7 @@ const ByPdf = (function() {
     let renderTask = null;
     let isRendering = false;
     let audioElem = null;
+
     const BOOKMARK_STORAGE_KEY = 'ielts_listening_pdf_bookmarks';
     const DB_NAME = 'IeltsListeningStorage';
     const DB_VERSION = 1;
@@ -21,7 +27,7 @@ const ByPdf = (function() {
     const ICON_PAUSE = `<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
     const ICON_BOOKMARK = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`;
 
-    // --- INDEXEDDB HELPER ---
+    // --- INDEXEDDB CACHE (BACKGROUND) ---
     function openDB() {
         return new Promise((resolve, reject) => {
             const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -46,7 +52,7 @@ const ByPdf = (function() {
                 tx.onerror = () => reject(tx.error);
             });
         } catch(e) {
-            console.error('IndexedDB Save Error:', e);
+            console.warn('IndexedDB save skipped:', e);
         }
     }
 
@@ -60,42 +66,36 @@ const ByPdf = (function() {
                 req.onerror = () => reject(req.error);
             });
         } catch(e) {
-            console.error('IndexedDB Read Error:', e);
             return null;
         }
     }
 
-    async function removeFromDB(key) {
-        try {
-            const db = await openDB();
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            tx.objectStore(STORE_NAME).delete(key);
-        } catch(e) {}
-    }
-
-    // PDF.js Worker
-    if (window.pdfjsLib) {
+    // Configure PDF.js Worker
+    if (window.pdfjsLib && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
 
     async function init() {
         audioElem = document.getElementById('pdf-audio-player');
-        setupViewerPanning();
+        setupViewerInteractions();
         setupAudioEvents();
         updateBookmarkBadge();
         await restoreCachedFiles();
     }
 
-    // Restore cached PDF and Audio when browser reopens
     async function restoreCachedFiles() {
-        const cachedPdf = await getFromDB('cached_pdf');
-        if (cachedPdf && cachedPdf.buffer) {
-            renderPdfBuffer(cachedPdf.buffer, cachedPdf.name, false);
-        }
+        try {
+            const cachedPdf = await getFromDB('cached_pdf');
+            if (cachedPdf && cachedPdf.buffer) {
+                renderPdfBuffer(cachedPdf.buffer, cachedPdf.name, false);
+            }
 
-        const cachedAudio = await getFromDB('cached_audio');
-        if (cachedAudio && cachedAudio.blob) {
-            applyAudioBlob(cachedAudio.blob, cachedAudio.name, false);
+            const cachedAudio = await getFromDB('cached_audio');
+            if (cachedAudio && cachedAudio.blob) {
+                applyAudioBlob(cachedAudio.blob, cachedAudio.name, false);
+            }
+        } catch(e) {
+            console.warn('Cache restore skipped:', e);
         }
     }
 
@@ -135,11 +135,12 @@ const ByPdf = (function() {
         }
     }
 
-    async function loadAudioFile(input) {
-        const file = input.files[0];
+    function loadAudioFile(input) {
+        const file = input.files && input.files[0];
         if (!file) return;
-        await saveToDB('cached_audio', { blob: file, name: file.name });
+
         applyAudioBlob(file, file.name, true);
+        saveToDB('cached_audio', { blob: file, name: file.name }).catch(() => {});
     }
 
     function applyAudioBlob(blob, fileName, notify = false) {
@@ -157,9 +158,9 @@ const ByPdf = (function() {
         if (notify) {
             Swal.fire({
                 icon: 'success',
-                title: 'Audio Saved Locally',
-                text: `${fileName} will remain available on next visit.`,
-                timer: 1500,
+                title: 'Audio Loaded',
+                text: fileName,
+                timer: 1400,
                 showConfirmButton: false
             });
         }
@@ -205,14 +206,20 @@ const ByPdf = (function() {
 
     // --- PDF CONTROLLER ---
     function loadPdfFile(input) {
-        const file = input.files[0];
+        const file = input.files && input.files[0];
         if (!file) return;
 
+        document.getElementById('pdf-viewport-container').style.display = 'block';
+        document.getElementById('pdf-toolbar').style.display = 'flex';
+
         const fileReader = new FileReader();
-        fileReader.onload = async function() {
+        fileReader.onload = function() {
             const buffer = this.result;
-            await saveToDB('cached_pdf', { buffer: buffer, name: file.name });
             renderPdfBuffer(buffer, file.name, true);
+            saveToDB('cached_pdf', { buffer: buffer, name: file.name }).catch(() => {});
+        };
+        fileReader.onerror = function() {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Could not read the selected PDF file.' });
         };
         fileReader.readAsArrayBuffer(file);
     }
@@ -223,11 +230,22 @@ const ByPdf = (function() {
         }
 
         const typedarray = new Uint8Array(arrayBuffer);
-        pdfjsLib.getDocument(typedarray).promise.then(pdf => {
+
+        // Modern PDF.js requires { data: typedarray } parameter object
+        pdfjsLib.getDocument({ data: typedarray }).promise.then(pdf => {
             pdfDoc = pdf;
             totalPages = pdf.numPages;
             currentPage = 1;
-            document.getElementById('pdf-total-pages').textContent = totalPages;
+
+            const totalPagesElem = document.getElementById('pdf-total-pages');
+            if (totalPagesElem) totalPagesElem.textContent = totalPages;
+
+            const pageInput = document.getElementById('pdf-page-input');
+            if (pageInput) {
+                pageInput.max = totalPages;
+                pageInput.value = 1;
+            }
+
             document.getElementById('pdf-viewport-container').style.display = 'block';
             document.getElementById('pdf-toolbar').style.display = 'flex';
 
@@ -242,21 +260,28 @@ const ByPdf = (function() {
             if (notify) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'PDF Saved Locally',
-                    text: `${fileName} will be remembered automatically.`,
-                    timer: 1500,
+                    title: 'PDF Loaded',
+                    text: fileName,
+                    timer: 1400,
                     showConfirmButton: false
                 });
             }
         }).catch(err => {
-            console.error('PDF Load Error:', err);
+            console.error('PDF parsing error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Unable to Render PDF',
+                text: err.message || 'The file could not be parsed as a valid PDF.'
+            });
         });
     }
 
     function renderPage(pageNum) {
         if (!pdfDoc) return;
         isRendering = true;
-        document.getElementById('pdf-current-page').textContent = pageNum;
+
+        const pageInput = document.getElementById('pdf-page-input');
+        if (pageInput) pageInput.value = pageNum;
 
         pdfDoc.getPage(pageNum).then(page => {
             const canvas = document.getElementById('pdf-canvas');
@@ -275,16 +300,16 @@ const ByPdf = (function() {
                 renderTask.cancel();
             }
 
-            const renderContext = {
+            renderTask = page.render({
                 canvasContext: ctx,
                 transform: transform,
                 viewport: viewport
-            };
+            });
 
-            renderTask = page.render(renderContext);
             renderTask.promise.then(() => {
                 isRendering = false;
-                document.getElementById('pdf-zoom-val').textContent = `${Math.round(currentScale * 100)}%`;
+                const zoomVal = document.getElementById('pdf-zoom-val');
+                if (zoomVal) zoomVal.textContent = `${Math.round(currentScale * 100)}%`;
             }).catch(err => {
                 if (err.name !== 'RenderingCancelledException') {
                     console.error('Render error:', err);
@@ -296,17 +321,22 @@ const ByPdf = (function() {
 
     function changePage(dir) {
         if (!pdfDoc) return;
-        const targetPage = currentPage + dir;
-        if (targetPage >= 1 && targetPage <= totalPages) {
-            currentPage = targetPage;
-            renderPage(currentPage);
-        }
+        goToPage(currentPage + dir);
+    }
+
+    function goToPage(pageNum) {
+        if (!pdfDoc) return;
+        let p = parseInt(pageNum, 10);
+        if (isNaN(p)) p = 1;
+        p = Math.max(1, Math.min(totalPages, p));
+        currentPage = p;
+        renderPage(currentPage);
     }
 
     function zoom(delta) {
         if (!pdfDoc) return;
-        const newScale = Math.max(0.6, Math.min(3.0, currentScale + delta));
-        if (newScale !== currentScale) {
+        const newScale = Math.max(0.5, Math.min(3.5, currentScale + delta));
+        if (Math.abs(newScale - currentScale) > 0.01) {
             currentScale = newScale;
             renderPage(currentPage);
         }
@@ -318,22 +348,34 @@ const ByPdf = (function() {
         pdfDoc.getPage(currentPage).then(page => {
             const defaultViewport = page.getViewport({ scale: 1.0 });
             const padding = window.innerWidth < 600 ? 16 : 30;
-            const availableWidth = (container.clientWidth || window.innerWidth) - padding;
-            currentScale = Math.max(0.6, Math.min(2.5, availableWidth / defaultViewport.width));
+            const availableWidth = Math.max(260, (container.clientWidth || window.innerWidth) - padding);
+            currentScale = Math.max(0.5, Math.min(3.0, availableWidth / defaultViewport.width));
             renderPage(currentPage);
         });
     }
 
-    // --- PANNING / DRAG SYSTEM ---
-    function setupViewerPanning() {
+    function resetView() {
+        if (!pdfDoc) return;
+        currentPage = 1;
+        const viewer = document.getElementById('pdf-viewport-container');
+        if (viewer) {
+            viewer.scrollLeft = 0;
+            viewer.scrollTop = 0;
+        }
+        fitWidth();
+    }
+
+    // --- MOUSE PAN, TOUCH PAN, TOUCH PINCH-TO-ZOOM, CTRL+WHEEL ZOOM ---
+    function setupViewerInteractions() {
         const viewer = document.getElementById('pdf-viewport-container');
         if (!viewer) return;
 
         let isDown = false;
         let startX, startY, scrollLeft, scrollTop;
 
+        // Desktop Mouse Drag to Pan
         viewer.addEventListener('mousedown', (e) => {
-            if (e.target.tagName === 'BUTTON') return;
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
             isDown = true;
             viewer.classList.add('grabbing');
             startX = e.pageX - viewer.offsetLeft;
@@ -353,10 +395,32 @@ const ByPdf = (function() {
             viewer.scrollTop = scrollTop - (y - startY);
         });
 
-        // Touch Pan
-        let touchStartX, touchStartY, touchScrollLeft, touchScrollTop;
+        // Ctrl + Mouse Wheel (or Trackpad Pinch) Zoom
+        viewer.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 0.15 : -0.15;
+                zoom(delta);
+            }
+        }, { passive: false });
+
+        // Touch Interaction: Single Finger Pan & Two-Finger Pinch-to-Zoom
+        let touchStartX = 0, touchStartY = 0, touchScrollLeft = 0, touchScrollTop = 0;
+        let isPinching = false;
+        let initialPinchDist = 0;
+        let pinchStartScale = 1.0;
+        let currentPinchScale = 1.0;
+
         viewer.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
+            if (e.touches.length === 2) {
+                isPinching = true;
+                initialPinchDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                pinchStartScale = currentScale;
+                currentPinchScale = currentScale;
+            } else if (e.touches.length === 1 && !isPinching) {
                 touchStartX = e.touches[0].pageX - viewer.offsetLeft;
                 touchStartY = e.touches[0].pageY - viewer.offsetTop;
                 touchScrollLeft = viewer.scrollLeft;
@@ -365,16 +429,43 @@ const ByPdf = (function() {
         }, { passive: true });
 
         viewer.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 1) {
+            if (isPinching && e.touches.length === 2) {
+                if (e.cancelable) e.preventDefault();
+                const dist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                if (initialPinchDist > 0) {
+                    const factor = dist / initialPinchDist;
+                    currentPinchScale = Math.max(0.5, Math.min(3.5, pinchStartScale * factor));
+                    const canvas = document.getElementById('pdf-canvas');
+                    if (canvas) {
+                        canvas.style.transform = `scale(${factor})`;
+                        canvas.style.transformOrigin = 'center top';
+                    }
+                }
+            } else if (e.touches.length === 1 && !isPinching) {
                 const x = e.touches[0].pageX - viewer.offsetLeft;
                 const y = e.touches[0].pageY - viewer.offsetTop;
                 viewer.scrollLeft = touchScrollLeft - (x - touchStartX);
                 viewer.scrollTop = touchScrollTop - (y - touchStartY);
             }
+        }, { passive: false });
+
+        viewer.addEventListener('touchend', (e) => {
+            if (isPinching) {
+                isPinching = false;
+                const canvas = document.getElementById('pdf-canvas');
+                if (canvas) canvas.style.transform = '';
+                if (Math.abs(currentPinchScale - currentScale) > 0.05) {
+                    currentScale = currentPinchScale;
+                    renderPage(currentPage);
+                }
+            }
         }, { passive: true });
     }
 
-    // --- BOOKMARKS ---
+    // --- BOOKMARK SYSTEM ---
     function getBookmarks() {
         try {
             return JSON.parse(localStorage.getItem(BOOKMARK_STORAGE_KEY)) || [];
@@ -450,8 +541,7 @@ const ByPdf = (function() {
 
     function jumpToBookmark(page) {
         if (!pdfDoc) return;
-        currentPage = page;
-        renderPage(currentPage);
+        goToPage(page);
         Swal.close();
     }
 
@@ -468,8 +558,10 @@ const ByPdf = (function() {
         loadPdfFile,
         loadAudioFile,
         changePage,
+        goToPage,
         zoom,
         fitWidth,
+        resetView,
         togglePlay,
         seekRelative,
         setSpeed,
