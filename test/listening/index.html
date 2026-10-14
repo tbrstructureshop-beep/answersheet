@@ -444,4 +444,754 @@
     <div class="container" id="workspace-container">
         <div class="section-nav-bar">
             <button id="btn-prev-sec" onclick="navigateSection(-1)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-wid
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Prev
+            </button>
+            <span class="sec-indicator" id="sec-indicator">Part 1 of 1</span>
+            <button id="btn-next-sec" onclick="navigateSection(1)">
+                Next
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+        <div id="workspace"></div>
+        <div class="global-actions">
+            <button onclick="addSection()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Add New Part
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="custom-keyboard"></div>
+
+<script src="byPdf.js"></script>
+
+<script>
+    const ICON_PRACTICE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+    const ICON_CORRECTION = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    const ICON_KEYBOARD = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="6" y1="8" x2="6.01" y2="8"></line><line x1="10" y1="8" x2="10.01" y2="8"></line><line x1="14" y1="8" x2="14.01" y2="8"></line><line x1="18" y1="8" x2="18.01" y2="8"></line></svg>`;
+    const ICON_SOUND_ON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`;
+    const ICON_SOUND_OFF = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line></svg>`;
+    const ICON_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+    const ICON_UP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>`;
+    const ICON_RIGHT = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+    const ICON_TRASH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+    const ICON_PLUS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+    const ICON_SWITCH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline></svg>`;
+    const ICON_CROSS = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+    let sectionCount = 0;
+    let currentSectionIndex = 0;
+    let isCorrectionMode = false;
+    let isMenuCollapsed = false;
+    let useCustomKB = true;
+    let soundEnabled = false;
+    let activeInputTarget = null;
+    let audioCtx = null;
+    let activeStudyMode = 'media';
+    const LOCAL_STORAGE_KEY = 'ielts_listening_pro_v5';
+    const SAVED_YT_URL_KEY = 'ielts_saved_yt_url';
+
+    const MEDIA_DB_NAME = 'IeltsListeningStorage';
+    const MEDIA_STORE_NAME = 'media_files';
+
+    // --- SMOOTH TOGGLE MENU / FOCUS MODE ---
+    function toggleMenuSpace() {
+        isMenuCollapsed = !isMenuCollapsed;
+        const menu = document.getElementById('collapsible-top-menu');
+        const btn = document.getElementById('btn-menu-toggle');
+        const icon = document.getElementById('menu-toggle-icon');
+        const label = document.getElementById('menu-toggle-label');
+
+        if (isMenuCollapsed) {
+            menu.classList.add('menu-hidden');
+            document.body.classList.add('menu-collapsed');
+            btn.classList.add('is-collapsed');
+            label.textContent = 'Show Menu';
+            icon.innerHTML = `<polyline points="6 9 12 15 18 9"></polyline>`;
+        } else {
+            menu.classList.remove('menu-hidden');
+            document.body.classList.remove('menu-collapsed');
+            btn.classList.remove('is-collapsed');
+            label.textContent = 'Hide Menu';
+            icon.innerHTML = `<polyline points="18 15 12 9 6 15"></polyline>`;
+        }
+
+        // Re-fit PDF canvas smoothly after space expands
+        if (activeStudyMode === 'pdf' && window.ByPdf) {
+            setTimeout(() => ByPdf.fitWidth(), 360);
+        }
+    }
+
+    // --- RESET PRACTICE SHEET ---
+    function resetPracticeSheet() {
+        Swal.fire({
+            title: 'Reset Practice Sheet?',
+            text: 'Choose whether to clear your entered answers for a retest, or reset the entire workspace.',
+            icon: 'warning',
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: 'Clear Answers Only',
+            denyButtonText: 'Reset Entire Test',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#2563eb',
+            denyButtonColor: '#ef4444'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Clear answers while keeping section structure
+                document.querySelectorAll('.answer-row').forEach(row => {
+                    const ansInput = row.querySelector('.answer-input');
+                    if (ansInput) ansInput.value = '';
+                    
+                    const mcqDesc = row.querySelector('.mcq-desc');
+                    if (mcqDesc) mcqDesc.value = '';
+                    
+                    const reason = row.querySelector('.reason-input');
+                    if (reason) reason.value = '';
+
+                    const optBtn = row.querySelector('.mcq-select');
+                    if (optBtn) {
+                        optBtn.value = '';
+                        optBtn.setAttribute('value', '');
+                        optBtn.classList.remove('has-value');
+                        optBtn.innerHTML = `Opt <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+                    }
+
+                    row.dataset.correct = 'null';
+                });
+                calculateScore();
+                saveData();
+                Swal.fire({ icon: 'success', title: 'Answers Cleared', text: 'You can now retake the test!', timer: 1400, showConfirmButton: false });
+            } else if (result.isDenied) {
+                // Reset entire workspace to 1 clean part
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                document.getElementById('workspace').innerHTML = '';
+                sectionCount = 0;
+                currentSectionIndex = 0;
+                addSection();
+                calculateScore();
+                saveData();
+                Swal.fire({ icon: 'success', title: 'Test Reset', text: 'Workspace has been reset to default.', timer: 1400, showConfirmButton: false });
+            }
+        });
+    }
+
+    function setMobileViewMode(mode) {
+        document.body.dataset.mobileView = mode;
+        document.querySelectorAll('.mobile-view-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === mode);
+        });
+        if (mode !== 'answers' && window.ByPdf) {
+            setTimeout(() => ByPdf.fitWidth(), 80);
+        }
+    }
+
+    function switchMediaMode(mode) {
+        activeStudyMode = mode;
+        const btnMedia = document.getElementById('tab-media');
+        const btnPdf = document.getElementById('tab-pdf');
+        const panelMedia = document.getElementById('media-mode-panel');
+        const panelPdf = document.getElementById('pdf-study-panel');
+
+        if (mode === 'pdf') {
+            btnPdf.classList.add('active');
+            btnMedia.classList.remove('active');
+            panelMedia.style.display = 'none';
+            panelPdf.style.display = 'flex';
+            if (window.ByPdf) setTimeout(() => ByPdf.fitWidth(), 100);
+        } else {
+            btnMedia.classList.add('active');
+            btnPdf.classList.remove('active');
+            panelMedia.style.display = 'block';
+            panelPdf.style.display = 'none';
+        }
+    }
+
+    // --- MEDIA PLAYER CONTROL WITH STORAGE ---
+    let ytPlayer = null;
+    let localPlayer = null;
+
+    function loadYouTube(explicitUrl = null) {
+        const url = explicitUrl || document.getElementById('yt-link').value.trim();
+        const videoId = extractYouTubeID(url);
+        if (!videoId) {
+            if (!explicitUrl) Swal.fire({icon: 'error', title: 'Invalid Link', text: 'Please enter a valid YouTube URL.'});
+            return;
+        }
+
+        localStorage.setItem(SAVED_YT_URL_KEY, url);
+        document.getElementById('yt-link').value = url;
+
+        const wrapper = document.getElementById('video-wrapper');
+        wrapper.style.display = 'block'; wrapper.className = 'video-wrapper is-video';
+        
+        if (ytPlayer && ytPlayer.destroy) ytPlayer.destroy();
+        wrapper.innerHTML = '<div id="yt-iframe-container"></div>';
+        
+        ytPlayer = new YT.Player('yt-iframe-container', {
+            videoId: videoId,
+            playerVars: { 'playsinline': 1, 'rel': 0 },
+            events: { 'onReady': () => { localPlayer = null; } }
+        });
+        document.getElementById('media-setup-box').style.display = 'none';
+        showMediaRestoreBar('YouTube Video Loaded');
+    }
+
+    function extractYouTubeID(url) {
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+        return url.match(regex)?.[1] || null;
+    }
+
+    function loadLocalFile(input) {
+        const file = input.files && input.files[0];
+        if (!file) return;
+
+        try {
+            const dbReq = indexedDB.open(MEDIA_DB_NAME, 1);
+            dbReq.onsuccess = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(MEDIA_STORE_NAME)) return;
+                const tx = db.transaction(MEDIA_STORE_NAME, 'readwrite');
+                tx.objectStore(MEDIA_STORE_NAME).put({ blob: file, name: file.name, type: file.type }, 'cached_media_file');
+            };
+        } catch(e) {}
+
+        applyLocalMediaBlob(file, file.name);
+    }
+
+    function applyLocalMediaBlob(blob, name) {
+        const wrapper = document.getElementById('video-wrapper');
+        wrapper.style.display = 'block';
+        if (ytPlayer && ytPlayer.destroy) { ytPlayer.destroy(); ytPlayer = null; }
+
+        if (blob.type.startsWith('audio/')) {
+            wrapper.className = 'video-wrapper is-audio';
+            wrapper.innerHTML = `<audio id="local-media" controls src="${URL.createObjectURL(blob)}"></audio>`;
+        } else {
+            wrapper.className = 'video-wrapper is-video';
+            wrapper.innerHTML = `<video id="local-media" controls src="${URL.createObjectURL(blob)}"></video>`;
+        }
+        localPlayer = document.getElementById('local-media');
+        document.getElementById('media-setup-box').style.display = 'none';
+        showMediaRestoreBar(`File: ${name}`);
+    }
+
+    function showMediaRestoreBar(title) {
+        const bar = document.getElementById('media-restore-bar');
+        const text = document.getElementById('media-active-title');
+        if (bar && text) {
+            text.textContent = title;
+            bar.style.display = 'flex';
+        }
+    }
+
+    function showMediaChangeBox() {
+        document.getElementById('media-setup-box').style.display = 'flex';
+        document.getElementById('media-restore-bar').style.display = 'none';
+    }
+
+    function restoreMediaMode() {
+        const savedUrl = localStorage.getItem(SAVED_YT_URL_KEY);
+        if (savedUrl) {
+            document.getElementById('yt-link').value = savedUrl;
+            if (window.YT && window.YT.Player) {
+                loadYouTube(savedUrl);
+            } else {
+                window.onYouTubeIframeAPIReady = () => loadYouTube(savedUrl);
+            }
+        }
+
+        try {
+            const req = indexedDB.open(MEDIA_DB_NAME, 1);
+            req.onsuccess = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(MEDIA_STORE_NAME)) return;
+                const tx = db.transaction(MEDIA_STORE_NAME, 'readonly');
+                const getReq = tx.objectStore(MEDIA_STORE_NAME).get('cached_media_file');
+                getReq.onsuccess = () => {
+                    if (getReq.result && getReq.result.blob && !savedUrl) {
+                        applyLocalMediaBlob(getReq.result.blob, getReq.result.name);
+                    }
+                };
+            };
+        } catch(e) {}
+    }
+
+    // --- TIME MARKS ---
+    function getCurrentMediaTime() {
+        if (activeStudyMode === 'pdf' && window.ByPdf) {
+            const pdfTime = ByPdf.getAudioTime();
+            if (pdfTime !== null) return pdfTime;
+        }
+        if (localPlayer) return localPlayer.currentTime;
+        if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') return ytPlayer.getCurrentTime();
+        return null;
+    }
+
+    function seekMediaTime(seconds) {
+        if (activeStudyMode === 'pdf' && window.ByPdf) {
+            if (ByPdf.seekAudio(seconds)) return;
+        }
+        if (localPlayer) { localPlayer.currentTime = seconds; localPlayer.play(); }
+        else if (ytPlayer && typeof ytPlayer.seekTo === 'function') { ytPlayer.seekTo(seconds, true); ytPlayer.playVideo(); }
+    }
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+        return `${m}:${s}`;
+    }
+
+    // --- WORKSPACE & SECTIONS ---
+    function addSection(title = null, skipSave = false) {
+        sectionCount++;
+        const workspace = document.getElementById('workspace');
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'section-card';
+        
+        sectionDiv.innerHTML = `
+            <div class="section-header">
+                <input type="text" class="section-title target-input" value="${title !== null ? title : `Part ${sectionCount}`}" oninput="saveData()">
+                <div>
+                    <button class="btn-outline btn-sm" onclick="toggleCollapse(this)">${ICON_DOWN} Hide</button>
+                    <button class="btn-danger btn-sm" onclick="removeSection(this)">${ICON_TRASH}</button>
+                </div>
+            </div>
+            <div class="time-marks-area">
+                <button class="btn-outline btn-sm" onclick="addTimeMark(this)">${ICON_CLOCK} Time Mark</button>
+                <div class="time-container"></div>
+            </div>
+            <div class="answers-container"></div>
+            <button class="btn-outline" onclick="addAnswer(this)">${ICON_PLUS} Add Answer</button>
+        `;
+        workspace.appendChild(sectionDiv);
+        applyInputProtection(); 
+        
+        if(!skipSave) {
+            addAnswer(sectionDiv.querySelector('.answers-container').nextElementSibling);
+            currentSectionIndex = document.querySelectorAll('.section-card').length - 1;
+            updateSectionNav();
+        }
+        return sectionDiv;
+    }
+
+    function addTimeMark(btn, forcedTime = null) {
+        const time = forcedTime !== null ? forcedTime : getCurrentMediaTime();
+        if (time === null) return Swal.fire({icon: 'warning', title: 'Media Paused', text: 'Play audio or video first to record timestamps.'});
+        
+        const container = btn.nextElementSibling;
+        const badge = document.createElement('span');
+        badge.className = 'time-badge';
+        badge.dataset.time = time;
+        badge.innerHTML = `[ ${formatTime(time)} ] <button onclick="removeTimeMark(this, event)">${ICON_CROSS}</button>`;
+        badge.onclick = (e) => { if(!e.target.closest('button')) seekMediaTime(parseFloat(time)); };
+        container.appendChild(badge);
+        if (forcedTime === null) saveData();
+    }
+
+    function removeTimeMark(btn, event) {
+        event.stopPropagation();
+        btn.closest('.time-badge').remove();
+        saveData();
+    }
+
+    function toggleCollapse(btn) {
+        const container = btn.closest('.section-card').querySelector('.answers-container');
+        if (container.style.display === 'none') { container.style.display = 'flex'; btn.innerHTML = `${ICON_DOWN} Hide`; } 
+        else { container.style.display = 'none'; btn.innerHTML = `${ICON_RIGHT} Expand`; }
+    }
+
+    function removeSection(btn) {
+        Swal.fire({
+            title: 'Delete Section?', text: "This will remove all items inside this part.", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Yes, delete'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                btn.closest('.section-card').remove();
+                if(currentSectionIndex > 0) currentSectionIndex--;
+                updateGlobalNumbering(); updateSectionNav(); saveData();
+            }
+        });
+    }
+
+    // --- SWEETALERT MODAL OPTIONS ---
+    function openOptionModal(btn, type) {
+        const isKey = type === 'key';
+        const currentValue = btn.value || '';
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        
+        const buttonsGrid = letters.map(l => {
+            const isSelected = currentValue === l;
+            const activeBg = isKey ? '#10b981' : '#2563eb';
+            return `
+                <button type="button" class="swal-opt-choice ${isSelected ? 'selected' : ''}" data-val="${l}" style="
+                    padding: 12px 0; font-size: 1.15rem; font-weight: 700; border-radius: 8px;
+                    border: 2px solid ${isSelected ? activeBg : '#e2e8f0'}; background: ${isSelected ? activeBg : '#ffffff'};
+                    color: ${isSelected ? '#ffffff' : '#1e293b'}; cursor: pointer; transition: all 0.15s ease;
+                ">
+                    ${l}
+                </button>
+            `;
+        }).join('');
+
+        Swal.fire({
+            title: isKey ? 'Select Answer Key' : 'Select Option Answer',
+            html: `
+                <div style="margin: 10px 0 5px 0;">
+                    <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 12px;">Choose option letter:</p>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 12px;">
+                        ${buttonsGrid}
+                    </div>
+                    <button type="button" id="swal-opt-clear" style="
+                        width: 100%; padding: 8px; font-size: 0.9rem; font-weight: 600; border-radius: 6px;
+                        border: 1px dashed #cbd5e1; background: #f8fafc; color: #64748b; cursor: pointer;
+                    ">
+                        Clear Selection
+                    </button>
+                </div>
+            `,
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: 360,
+            didOpen: () => {
+                const popup = Swal.getPopup();
+                popup.querySelectorAll('.swal-opt-choice').forEach(choiceBtn => {
+                    choiceBtn.onclick = () => {
+                        playClickSound();
+                        setOptionValue(btn, choiceBtn.dataset.val, isKey);
+                        Swal.close();
+                    };
+                });
+
+                const clearBtn = popup.querySelector('#swal-opt-clear');
+                if (clearBtn) {
+                    clearBtn.onclick = () => {
+                        playClickSound();
+                        setOptionValue(btn, '', isKey);
+                        Swal.close();
+                    };
+                }
+            }
+        });
+    }
+
+    function setOptionValue(btn, val, isKey) {
+        btn.value = val;
+        btn.setAttribute('value', val);
+        const arrow = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+        
+        if (val) {
+            btn.innerHTML = `${isKey ? 'Key: ' + val : val} ${arrow}`;
+            btn.classList.add('has-value');
+        } else {
+            btn.innerHTML = `${isKey ? 'Key' : 'Opt'} ${arrow}`;
+            btn.classList.remove('has-value');
+        }
+        saveData();
+    }
+
+    // --- ANSWERS ---
+    function addAnswer(btn, data = {type: "essay", text: "", mcqOpt: "", mcqDesc: "", correct: "null", correctOpt: "", correctDesc: "", reason: ""}) {
+        const container = btn.closest('.section-card').querySelector('.answers-container');
+        const row = document.createElement('div');
+        row.className = 'answer-row'; 
+        row.dataset.correct = data.correct;
+        row.dataset.type = data.type;
+
+        const arrowSvg = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+        const mcqOpt = data.mcqOpt || "";
+        const correctOpt = data.correctOpt || "";
+
+        row.innerHTML = `
+            <div class="answer-main">
+                <span class="answer-num"></span>
+                <input type="text" class="answer-input essay-ui target-input" value="${data.text}" placeholder="Write answer..." oninput="saveData()">
+                <div class="mcq-ui">
+                    <button type="button" class="mcq-select ${mcqOpt ? 'has-value' : ''}" value="${mcqOpt}" onclick="openOptionModal(this, 'opt')">
+                        ${mcqOpt ? mcqOpt : 'Opt'} ${arrowSvg}
+                    </button>
+                    <input type="text" class="mcq-desc target-input" value="${data.mcqDesc}" placeholder="Option description..." oninput="saveData()">
+                </div>
+                <button class="btn-outline btn-sm" onclick="toggleAnswerType(this)" title="Switch Type">${ICON_SWITCH}</button>
+                <button class="btn-danger btn-sm" onclick="removeAnswer(this)">${ICON_CROSS}</button>
+            </div>
+            <div class="correction-ui" style="display: ${isCorrectionMode ? 'flex' : 'none'};">
+                <div class="correction-tools">
+                    <button class="btn-icon check" onclick="markCorrect(this, 'true')">${ICON_CORRECTION}</button>
+                    <button class="btn-icon cross" onclick="markCorrect(this, 'false')">${ICON_CROSS}</button>
+                </div>
+                <div class="mcq-ui" style="margin-top: 4px;">
+                    <button type="button" class="mcq-correct-select ${correctOpt ? 'has-value' : ''}" value="${correctOpt}" onclick="openOptionModal(this, 'key')">
+                        ${correctOpt ? 'Key: ' + correctOpt : 'Key'} ${arrowSvg}
+                    </button>
+                    <input type="text" class="mcq-correct-desc target-input" value="${data.correctDesc}" placeholder="Correct key description..." oninput="saveData()">
+                </div>
+                <input type="text" class="reason-input target-input" value="${data.reason}" placeholder="Reason / Explanation (Optional)..." oninput="saveData()">
+            </div>
+        `;
+        container.appendChild(row);
+        applyInputProtection(); updateGlobalNumbering(); calculateScore(); saveData();
+    }
+
+    function toggleAnswerType(btn) {
+        const row = btn.closest('.answer-row');
+        row.dataset.type = row.dataset.type === 'essay' ? 'mcq' : 'essay';
+        saveData();
+    }
+
+    function removeAnswer(btn) { btn.closest('.answer-row').remove(); updateGlobalNumbering(); calculateScore(); saveData(); }
+    function updateGlobalNumbering() { document.querySelectorAll('.answer-row').forEach((row, i) => { row.querySelector('.answer-num').textContent = (i + 1) + "."; }); }
+
+    function updateSectionNav() {
+        const sections = document.querySelectorAll('.section-card');
+        if (!sections.length) return;
+        sections.forEach((sec, i) => { sec.classList.remove('active'); if (i === currentSectionIndex) sec.classList.add('active'); });
+        document.getElementById('btn-prev-sec').disabled = (currentSectionIndex === 0);
+        document.getElementById('btn-next-sec').disabled = (currentSectionIndex === sections.length - 1);
+        document.getElementById('sec-indicator').textContent = `Part ${currentSectionIndex + 1} of ${sections.length}`;
+    }
+    
+    function navigateSection(dir) {
+        const len = document.querySelectorAll('.section-card').length;
+        currentSectionIndex = Math.max(0, Math.min(len - 1, currentSectionIndex + dir));
+        updateSectionNav();
+    }
+
+    function toggleCorrectionMode() {
+        isCorrectionMode = !isCorrectionMode;
+        const btn = document.getElementById('btn-correction');
+        if (isCorrectionMode) { btn.innerHTML = `${ICON_PRACTICE} Practice`; btn.className = "btn-outline"; document.getElementById('score-banner').style.display = "block"; } 
+        else { btn.innerHTML = `${ICON_CORRECTION} Correction`; btn.className = "btn-warning"; document.getElementById('score-banner').style.display = "none"; }
+        document.querySelectorAll('.correction-ui').forEach(ui => ui.style.display = isCorrectionMode ? 'flex' : 'none');
+        calculateScore();
+    }
+    
+    function markCorrect(btn, status) { btn.closest('.answer-row').dataset.correct = status; calculateScore(); saveData(); }
+    
+    function calculateScore() {
+        const rows = document.querySelectorAll('.answer-row');
+        let correctCount = 0; rows.forEach(row => { if (row.dataset.correct === 'true') correctCount++; });
+        document.getElementById('score-banner').textContent = `Score: ${correctCount} / ${rows.length}`;
+    }
+
+    function toggleSoundMode() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('btn-sound-mode');
+        btn.innerHTML = soundEnabled ? `${ICON_SOUND_ON} Sound: ON` : `${ICON_SOUND_OFF} Sound: OFF`;
+    }
+
+    function playClickSound() {
+        if (!soundEnabled) return;
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.05);
+        } catch(e) {}
+    }
+
+    // --- CUSTOM KEYBOARD ---
+    let kbShift = false, kbSymbol = false, kbMoreSymbol = false;
+    const kbLayouts = {
+        lowercase: [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['⇧','z','x','c','v','b','n','m','⌫'],['123','Case','Space','Done']],
+        uppercase: [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['⬆','Z','X','C','V','B','N','M','⌫'],['123','Case','Space','Done']],
+        symbols: [['1','2','3','4','5','6','7','8','9','0'],['-','/',':',';','(',')','$','&','@','"'],['#+=','.','\,','?','!','\'','⌫'],['abc','Case','Space','Done']],
+        more_symbols: [['[',']','{','}','#','%','^','*','+','='],['_','\\','|','~','<','>','€','£','¥','¢'],['123','.','\,','?','!','\'','⌫'],['abc','Case','Space','Done']]
+    };
+
+    function renderKeyboard() {
+        const kb = document.getElementById('custom-keyboard');
+        let layoutName = kbMoreSymbol ? 'more_symbols' : (kbSymbol ? 'symbols' : (kbShift ? 'uppercase' : 'lowercase'));
+        kb.innerHTML = '';
+        
+        kbLayouts[layoutName].forEach(row => {
+            const rowDiv = document.createElement('div'); rowDiv.className = 'kb-row';
+            row.forEach(key => {
+                const btn = document.createElement('div'); btn.className = 'kb-key';
+                let label = key; if(key === 'Space') label = 'Space'; if(key === 'Case') label = 'Aa';
+                btn.textContent = label;
+                
+                if(['⇧','⬆','⌫','123','abc','#+='].includes(key)) btn.classList.add('wide');
+                if(key === 'Space') btn.classList.add('space');
+                if(key === 'Done') btn.classList.add('done');
+                if(key === 'Case') btn.classList.add('proper');
+
+                const triggerKey = (e) => { e.preventDefault(); e.stopPropagation(); handleKey(key); };
+                btn.onmousedown = triggerKey; btn.ontouchstart = triggerKey;
+                rowDiv.appendChild(btn);
+            });
+            kb.appendChild(rowDiv);
+        });
+    }
+
+    function handleKey(key) {
+        if(!activeInputTarget) return;
+        playClickSound();
+
+        let val = activeInputTarget.value;
+        let start = activeInputTarget.selectionStart;
+        let end = activeInputTarget.selectionEnd;
+        let hasSelection = start !== end;
+
+        if(!['⇧','⬆','123','abc','#+=','Done','Space','⌫','Case'].includes(key)) {
+            activeInputTarget.value = val.substring(0, start) + key + val.substring(end);
+            activeInputTarget.setSelectionRange(start + key.length, start + key.length);
+            if(kbShift) { kbShift = false; renderKeyboard(); }
+            saveData(); return;
+        }
+
+        if(key === '⇧' || key === '⬆') { kbShift = !kbShift; renderKeyboard(); return; }
+        if(key === '123') { kbSymbol = true; kbMoreSymbol = false; renderKeyboard(); return; }
+        if(key === '#+=') { kbSymbol = false; kbMoreSymbol = true; renderKeyboard(); return; }
+        if(key === 'abc') { kbSymbol = false; kbMoreSymbol = false; renderKeyboard(); return; }
+        if(key === 'Done') { hideKeyboard(); return; }
+        
+        if(key === 'Space') { 
+            activeInputTarget.value = val.substring(0, start) + ' ' + val.substring(end);
+            activeInputTarget.setSelectionRange(start + 1, start + 1);
+            saveData(); return; 
+        }
+        
+        if(key === '⌫') { 
+            if (hasSelection) {
+                activeInputTarget.value = val.substring(0, start) + val.substring(end);
+                activeInputTarget.setSelectionRange(start, start);
+            } else if (start > 0) {
+                activeInputTarget.value = val.substring(0, start - 1) + val.substring(end);
+                activeInputTarget.setSelectionRange(start - 1, start - 1);
+            }
+            saveData(); return; 
+        }
+        
+        if(key === 'Case') { 
+            let targetText = hasSelection ? val.substring(start, end) : val;
+            let currentCaseState = activeInputTarget.dataset.caseState || "0"; 
+            let newText = "";
+            
+            if (currentCaseState === "0" || currentCaseState === "3") {
+                newText = targetText.split(' ').map(w => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : '').join(' ');
+                activeInputTarget.dataset.caseState = "1";
+            } else if (currentCaseState === "1") {
+                newText = targetText.toLowerCase();
+                activeInputTarget.dataset.caseState = "2";
+            } else if (currentCaseState === "2") {
+                newText = targetText.toUpperCase();
+                activeInputTarget.dataset.caseState = "3";
+            }
+            
+            if (hasSelection) {
+                activeInputTarget.value = val.substring(0, start) + newText + val.substring(end);
+                activeInputTarget.setSelectionRange(start, start + newText.length);
+            } else {
+                activeInputTarget.value = newText;
+                activeInputTarget.setSelectionRange(newText.length, newText.length);
+            }
+            saveData(); return; 
+        }
+    }
+
+    function showKeyboard(inputElem) {
+        if(!useCustomKB) return;
+        activeInputTarget = inputElem;
+        document.querySelectorAll('.target-input').forEach(el => el.classList.remove('input-active'));
+        inputElem.classList.add('input-active');
+        document.getElementById('custom-keyboard').classList.add('show');
+        
+        setTimeout(() => {
+            inputElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
+
+    function hideKeyboard() {
+        document.getElementById('custom-keyboard').classList.remove('show');
+        if(activeInputTarget) activeInputTarget.classList.remove('input-active');
+        activeInputTarget = null;
+    }
+
+    function toggleKeyboardMode() {
+        useCustomKB = !useCustomKB;
+        document.getElementById('btn-kb-mode').innerHTML = useCustomKB ? `${ICON_KEYBOARD} KB: ON` : `${ICON_KEYBOARD} KB: OFF`;
+        hideKeyboard(); applyInputProtection();
+    }
+
+    function applyInputProtection() {
+        document.querySelectorAll('.target-input').forEach(input => { input.readOnly = useCustomKB; });
+    }
+
+    document.addEventListener('click', (e) => {
+        if(e.target.classList.contains('target-input')) { showKeyboard(e.target); } 
+        else if(!e.target.closest('#custom-keyboard')) { hideKeyboard(); }
+    });
+
+    // --- DATA MANAGEMENT ---
+    function saveData(showAlert = false) {
+        const data = [];
+        document.querySelectorAll('.section-card').forEach(sec => {
+            const timeMarks = [];
+            sec.querySelectorAll('.time-badge').forEach(b => timeMarks.push(b.dataset.time));
+
+            const answers = [];
+            sec.querySelectorAll('.answer-row').forEach(row => {
+                answers.push({
+                    type: row.dataset.type,
+                    text: row.querySelector('.answer-input').value,
+                    mcqOpt: row.querySelector('.mcq-select').value,
+                    mcqDesc: row.querySelector('.mcq-desc').value,
+                    correct: row.dataset.correct,
+                    correctOpt: row.querySelector('.mcq-correct-select').value,
+                    correctDesc: row.querySelector('.mcq-correct-desc').value,
+                    reason: row.querySelector('.reason-input').value
+                });
+            });
+            data.push({ title: sec.querySelector('.section-title').value, timeMarks, answers });
+        });
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+        
+        if (showAlert) {
+            Swal.fire({ position: 'top-end', icon: 'success', title: 'Progress Saved', showConfirmButton: false, timer: 1400 });
+        }
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (saved) {
+            const data = JSON.parse(saved);
+            if(data.length > 0) {
+                document.getElementById('workspace').innerHTML = ''; sectionCount = 0;
+                data.forEach(secData => {
+                    const secDiv = addSection(secData.title, true);
+                    if(secData.timeMarks) {
+                        const btnMark = secDiv.querySelector('.time-marks-area button');
+                        secData.timeMarks.forEach(t => addTimeMark(btnMark, t));
+                    }
+                    const btnAddAns = secDiv.querySelector('.answers-container').nextElementSibling;
+                    secData.answers.forEach(ans => addAnswer(btnAddAns, ans));
+                });
+                currentSectionIndex = 0; updateSectionNav(); calculateScore(); renderKeyboard();
+                restoreMediaMode();
+                if (window.ByPdf) ByPdf.init();
+                return;
+            }
+        }
+        addSection(); renderKeyboard();
+        restoreMediaMode();
+        if (window.ByPdf) ByPdf.init();
+    }
+
+    window.onload = loadData;
+</script>
+</body>
+</html>
